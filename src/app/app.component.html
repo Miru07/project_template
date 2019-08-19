@@ -1,0 +1,14 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<div style="text-align:center">
+  <h1>
+    Welcome to {{ title }}!
+  </h1>
+  <h2>
+    {{subtitle}}
+  </h2>
+<!--  <app-user-list [colorlist]="colors"></app-user-list>-->
+  <app-user-list [userlist]="users" #userListComponent></app-user-list>
+  <app-user-list [testUser]="testUser"></app-user-list>
+  <button (click)="alertComponent()">Click me!</button>
+</div>
+<router-outlet></router-outlet>

@@ -1,0 +1,8 @@
+<!--<p *ngIf="isBatman">{{user.firstname}}, {{user.lastname}}-->
+<p>{{user.firstname}}, {{user.lastname}}
+  <button appAuthorization
+          [roles] = 'user.role'
+          [user] = 'user'
+          (click)="alertUser(user)">
+    Close bug</button>
+</p>
