@@ -108,7 +108,7 @@ public class TestServlet extends HttpServlet {
     public void insertUser(Integer counter, String email, String fName, String lName, String phoneNr, String password,
                            String username, Integer status){
 
-        userDTO = new UserDTO(0, counter, fName, lName, phoneNr, email, username, password, status);
+        userDTO = new UserDTO(counter, fName, lName, phoneNr, email, username, password, status);
         userManager.insertUser(userDTO);
     }
 
