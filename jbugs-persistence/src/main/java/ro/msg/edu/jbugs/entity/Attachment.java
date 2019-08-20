@@ -12,8 +12,9 @@ public class Attachment implements Serializable {
     @Column(name="ID")
     private Integer ID;
 
+    @Lob
     @Column(name="attContent")
-    private String attContent;
+    private byte[] attContent;
 
     @ManyToOne(cascade= CascadeType.MERGE)
     @JoinColumn(name="id_bug",referencedColumnName = "ID")
@@ -27,13 +28,6 @@ public class Attachment implements Serializable {
         this.ID = ID;
     }
 
-    public String getAttContent() {
-        return attContent;
-    }
-
-    public void setAttContent(String attContent) {
-        this.attContent = attContent;
-    }
 
     public Bug getBugID() {
         return bugID;
