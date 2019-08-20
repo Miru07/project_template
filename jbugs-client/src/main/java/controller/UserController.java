@@ -1,3 +1,5 @@
+package controller;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.UserDTO;
@@ -26,9 +28,6 @@ public class UserController extends HttpServlet {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getUsers() throws JsonProcessingException {
-        UserDTO testUser1 = new UserDTO(0, "test", "test", "077", "email",
-                "username", "passw", 0);
-        userManagerRemote.insertUser(testUser1);
 
 
         List<UserDTO> listOfAllUsers = userManagerRemote.findAllUsers();
