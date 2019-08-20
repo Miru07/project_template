@@ -19,6 +19,11 @@
 
     <dependencyManagement>
         <dependencies>
+            <!--JSON support:-->
+            <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            </dependency>
             <dependency>
                 <groupId>javax</groupId>
                 <artifactId>javaee-api</artifactId>

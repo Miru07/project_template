@@ -117,7 +117,12 @@ public class UserManager implements UserManagerRemote {
 //        return userDao.deleteUser(userID);
 //    }
 
-    public UserDTO login(String username, String password) throws BusinessException{
+    @Override
+    public UserDTO login(String username, String password) throws BusinessException {
+        return UserDTOEntityMapper.getDTOFromUser(userDao.findByUsernameAndHashedPass(username, password));
+    }
+
+    public UserDTO login2(String username, String password) throws BusinessException{
 
         User userToLogin = userDao.findUserByUsername(username);
 

@@ -61,7 +61,7 @@ public class UserManagerTest {
     public void login() throws BusinessException {
 
         //noinspection unchecked
-        when(userDao.findUserByUsernameAndPassword("dinum", "parola")).thenThrow(BusinessException.class);
+        when(userDao.findByUsernameAndHashedPass("dinum", "parola")).thenThrow(BusinessException.class);
         userManager.login("dinum", "parola");
     }
 

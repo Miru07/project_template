@@ -8,20 +8,22 @@ import java.util.Set;
 @Entity
 @Table(name = "users")
 @NamedQueries({
-
         @NamedQuery(name = User.FIND_ALL_USERS, query = "select u from User u"),
-        @NamedQuery(name = User.CHECK_USERNAME_UNIQUE, query = "select count(u) from User u where u.username=:username"),
-        @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME_AND_PASSWWORD, query = "select u from User u " +
-                                                                                "where u.username=:username " +
-                                                                                "and u.password=:password"),
-        @NamedQuery(name = User.GET_USER_BY_USERNAME, query = "select u from User u where u.username=:username")
+        @NamedQuery(name = User.QUERY_CHECK_USERNAME_UNIQUE, query = "select count(u) from User u where u.username = :username"),
+        @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME_AND_PASSWORD, query = "select u from User u where u.username = :username and u.password = :password"),
+        @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME, query = "select u from User u where u.username = :username")
 })
 
 public class User implements Serializable {
+
+    public static final Integer USER_STATUS_ACTIVE = 0;
+    public static final Integer USER_STATUS_INACTIVE = 1;
+
     public static final String FIND_ALL_USERS = "findAllUsers";
-    public static final String CHECK_USERNAME_UNIQUE = "checkUsernameUnique";
-    public static final String QUERY_SELECT_BY_USERNAME_AND_PASSWWORD = "User.querySelectUsernameAndPassword";
-    public static final String GET_USER_BY_USERNAME = "User.getUserByUsername";
+    public static final String QUERY_CHECK_USERNAME_UNIQUE = "User.checkUsernameUnique";
+    public static final String QUERY_SELECT_BY_USERNAME_AND_PASSWORD = "User.selectByUsernameAndPassword";
+    public static final String QUERY_SELECT_BY_USERNAME = "User.selectByUsername";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name="ID")

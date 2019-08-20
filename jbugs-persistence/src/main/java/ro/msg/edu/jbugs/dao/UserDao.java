@@ -33,15 +33,10 @@ public class UserDao {
     }
 
     public boolean isUsernameUnique(String username){
-
-        Query query = entityManager.createNamedQuery(User.CHECK_USERNAME_UNIQUE, Integer.class);
-        query.setParameter("username", username);
-
-        Long selectResultLong = (Long) query.getSingleResult();
-        int selectResult = selectResultLong.intValue();
-
-        return selectResult == 0;
-
+        Long occurences = entityManager.createNamedQuery(User.QUERY_CHECK_USERNAME_UNIQUE, Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+        return occurences == 0;
     }
 
     public List<User> findAllUsers(){
@@ -66,32 +61,56 @@ public class UserDao {
 //        return query.executeUpdate();
 //    }
 
-    public User findUserByUsernameAndPassword(String username, String password) throws BusinessException {
-        String hashPassword = sha256()
-                .hashString(password, StandardCharsets.UTF_8)
-                .toString();
+    /**
+     ********LOGIN**********
+     *
+     * @param username
+     * @param hashedPassword
+     * @return User
+     * @throws BusinessException
+     */
+    public User findByUsernameAndHashedPass(String username, String hashedPassword) throws BusinessException {
+        User user;
+        try {
+            user = this.findUserByUsername(username);
 
-        try{
+            if(user.getStatus() == User.USER_STATUS_INACTIVE){
+                throw new BusinessException("msg", "user is inactive");
+            }
 
-            return entityManager.createNamedQuery(User.QUERY_SELECT_BY_USERNAME_AND_PASSWWORD, User.class)
-                    .setParameter("username", username).setParameter("password", hashPassword).getSingleResult();
-        }catch (NoResultException e){
-
-            throw new BusinessException("msg-001", "Invalid username or password");
+            if(!user.getPassword().equals(hashedPassword)){
+                if(user.getCounter() >= 4){
+                    user.setStatus(User.USER_STATUS_INACTIVE);
+                    throw new BusinessException("msg-003", "user was deactivated");
+                }
+                else{
+                    user.setCounter(user.getCounter()+1);
+                    throw new BusinessException("msg-002", "incorrect password");
+                }
+            }
+            return user;
+        } catch(NoResultException e){
+            throw new BusinessException("msg-001", "invalid username");
         }
     }
 
+    /**
+     ********LOGIN**********
+     *
+     * @param username
+     * @return User
+     * @throws BusinessException
+     */
     public User findUserByUsername(String username) throws BusinessException {
+        User user;
+        try {
+            user = entityManager.createNamedQuery(User.QUERY_SELECT_BY_USERNAME, User.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
 
-        Query query = entityManager.createNamedQuery(User.GET_USER_BY_USERNAME, User.class);
-        query.setParameter("username", username);
-
-        try{
-
-            return (User) query.getSingleResult();
-        }
-        catch(NoResultException ex){
-            throw new BusinessException("msg-002", "No user found");
+            return user;
+        } catch(NoResultException e){
+            throw new BusinessException("msg-001", "invalid username");
         }
     }
 }
