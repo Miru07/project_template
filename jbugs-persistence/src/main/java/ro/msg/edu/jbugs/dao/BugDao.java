@@ -47,5 +47,10 @@ public class BugDao {
         return query.executeUpdate();
 
     }
+
+    public List<Bug> getAllBugs()
+    {
+        return entityManager.createNamedQuery(Bug.FIND_ALL_BUGS, Bug.class).getResultList();
+    }
 }
 
