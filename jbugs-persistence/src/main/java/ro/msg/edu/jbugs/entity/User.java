@@ -13,7 +13,6 @@ import java.util.Set;
         @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME_AND_PASSWORD, query = "select u from User u where u.username = :username and u.password = :password"),
         @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME, query = "select u from User u where u.username = :username")
 })
-
 public class User implements Serializable {
 
     public static final Integer USER_STATUS_ACTIVE = 0;

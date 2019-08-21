@@ -18,14 +18,15 @@ public class LoginController extends HttpServlet {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public UserDTO getUserAfterLogin(UserLoginData userLoginData) {
-        try {
-            UserDTO userDTO = userManagerRemote.login(userLoginData.getUsername(), userLoginData.getHashedPassword());
+    public UserLoginData getUserAfterLogin(UserLoginData userLoginData) {
+        return userLoginData;
+        /*
+        UserDTO userDTO = new UserDTO();
 
-            return userDTO;
-        } catch (BusinessException ex) {
-            // do nothing
-        }
-        return null;
+        userDTO.setUsername(userLoginData.getUsername());
+
+        userDTO.setPassword(userLoginData.getHashedPassword());
+        return userDTO;
+    */
     }
 }
