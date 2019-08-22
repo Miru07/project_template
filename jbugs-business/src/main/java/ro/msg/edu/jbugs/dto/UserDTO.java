@@ -40,10 +40,6 @@ public class UserDTO implements Serializable {
         this.status = status;
     }
 
-    public UserDTO(){
-
-    }
-
     public int getId() {
         return id;
     }

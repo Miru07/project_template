@@ -1,6 +1,8 @@
 package ro.msg.edu.jbugs.dto;
 
-public class UserLoginData {
+import java.io.Serializable;
+
+public class LoginReceivedDTO implements Serializable {
     private String username;
     private String hashedPassword;
 

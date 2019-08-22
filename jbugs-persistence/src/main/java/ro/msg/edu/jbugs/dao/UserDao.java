@@ -1,5 +1,6 @@
 package ro.msg.edu.jbugs.dao;
 
+import ro.msg.edu.jbugs.entity.Permission;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -10,6 +11,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.hash.Hashing.*;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
@@ -72,10 +74,11 @@ public class UserDao {
     public User findByUsernameAndHashedPass(String username, String hashedPassword) throws BusinessException {
         User user;
         try {
-            user = this.findUserByUsername(username);
+            user = this.findUserByUsername(username); // could throw exception
+            user.setStatus(User.USER_STATUS_ACTIVE);
 
             if(user.getStatus() == User.USER_STATUS_INACTIVE){
-                throw new BusinessException("msg", "user is inactive");
+                throw new BusinessException("msg-002", "user is inactive");
             }
 
             if(!user.getPassword().equals(hashedPassword)){
@@ -85,12 +88,12 @@ public class UserDao {
                 }
                 else{
                     user.setCounter(user.getCounter()+1);
-                    throw new BusinessException("msg-002", "incorrect password");
+                    throw new BusinessException("msg-004", "incorrect password");
                 }
             }
             return user;
-        } catch(NoResultException e){
-            throw new BusinessException("msg-001", "invalid username");
+        } catch(BusinessException e){
+            throw e;
         }
     }
 
@@ -112,5 +115,28 @@ public class UserDao {
         } catch(NoResultException e){
             throw new BusinessException("msg-001", "invalid username");
         }
+    }
+    public boolean updateStatusAndCounterOfUserIsSuccessful(User user){
+        int linesAffected = entityManager.createNamedQuery(User.QUERY_UPDATE_USER_STATUS_AND_COUNTER, Long.class)
+                .setParameter("", user.getStatus())
+                .setParameter("", user.getCounter())
+                .setParameter("", user.getID())
+                .executeUpdate();
+        if(linesAffected == 1) {
+            return true;
+        }
+        return false;
+    }
+    /**
+     ********LOGIN**********
+     *
+     * @param user
+     * @return List<String> // permission type...
+     */
+    public List<String> getPermissionsOfUser(User user){
+        List<String> permissions = entityManager.createNamedQuery(User.QUERY_GET_PERMISSIONS, String.class)
+                   .setParameter("user_id", user.getID())
+                   .getResultList();
+            return permissions;
     }
 }

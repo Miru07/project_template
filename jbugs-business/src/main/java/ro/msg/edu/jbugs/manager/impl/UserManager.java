@@ -1,11 +1,10 @@
 package ro.msg.edu.jbugs.manager.impl;
 
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.NotificationDTO;
-import ro.msg.edu.jbugs.dto.UserBugsDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.NotificationType;
+import ro.msg.edu.jbugs.entity.Permission;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
@@ -16,7 +15,9 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.hash.Hashing.*;
 
@@ -29,7 +30,7 @@ public class UserManager implements UserManagerRemote {
     private NotificationManagerRemote notificationManager;
 
     @Override
-    public void insertUser(UserDTO userDTO){
+    public void insertUser(UserDTO userDTO) {
 
         User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
         String username = generateUsername(user.getFirstName(), user.getLastName());
@@ -39,25 +40,24 @@ public class UserManager implements UserManagerRemote {
                 .toString();
         user.setPassword(hashPassword);
 
-        User newUser =  userDao.insertUser(user);
+        User newUser = userDao.insertUser(user);
         UserDTO userDTO1 = UserDTOEntityMapper.getDTOFromUser(newUser);
         userDTO1.setPassword(userDTO.getPassword());
         LocalDate date = LocalDate.now();
 
-        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  newUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString() , "", newUser);
+        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date), "Welcome: " + newUser.toString(),
+                NotificationType.WELCOME_NEW_USER.toString(), "", newUser);
 
-      notificationManager.insertNotification(notificationDTO);
+        notificationManager.insertNotification(notificationDTO);
     }
 
-    String generateUsername(String firstName, String lastName){
+    String generateUsername(String firstName, String lastName) {
 
         String firstPart;
-        if(lastName.length() >= 5){
+        if (lastName.length() >= 5) {
 
             firstPart = lastName.substring(0, 5);
-        }
-        else {
+        } else {
 
             firstPart = lastName;
         }
@@ -65,14 +65,13 @@ public class UserManager implements UserManagerRemote {
         int charPosition = 0;
         String username = (firstPart + firstName.charAt(charPosition)).toLowerCase();
 
-        while(!userDao.isUsernameUnique(username)){
+        while (!userDao.isUsernameUnique(username)) {
 
             charPosition++;
-            if(charPosition < firstName.length()){
+            if (charPosition < firstName.length()) {
 
                 username = (username + firstName.charAt(charPosition)).toLowerCase();
-            }
-            else{
+            } else {
 
                 username = username + "x";
             }
@@ -81,26 +80,26 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public UserDTO findUser(Integer id){
+    public UserDTO findUser(Integer id) {
 
         User user = userDao.findUser(id);
         return UserDTOEntityMapper.getDTOFromUser(user);
     }
 
     @Override
-    public List<UserDTO> findAllUsers(){
+    public List<UserDTO> findAllUsers() {
 
         List<User> users = userDao.findAllUsers();
         return UserDTOEntityMapper.getUserDTOListFromUserList(users);
     }
 
     @Override
-    public List<UserBugsDTO> getUserBugs(){
+    public List<UserBugsDTO> getUserBugs() {
 
         List<UserBugsDTO> userBugsDTOList = new ArrayList<>();
         List<Object[]> userBugsList = userDao.findUserBugs();
 
-        for(Object[] userBug : userBugsList){
+        for (Object[] userBug : userBugsList) {
 
             Long value = (Long) userBug[2];
             UserBugsDTO userBugsDTO = new UserBugsDTO(userBug[0].toString(), userBug[1].toString(), value.intValue());
@@ -118,42 +117,56 @@ public class UserManager implements UserManagerRemote {
 //    }
 
     @Override
-    public UserDTO login(String username, String password) throws BusinessException {
-        return UserDTOEntityMapper.getDTOFromUser(userDao.findByUsernameAndHashedPass(username, password));
+    public LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO) {
+        LoginResponseUserDTO loginResponseUserDTO;
+        try {
+            User user = userDao.findByUsernameAndHashedPass(
+                    loginReceivedDTO.getUsername(), loginReceivedDTO.getHashedPassword());
+            List<String> permissions = userDao.getPermissionsOfUser(user);
+
+
+            System.out.println(permissions);
+
+
+            Set<String> stringPermissions = new HashSet<>();
+            permissions.forEach(permission -> stringPermissions.add(permission));
+
+            UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(user);
+            loginResponseUserDTO = new LoginResponseUserDTO(userDTO, stringPermissions);
+            return loginResponseUserDTO;
+        } catch (BusinessException busy) {
+            loginResponseUserDTO = new LoginResponseUserDTO();
+            loginResponseUserDTO.setResponseMessage(busy.getMessage()); // busy.getErrorCode()
+            return loginResponseUserDTO;
+        }
     }
 
-    public UserDTO login2(String username, String password) throws BusinessException{
+    public UserDTO login2(String username, String password) throws BusinessException {
 
         User userToLogin = userDao.findUserByUsername(username);
 
-        if(userToLogin != null){
+        if (userToLogin != null) {
 
             String hashPassword = sha256().hashString(password, StandardCharsets.UTF_8).toString();
-            if(hashPassword.equals(userToLogin.getPassword())){
+            if (hashPassword.equals(userToLogin.getPassword())) {
 
-                if(userToLogin.getStatus() == 0){
+                if (userToLogin.getStatus() == 0) {
 
                     throw new BusinessException("msg-003", "User is disabled");
-                }
-                else
-                {
+                } else {
                     userToLogin.setCounter(0);
                     return UserDTOEntityMapper.getDTOFromUser(userToLogin);
                 }
-            }
-            else
-            {
+            } else {
 
                 int userCounter = userToLogin.getCounter() + 1;
                 userToLogin.setCounter(userCounter);
-                if(userCounter == 5){
+                if (userCounter == 5) {
                     userToLogin.setStatus(0);
                     throw new BusinessException("msg-004", "Max number of tries");
                 }
             }
-        }
-        else
-        {
+        } else {
             throw new BusinessException("msg-005", "User not in DB");
         }
 

@@ -11,13 +11,22 @@ import java.util.Set;
         @NamedQuery(name = User.FIND_ALL_USERS, query = "select u from User u"),
         @NamedQuery(name = User.QUERY_CHECK_USERNAME_UNIQUE, query = "select count(u) from User u where u.username = :username"),
         @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME_AND_PASSWORD, query = "select u from User u where u.username = :username and u.password = :password"),
-        @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME, query = "select u from User u where u.username = :username")
+        @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME, query = "select u from User u where u.username = :username"),
+        @NamedQuery(name = User.QUERY_GET_PERMISSIONS, query = "Select p.type From User u " +
+                "inner join u.roles as r " +
+                "inner join r.permissions as p " +
+                "where u.ID = :user_id "),
+        @NamedQuery(name = User.QUERY_UPDATE_USER_STATUS_AND_COUNTER, query = "UPDATE User " +
+                "SET status = :status, counter = :counter " +
+                "WHERE ID = :id")
 })
 public class User implements Serializable {
 
     public static final Integer USER_STATUS_ACTIVE = 0;
     public static final Integer USER_STATUS_INACTIVE = 1;
 
+    public static final String QUERY_UPDATE_USER_STATUS_AND_COUNTER = "User.updateStatusAndCounter";
+    public static final String QUERY_GET_PERMISSIONS = "User.getUserPermissions";
     public static final String FIND_ALL_USERS = "findAllUsers";
     public static final String QUERY_CHECK_USERNAME_UNIQUE = "User.checkUsernameUnique";
     public static final String QUERY_SELECT_BY_USERNAME_AND_PASSWORD = "User.selectByUsernameAndPassword";

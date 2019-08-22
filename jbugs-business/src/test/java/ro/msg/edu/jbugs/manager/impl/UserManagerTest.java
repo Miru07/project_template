@@ -7,7 +7,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.UserDao;
+import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
+import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -62,7 +65,10 @@ public class UserManagerTest {
 
         //noinspection unchecked
         when(userDao.findByUsernameAndHashedPass("dinum", "parola")).thenThrow(BusinessException.class);
-        userManager.login("dinum", "parola");
+        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
+        loginReceivedDTO.setUsername("test5");
+        loginReceivedDTO.setHashedPassword("test5");
+        userManager.login(loginReceivedDTO);
     }
 
     private User createUser(){
@@ -85,7 +91,10 @@ public class UserManagerTest {
     public void login3() throws BusinessException {
 
         when(userDao.findUserByUsername("dinum")).thenReturn(null);
-        userManager.login("dinum", "parola");
+        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
+        loginReceivedDTO.setUsername("test5");
+        loginReceivedDTO.setHashedPassword("test5");
+        userManager.login(loginReceivedDTO);
     }
 
     @Test
@@ -93,7 +102,10 @@ public class UserManagerTest {
 
         User persistedUser = createUser();
         when(userDao.findUserByUsername("test5")).thenReturn(persistedUser);
-        userManager.login("test5", "wrong");
+        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
+        loginReceivedDTO.setUsername("test5");
+        loginReceivedDTO.setHashedPassword("test5");
+        userManager.login(loginReceivedDTO);
         assertEquals((Integer)2, persistedUser.getCounter());
     }
 
@@ -102,14 +114,17 @@ public class UserManagerTest {
 
         User persistedUser = createUser();
         when(userDao.findUserByUsername("test5")).thenReturn(persistedUser);
-        UserDTO userDTO = userManager.login("test5", "test5");
+        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
+        loginReceivedDTO.setUsername("test5");
+        loginReceivedDTO.setHashedPassword("test5");
+        LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceivedDTO);
 
-        assertEquals(persistedUser.getFirstName(), userDTO.getFirstName());
-        assertEquals(persistedUser.getLastName(), userDTO.getLastName());
-        assertEquals(1L, userDTO.getId());
-        assertEquals(persistedUser.getEmail(), userDTO.getEmail());
-        assertEquals(persistedUser.getMobileNumber(), userDTO.getMobileNumber());
-        assertEquals(persistedUser.getPassword(), userDTO.getPassword());
-        assertEquals(persistedUser.getUsername(), userDTO.getUsername());
+        assertEquals(persistedUser.getFirstName(), loginResponseUserDTO.getFirstName());
+        assertEquals(persistedUser.getLastName(), loginResponseUserDTO.getLastName());
+        // assertEquals(1L, loginResponseUserDTO.getId());
+        assertEquals(persistedUser.getEmail(), loginResponseUserDTO.getEmail());
+        assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
+        // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());
+        assertEquals(persistedUser.getUsername(), loginResponseUserDTO.getUsername());
     }
 }
