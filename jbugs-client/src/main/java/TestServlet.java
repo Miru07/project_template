@@ -1,21 +1,14 @@
 import ro.msg.edu.jbugs.MailSender;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserBugsDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import ro.msg.edu.jbugs.manager.impl.CommentManager;
-import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.manager.impl.UserManager;
 import ro.msg.edu.jbugs.manager.remote.CommentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
-
 import javax.ejb.EJB;
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,11 +33,6 @@ public class TestServlet extends HttpServlet {
     private NotificationManagerRemote notificationManager;
 
     public void init() throws ServletException {
-        message = "Hello, M.";
-
-        UserDTO testUser1 = new UserDTO(0, "test", "test", "077", "email",
-                "username", "passw", 0);
-        userManager.insertUser(testUser1);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
