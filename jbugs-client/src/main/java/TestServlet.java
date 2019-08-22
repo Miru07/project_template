@@ -64,7 +64,7 @@ public class TestServlet extends HttpServlet {
     }
 
     public void insertUser(Integer counter, String email, String fName, String lName, String phoneNr, String password,
-                           String username, Integer status){
+                           String username, Integer status) throws BusinessException {
 
         userDTO = new UserDTO(0, fName, lName, username, password, counter, email, phoneNr, status, null);
         userManager.insertUser(userDTO);

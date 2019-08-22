@@ -3,6 +3,7 @@ package controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.ejb.EJB;
@@ -42,8 +43,12 @@ public class UserController extends HttpServlet {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(UserDTO userDTO) throws JsonProcessingException {
-        userManagerRemote.insertUser(userDTO);
-        return Response.status(Response.Status.OK).entity(userDTO).build();
+        try {
+            userManagerRemote.insertUser(userDTO);
+            return Response.status(Response.Status.OK).entity(userDTO).build();
+        } catch (BusinessException e) {
+            return Response.status(500).entity(e.getErrorCode()).build();
+        }
     }
 
 }
