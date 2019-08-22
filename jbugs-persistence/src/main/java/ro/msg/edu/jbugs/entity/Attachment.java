@@ -36,4 +36,12 @@ public class Attachment implements Serializable {
     public void setBugID(Bug id_bug) {
         this.bugID = id_bug;
     }
+
+    public byte[] getAttContent() {
+        return attContent;
+    }
+
+    public void setAttContent(byte[] attContent) {
+        this.attContent = attContent;
+    }
 }

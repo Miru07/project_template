@@ -48,6 +48,18 @@ public class BugDTO implements Serializable {
         this.ASSIGNED_ID = ASSIGNED_ID;
     }
 
+    public BugDTO(String title, String description, String version, Date targetDate, String status, String fixedVersion, String severity, UserDTO CREATED_ID, UserDTO ASSIGNED_ID) {
+        this.title = title;
+        this.description = description;
+        this.version = version;
+        this.targetDate = targetDate;
+        this.status = status;
+        this.fixedVersion = fixedVersion;
+        this.severity = severity;
+        this.CREATED_ID = CREATED_ID;
+        this.ASSIGNED_ID = ASSIGNED_ID;
+    }
+
     public Integer getID() {
         return ID;
     }

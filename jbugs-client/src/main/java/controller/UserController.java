@@ -36,4 +36,5 @@ public class UserController extends HttpServlet {
         String listOfUsersJSON = jsonTransformer.writeValueAsString(listOfAllUsers);
         return listOfUsersJSON;
     }
+
 }

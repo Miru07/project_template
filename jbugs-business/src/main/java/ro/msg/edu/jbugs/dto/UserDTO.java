@@ -14,6 +14,18 @@ public class UserDTO implements Serializable {
     private String mobileNumber;
     private Integer status;
 
+    public UserDTO(int id, String firstName, String lastName, String username, String password, int counter, String email, String mobileNumber, Integer status) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.counter = counter;
+        this.email = email;
+        this.mobileNumber = mobileNumber;
+        this.status = status;
+    }
+
     public UserDTO(Integer counter, String firstName, String lastName, String mobileNumber, String email,
                    String username, String password, Integer status) {
 
