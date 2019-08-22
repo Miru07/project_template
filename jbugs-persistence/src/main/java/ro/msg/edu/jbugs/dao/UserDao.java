@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.dao;
 
-import ro.msg.edu.jbugs.entity.Permission;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -11,7 +10,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
 
 import static com.google.common.hash.Hashing.*;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
@@ -55,51 +53,46 @@ public class UserDao {
         return (List<Object[]>) query.getResultList();
     }
 
-//    public Integer deleteUser(Integer userID){
-//
-//        Query query = entityManager.createNativeQuery("DELETE FROM users WHERE ID=?1");
-//        query.setParameter(1, userID);
-//
-//        return query.executeUpdate();
-//    }
-
+    private String getHashedPassword(String password){
+        return sha256().hashString(password, StandardCharsets.UTF_8).toString();
+    }
     /**
-     ********LOGIN**********
-     *
+     ************************************LOGIN********************************************
      * @param username
-     * @param hashedPassword
+     * @param password
      * @return User
      * @throws BusinessException
      */
-    public User findByUsernameAndHashedPass(String username, String hashedPassword) throws BusinessException {
+    public User findByUsernameAndPassword(String username, String password) throws BusinessException {
         User user;
         try {
             user = this.findUserByUsername(username); // could throw exception
-            user.setStatus(User.USER_STATUS_ACTIVE);
-
+            // user.setStatus(User.USER_STATUS_ACTIVE);
             if(user.getStatus() == User.USER_STATUS_INACTIVE){
-                throw new BusinessException("msg-002", "user is inactive");
+                throw new BusinessException("msg-002", "User is inactive");
             }
+            
+            String hashedPassword = this.getHashedPassword(password);
 
-            if(!user.getPassword().equals(hashedPassword)){
-                if(user.getCounter() >= 4){
+            if(!user.getPassword().equals(password)){
+                int PASS_MAX_NR_TRIES = 4;
+                if(user.getCounter() >= PASS_MAX_NR_TRIES){
                     user.setStatus(User.USER_STATUS_INACTIVE);
-                    throw new BusinessException("msg-003", "user was deactivated");
+                    throw new BusinessException("msg-003", "User was deactivated");
                 }
                 else{
                     user.setCounter(user.getCounter()+1);
-                    throw new BusinessException("msg-004", "incorrect password");
+                    throw new BusinessException("msg-004", "Incorrect password");
                 }
             }
+            user.setCounter(0); // if success, set counter for wrongPass to 0
             return user;
         } catch(BusinessException e){
             throw e;
         }
     }
-
     /**
-     ********LOGIN**********
-     *
+     ************************************LOGIN********************************************
      * @param username
      * @return User
      * @throws BusinessException
@@ -110,12 +103,16 @@ public class UserDao {
             user = entityManager.createNamedQuery(User.QUERY_SELECT_BY_USERNAME, User.class)
                     .setParameter("username", username)
                     .getSingleResult();
-
             return user;
         } catch(NoResultException e){
-            throw new BusinessException("msg-001", "invalid username");
+            throw new BusinessException("msg-001", "Invalid username");
         }
     }
+    /**
+     * **********************************LOGIN********************not sure if needed just yet
+     * @param user
+     * @return
+     */
     public boolean updateStatusAndCounterOfUserIsSuccessful(User user){
         int linesAffected = entityManager.createNamedQuery(User.QUERY_UPDATE_USER_STATUS_AND_COUNTER, Long.class)
                 .setParameter("", user.getStatus())
@@ -128,15 +125,17 @@ public class UserDao {
         return false;
     }
     /**
-     ********LOGIN**********
-     *
+     ************************************LOGIN********************************************
      * @param user
      * @return List<String> // permission type...
      */
     public List<String> getPermissionsOfUser(User user){
+        return this.getPermissionsOfUser(user.getID());
+    }
+    public List<String> getPermissionsOfUser(Integer userId){
         List<String> permissions = entityManager.createNamedQuery(User.QUERY_GET_PERMISSIONS, String.class)
-                   .setParameter("user_id", user.getID())
-                   .getResultList();
-            return permissions;
+                .setParameter("user_id", userId)
+                .getResultList();
+        return permissions;
     }
 }

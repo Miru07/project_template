@@ -18,4 +18,5 @@ public interface UserManagerRemote {
     List<UserBugsDTO> getUserBugs();
     //Integer deleteUser(Integer userID);
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
+    boolean userHasPermission(Integer userId, String permission);
 }

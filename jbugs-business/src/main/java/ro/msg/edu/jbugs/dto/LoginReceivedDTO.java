@@ -1,24 +1,14 @@
 package ro.msg.edu.jbugs.dto;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.io.Serializable;
 
+@Getter
+@Setter
 public class LoginReceivedDTO implements Serializable {
     private String username;
-    private String hashedPassword;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getHashedPassword() {
-        return hashedPassword;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
+    private String password;
 }
