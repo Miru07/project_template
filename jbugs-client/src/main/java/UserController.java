@@ -36,6 +36,7 @@ public class UserController extends HttpServlet {
 
 
     @POST
+    @Path("/create-user")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addUser(UserDTO userDTO) throws JsonProcessingException {
