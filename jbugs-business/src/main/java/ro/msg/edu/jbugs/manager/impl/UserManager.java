@@ -1,11 +1,14 @@
 package ro.msg.edu.jbugs.manager.impl;
 
+import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.NotificationDTO;
+import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.UserBugsDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.NotificationType;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
@@ -15,8 +18,7 @@ import javax.ejb.*;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static com.google.common.hash.Hashing.*;
 
@@ -26,31 +28,51 @@ public class UserManager implements UserManagerRemote {
     @EJB
     private UserDao userDao;
     @EJB
+    private RoleDao roleDao;
+    @EJB
     private NotificationManagerRemote notificationManager;
 
     @Override
     public void insertUser(UserDTO userDTO){
-
-        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
-        String username = generateUsername(user.getFirstName(), user.getLastName());
-        user.setUsername(username);
-        String hashPassword = sha256()
-                .hashString(user.getPassword(), StandardCharsets.UTF_8)
-                .toString();
-        user.setPassword(hashPassword);
-
-        User newUser =  userDao.insertUser(user);
-        UserDTO userDTO1 = UserDTOEntityMapper.getDTOFromUser(newUser);
-        userDTO1.setPassword(userDTO.getPassword());
+        User newUser =  userDao.insertUser(getUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 
         NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  newUser.toString(),
                 NotificationType.WELCOME_NEW_USER.toString() , "", newUser);
 
-      notificationManager.insertNotification(notificationDTO);
+        notificationManager.insertNotification(notificationDTO);
     }
 
-    String generateUsername(String firstName, String lastName){
+    public User getUserToInsert(UserDTO userDTO){
+        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
+        String username = generateUsername(user.getFirstName(), user.getLastName());
+        user.setUsername(username);
+
+        String generatedPassword = generatePassword();
+        String hashPassword = sha256()
+                .hashString(generatedPassword, StandardCharsets.UTF_8)
+                .toString();
+        user.setPassword(hashPassword);
+
+        user.setRoles(getActualRoleList(userDTO.getRoles()));
+
+        return user;
+    }
+
+    public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS){
+        Set<Role> actualRoles = new HashSet<>();
+        roleDTOS.forEach(roleDTO -> {
+            try {
+                actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
+            } catch (BusinessException e) {
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                e.printStackTrace();
+            }
+        });
+        return actualRoles;
+    }
+
+    public String generateUsername(String firstName, String lastName){
 
         String firstPart;
         if(lastName.length() >= 5){
@@ -78,6 +100,13 @@ public class UserManager implements UserManagerRemote {
             }
         }
         return username;
+    }
+
+    public String generatePassword(){
+        String password = new Random().ints(10, 33, 122).collect(StringBuilder::new,
+                StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return password;
     }
 
     @Override
@@ -108,14 +137,6 @@ public class UserManager implements UserManagerRemote {
         }
         return userBugsDTOList;
     }
-
-//    @Override
-//    public Integer deleteUser(Integer userID){
-//
-//        notificationManager.deleteNotification(userID);
-//
-//        return userDao.deleteUser(userID);
-//    }
 
     public UserDTO login(String username, String password) throws BusinessException{
 

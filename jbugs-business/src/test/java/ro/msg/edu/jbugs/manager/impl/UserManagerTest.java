@@ -6,10 +6,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
+import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -24,6 +31,9 @@ public class UserManagerTest {
 
     @Mock
     private UserDao userDao;
+
+    @Mock
+    private RoleDao roleDao;
 
     public UserManagerTest() {
 
@@ -111,5 +121,40 @@ public class UserManagerTest {
         assertEquals(persistedUser.getMobileNumber(), userDTO.getMobileNumber());
         assertEquals(persistedUser.getPassword(), userDTO.getPassword());
         assertEquals(persistedUser.getUsername(), userDTO.getUsername());
+    }
+
+    @Test
+    public void getActualRoleList() throws BusinessException{
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        Role role = new Role(1, "Administrator");
+        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+
+        Set<Role> actualRoles = userManager.getActualRoleList(roleDTOS);
+
+        assertTrue(actualRoles.contains(role));
+
+        roleDTOS.clear();
+        roleDTOS.add(new RoleDTO("wrong role"));
+        when(roleDao.findRoleByType("wrong role")).thenThrow(BusinessException.class);
+        actualRoles = userManager.getActualRoleList(roleDTOS);
+    }
+
+    @Test
+    public void getUserToInsert() throws BusinessException {
+        UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        userDTO.setRoles(roleDTOS);
+
+        Role role = new Role(1, "Administrator");
+        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+
+        when(userDao.isUsernameUnique("test5t")).thenReturn(true);
+
+        User newUser = userManager.getUserToInsert(userDTO);
+
+        assertEquals(newUser.getUsername(), "test5t");
+        assertTrue(newUser.getRoles().contains(role));
     }
 }

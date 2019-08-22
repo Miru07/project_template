@@ -1,14 +1,14 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.UserInsertDTO;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServlet;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -18,7 +18,9 @@ import java.util.List;
  * @since 19.1.2
  */
 
+
 @Path("/users")
+@Produces("application/json")
 public class UserController extends HttpServlet {
     @EJB
     private UserManagerRemote userManagerRemote;
@@ -26,15 +28,20 @@ public class UserController extends HttpServlet {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getUsers() throws JsonProcessingException {
-        UserDTO testUser1 = new UserDTO(0, "test", "test", "077", "email",
-                "username", "passw", 0);
-        userManagerRemote.insertUser(testUser1);
-
-
         List<UserDTO> listOfAllUsers = userManagerRemote.findAllUsers();
 
         ObjectMapper jsonTransformer = new ObjectMapper();
         String listOfUsersJSON = jsonTransformer.writeValueAsString(listOfAllUsers);
         return listOfUsersJSON;
     }
+
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addUser(UserInsertDTO userDTO) throws JsonProcessingException {
+        //userManagerRemote.insertUser(userDTO);
+        return Response.status(Response.Status.OK).entity(userDTO).build();
+    }
+
 }

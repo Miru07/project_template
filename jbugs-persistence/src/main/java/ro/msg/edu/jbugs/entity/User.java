@@ -163,6 +163,7 @@ public class User implements Serializable {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+        roles.forEach(role -> role.addUser(this));
     }
 
     public Integer getStatus() {
