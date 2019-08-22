@@ -6,7 +6,6 @@ import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 
 import javax.ejb.EJB;
-import javax.json.stream.JsonParsingException;
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
