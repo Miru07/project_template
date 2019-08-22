@@ -136,12 +136,13 @@ public class UserManagerTest {
 
         roleDTOS.clear();
         roleDTOS.add(new RoleDTO("wrong role"));
-        when(roleDao.findRoleByType("wrong role")).thenThrow(BusinessException.class);
+        when(roleDao.findRoleByType("wrong role")).thenThrow(new BusinessException("test", "test"));
         actualRoles = userManager.getActualRoleList(roleDTOS);
+        assertEquals(actualRoles.size(), 0);
     }
 
     @Test
-    public void getUserToInsert() throws BusinessException {
+    public void createUserToInsert() throws BusinessException {
         UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
         Set<RoleDTO> roleDTOS = new HashSet<>();
         roleDTOS.add(new RoleDTO("Administrator"));
@@ -152,8 +153,10 @@ public class UserManagerTest {
 
         when(userDao.isUsernameUnique("test5t")).thenReturn(true);
 
-        User newUser = userManager.getUserToInsert(userDTO);
+        User newUser = userManager.createUserToInsert(userDTO);
 
+        assertEquals((Integer)newUser.getCounter(), (Integer)0);
+        assertEquals((Integer)newUser.getStatus(), (Integer)1);
         assertEquals(newUser.getUsername(), "test5t");
         assertTrue(newUser.getRoles().contains(role));
     }

@@ -1,5 +1,6 @@
 package ro.msg.edu.jbugs.manager.impl;
 
+import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.NotificationDTO;
@@ -32,18 +33,23 @@ public class UserManager implements UserManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
+    private Logger logger = Logger.getLogger(UserManager.class.getName());
+
+
     @Override
     public void insertUser(UserDTO userDTO){
-        User newUser =  userDao.insertUser(getUserToInsert(userDTO));
+        User persistedUser =  userDao.insertUser(createUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 
-        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  newUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString() , "", newUser);
+        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  persistedUser.toString(),
+                NotificationType.WELCOME_NEW_USER.toString() , "", persistedUser);
 
         notificationManager.insertNotification(notificationDTO);
     }
 
-    public User getUserToInsert(UserDTO userDTO){
+    public User createUserToInsert(UserDTO userDTO){
+        userDTO.setCounter(0);
+        userDTO.setStatus(1);
         User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
         String username = generateUsername(user.getFirstName(), user.getLastName());
         user.setUsername(username);
@@ -65,8 +71,8 @@ public class UserManager implements UserManagerRemote {
             try {
                 actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
             } catch (BusinessException e) {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                e.printStackTrace();
+                logger.error(e);
+                return;
             }
         });
         return actualRoles;
@@ -88,14 +94,11 @@ public class UserManager implements UserManagerRemote {
         String username = (firstPart + firstName.charAt(charPosition)).toLowerCase();
 
         while(!userDao.isUsernameUnique(username)){
-
             charPosition++;
             if(charPosition < firstName.length()){
-
                 username = (username + firstName.charAt(charPosition)).toLowerCase();
             }
             else{
-
                 username = username + "x";
             }
         }
@@ -111,21 +114,18 @@ public class UserManager implements UserManagerRemote {
 
     @Override
     public UserDTO findUser(Integer id){
-
         User user = userDao.findUser(id);
         return UserDTOEntityMapper.getDTOFromUser(user);
     }
 
     @Override
     public List<UserDTO> findAllUsers(){
-
         List<User> users = userDao.findAllUsers();
         return UserDTOEntityMapper.getUserDTOListFromUserList(users);
     }
 
     @Override
     public List<UserBugsDTO> getUserBugs(){
-
         List<UserBugsDTO> userBugsDTOList = new ArrayList<>();
         List<Object[]> userBugsList = userDao.findUserBugs();
 
@@ -139,16 +139,13 @@ public class UserManager implements UserManagerRemote {
     }
 
     public UserDTO login(String username, String password) throws BusinessException{
-
         User userToLogin = userDao.findUserByUsername(username);
 
         if(userToLogin != null){
-
             String hashPassword = sha256().hashString(password, StandardCharsets.UTF_8).toString();
             if(hashPassword.equals(userToLogin.getPassword())){
 
                 if(userToLogin.getStatus() == 0){
-
                     throw new BusinessException("msg-003", "User is disabled");
                 }
                 else
@@ -159,7 +156,6 @@ public class UserManager implements UserManagerRemote {
             }
             else
             {
-
                 int userCounter = userToLogin.getCounter() + 1;
                 userToLogin.setCounter(userCounter);
                 if(userCounter == 5){
