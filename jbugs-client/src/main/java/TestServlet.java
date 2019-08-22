@@ -41,6 +41,10 @@ public class TestServlet extends HttpServlet {
 
     public void init() throws ServletException {
         message = "Hello, M.";
+
+        UserDTO testUser1 = new UserDTO(0, "test", "test", "077", "email",
+                "username", "passw", 0);
+        userManager.insertUser(testUser1);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
