@@ -74,7 +74,7 @@ public class UserDao {
             
             String hashedPassword = this.getHashedPassword(password);
 
-            if(!user.getPassword().equals(password)){
+            if(!user.getPassword().equals(hashedPassword)){
                 int PASS_MAX_NR_TRIES = 4;
                 if(user.getCounter() >= PASS_MAX_NR_TRIES){
                     user.setStatus(User.USER_STATUS_INACTIVE);

@@ -19,10 +19,11 @@ public class LoginController extends HttpServlet {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public LoginResponseUserDTO getUserAndTokenAfterLogin(LoginReceivedDTO loginReceived) {
+        // later on, to be added decrypt password from loginReceived
+        // now, it receives password as plain text
         LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceived);
         if(loginResponseUserDTO.getMessage() == LoginResponseUserDTO.SUCCESS) {
-            String jwtToken = TokenService.generateJWT(loginResponseUserDTO.getId().toString(), "server",
-                    loginResponseUserDTO.getUsername(), 123456789);
+            String jwtToken = TokenService.generateJbugsToken(loginResponseUserDTO);
             loginResponseUserDTO.setToken(jwtToken);
         }
         return loginResponseUserDTO;

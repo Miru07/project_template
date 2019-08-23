@@ -8,12 +8,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * Document me.
- *
- * @author msg systems AG; User Name.
- * @since 19.1.2
- */
 public class UserControllerTest {
 
     @Test
