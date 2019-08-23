@@ -11,13 +11,15 @@ import java.io.Serializable;
 public class BugAttachmentWrapperDTO implements Serializable {
     private BugDTO bug;
     private AttachmentDTO attachment;
+    private String token;
 
     public BugAttachmentWrapperDTO() {
     }
 
-    public BugAttachmentWrapperDTO(BugDTO bug, AttachmentDTO attachment) {
+    public BugAttachmentWrapperDTO(BugDTO bug, AttachmentDTO attachment, String token) {
         this.bug = bug;
         this.attachment = attachment;
+        this.token = token;
     }
 
     public BugDTO getBug() {
@@ -36,6 +38,14 @@ public class BugAttachmentWrapperDTO implements Serializable {
         this.attachment = attachment;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "BugAttachmentWrapperDTO{" +
@@ -43,4 +53,6 @@ public class BugAttachmentWrapperDTO implements Serializable {
                 ", attachment=" + attachment +
                 '}';
     }
+
+
 }

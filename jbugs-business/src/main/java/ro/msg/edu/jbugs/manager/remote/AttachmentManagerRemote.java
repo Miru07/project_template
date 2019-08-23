@@ -3,6 +3,7 @@ package ro.msg.edu.jbugs.manager.remote;
 import ro.msg.edu.jbugs.dto.AttachmentDTO;
 
 import javax.ejb.Remote;
+import javax.validation.constraints.NotNull;
 
 /**
  * Interface for Remote usage
@@ -12,5 +13,5 @@ import javax.ejb.Remote;
 @Remote
 public interface AttachmentManagerRemote {
 
-    AttachmentDTO insertAttachment(AttachmentDTO attachmentDTO);
+    AttachmentDTO insertAttachment(@NotNull AttachmentDTO attachmentDTO);
 }

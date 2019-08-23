@@ -4,6 +4,7 @@ import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 
 import javax.ejb.Remote;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -20,5 +21,5 @@ public interface BugManagerRemote {
 
     List<BugDTO> getAllBugs();
 
-    BugDTO insertBug(BugDTO bugDTO);
+    BugDTO insertBug(@NotNull BugDTO bugDTO);
 }

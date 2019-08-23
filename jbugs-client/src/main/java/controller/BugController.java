@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
+import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
+import utils.TokenService;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +29,8 @@ public class BugController extends HttpServlet {
     private BugManagerRemote bugManagerRemote;
     @EJB
     private AttachmentManagerRemote attachmentManagerRemote;
+    @EJB
+    private UserManagerRemote userManagerRemote;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -57,6 +62,11 @@ public class BugController extends HttpServlet {
     public boolean createBug(@NotNull BugAttachmentWrapperDTO bugAttachmentWrapperDTO) {
         BugDTO bugToInsert = bugAttachmentWrapperDTO.getBug();
         AttachmentDTO attachmentToInsert = bugAttachmentWrapperDTO.getAttachment();
+
+        String token = bugAttachmentWrapperDTO.getToken();
+        Integer id = TokenService.getCurrentUserID(token);
+        UserDTO createdUserDTO = userManagerRemote.findUser(id);
+        bugToInsert.setCREATED_ID(createdUserDTO);
 
         BugDTO persistedBugWithID = bugManagerRemote.insertBug(bugToInsert);
         attachmentToInsert.setBugID(persistedBugWithID);
