@@ -14,6 +14,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.13</version>
+        </dependency>
+        <dependency>
             <groupId>edu.msg.ro</groupId>
             <artifactId>jbugs-persistence</artifactId>
             <version>${project.version}</version>
