@@ -115,15 +115,15 @@ public class UserDTO implements Serializable {
     @Override
     public String toString() {
         return "UserDTO{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", counter=" + counter +
+                "counter=" + counter +
                 ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", id=" + id +
+                ", lastName='" + lastName + '\'' +
                 ", mobileNumber='" + mobileNumber + '\'' +
+                ", password='" + password + '\'' +
                 ", status=" + status +
+                ", username='" + username + '\'' +
                 '}';
     }
 

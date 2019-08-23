@@ -35,4 +35,11 @@ public class BugManager implements BugManagerRemote {
 
         return bugDao.updateBugStatus();
     }
+
+    @Override
+    public List<BugDTO> getAllBugs(){
+        List<Bug> bugList = bugDao.getAllBugs();
+
+        return BugDTOEntityMapper.getBugDTOList(bugList);
+    }
 }
