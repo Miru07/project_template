@@ -127,7 +127,7 @@ public class UserManager implements UserManagerRemote {
             return loginResponseUserDTO;
         } catch (BusinessException busy) {
             loginResponseUserDTO = new LoginResponseUserDTO(); // init to 0 and null fields... token included
-            loginResponseUserDTO.setMessage(busy.getMessage()); // busy.getErrorCode()
+            loginResponseUserDTO.setMessageCode(busy.getErrorCode()); // busy.getMessage()
             return loginResponseUserDTO;
         }
     }

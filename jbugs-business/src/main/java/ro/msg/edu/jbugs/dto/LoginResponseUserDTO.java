@@ -15,7 +15,7 @@ import java.util.Set;
 public class LoginResponseUserDTO implements Serializable {
     public static final String SUCCESS = "SUCCESS";
 
-    private String message;
+    private String messageCode;
     private String token;
 
     private Integer id;
@@ -35,7 +35,7 @@ public class LoginResponseUserDTO implements Serializable {
         this.mobileNumber = userDTO.getMobileNumber();
 
         this.permissions = permissions;
-        this.message = LoginResponseUserDTO.SUCCESS;
+        this.messageCode = LoginResponseUserDTO.SUCCESS;
         this.token = "";
     }
 }
