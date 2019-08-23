@@ -10,7 +10,7 @@ import java.util.List;
 @Remote
 public interface UserManagerRemote {
 
-    void insertUser(UserDTO userDTO);
+    void insertUser(UserDTO userDTO) throws BusinessException;
     UserDTO findUser(Integer id);
     List<UserDTO> findAllUsers();
     List<UserBugsDTO> getUserBugs();

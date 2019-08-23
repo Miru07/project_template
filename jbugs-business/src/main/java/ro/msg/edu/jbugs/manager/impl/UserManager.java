@@ -14,14 +14,16 @@ import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
+import ro.msg.edu.jbugs.validators.UserValidator;
 
-import javax.ejb.*;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.google.common.hash.Hashing.*;
+import static com.google.common.hash.Hashing.sha256;
 
 @Stateless
 public class UserManager implements UserManagerRemote {
@@ -37,7 +39,8 @@ public class UserManager implements UserManagerRemote {
 
 
     @Override
-    public void insertUser(UserDTO userDTO){
+    public void insertUser(UserDTO userDTO) throws BusinessException {
+        UserValidator.validate(userDTO);
         User persistedUser =  userDao.insertUser(createUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 

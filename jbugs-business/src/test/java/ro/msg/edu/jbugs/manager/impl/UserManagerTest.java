@@ -18,7 +18,8 @@ import ro.msg.edu.jbugs.exceptions.BusinessException;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -91,6 +92,13 @@ public class UserManagerTest {
         return user;
     }
 
+    private UserDTO createUserDTO() {
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
+        return userDTO;
+    }
+
     @Test(expected = BusinessException.class)
     public void login3() throws BusinessException {
 
@@ -159,5 +167,40 @@ public class UserManagerTest {
         assertEquals((Integer)newUser.getStatus(), (Integer)1);
         assertEquals(newUser.getUsername(), "test5t");
         assertTrue(newUser.getRoles().contains(role));
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("df34");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailLastnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setLastName("dff34");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailPhoneNumberIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setMobileNumber("456787654323456789876543456");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailEmailIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setEmail("mara@yahoo.com");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailRolesIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setRoles(new HashSet<>());
+        userManager.insertUser(userDTO);
     }
 }
