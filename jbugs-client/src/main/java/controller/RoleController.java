@@ -3,6 +3,7 @@ package controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.PermissionDTO;
+import ro.msg.edu.jbugs.dto.PermissionsInsertDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.RoleManagerRemote;
 
@@ -41,13 +42,13 @@ public class RoleController extends HttpServlet {
         }
     }
 
-    @POST
-    @Path("/get-permissions/{id}")
+    @PUT
+    @Path("/set-permissions")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response setRolePermissions(@PathParam("id") int id, PermissionDTO[] permissionDTOS) {
+    public Response setRolePermissions(PermissionsInsertDTO permissionsReguest) {
         try {
-            roleManager.setRolePermissions(id, permissionDTOS);
+            roleManager.setRolePermissions(permissionsReguest.getRoleId(), permissionsReguest.getPermissions());
             return Response.status(Response.Status.OK).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
