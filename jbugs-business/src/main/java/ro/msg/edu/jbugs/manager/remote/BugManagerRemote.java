@@ -11,4 +11,5 @@ public interface BugManagerRemote {
 
     List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
     Integer updateBugStatus();
+    List<BugDTO> getAllBugs();
 }
