@@ -2,7 +2,6 @@ package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 
@@ -32,11 +31,10 @@ public class BugController extends HttpServlet {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public BugAttachmentWrapperDTO createBug(BugAttachmentWrapperDTO wrapperDTO) {
-        System.out.println(wrapperDTO.toString());
+    @Produces(MediaType.APPLICATION_JSON)
+    public BugDTO createBug(BugDTO bugDTO) {
+        System.out.println(bugDTO.toString());
 
-        bugManagerRemote.insertBug(wrapperDTO);
-
-        return wrapperDTO;
+        return bugManagerRemote.insertBug(bugDTO);
     }
 }

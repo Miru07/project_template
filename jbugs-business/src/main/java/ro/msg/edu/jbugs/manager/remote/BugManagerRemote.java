@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.manager.remote;
 
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 
@@ -14,5 +13,5 @@ public interface BugManagerRemote {
     Integer updateBugStatus();
     List<BugDTO> getAllBugs();
 
-    BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO);
+    BugDTO insertBug(BugDTO bugDTO);
 }

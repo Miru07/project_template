@@ -2,6 +2,7 @@ package ro.msg.edu.jbugs.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Arrays;
 
 @Entity
 @Table(name="attachments")
@@ -43,5 +44,14 @@ public class Attachment implements Serializable {
 
     public void setAttContent(byte[] attContent) {
         this.attContent = attContent;
+    }
+
+    @Override
+    public String toString() {
+        return "Attachment{" +
+                "ID=" + ID +
+                ", attContent=" + Arrays.toString(attContent) +
+                ", bugID=" + bugID +
+                '}';
     }
 }

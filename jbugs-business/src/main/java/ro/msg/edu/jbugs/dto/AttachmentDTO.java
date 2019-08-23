@@ -1,6 +1,7 @@
 package ro.msg.edu.jbugs.dto;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Document me.
@@ -44,5 +45,14 @@ public class AttachmentDTO implements Serializable {
 
     public void setBugID(BugDTO bugID) {
         this.bugID = bugID;
+    }
+
+    @Override
+    public String toString() {
+        return "AttachmentDTO{" +
+                "ID=" + ID +
+                ", attContent=" + Arrays.toString(attContent) +
+                ", bugID=" + bugID +
+                '}';
     }
 }
