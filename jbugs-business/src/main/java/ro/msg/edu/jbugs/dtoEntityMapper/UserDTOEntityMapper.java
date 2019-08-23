@@ -24,10 +24,9 @@ public class UserDTOEntityMapper {
 
     public static UserDTO getDTOFromUser(User user){
 
-        UserDTO userDTO = new UserDTO(user.getCounter(), user.getFirstName(), user.getLastName(),
-                user.getMobileNumber(), user.getEmail(), user.getUsername(), user.getPassword(), user.getStatus());
+        UserDTO userDTO = new UserDTO(user.getID(), user.getFirstName(), user.getLastName(),
+                user.getUsername(), user.getPassword(),user.getCounter(), user.getEmail(), user.getMobileNumber(), user.getStatus(), RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
 
-        userDTO.setId(user.getID());
         return userDTO;
     }
 

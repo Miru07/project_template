@@ -1,21 +1,14 @@
 import ro.msg.edu.jbugs.MailSender;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserBugsDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import ro.msg.edu.jbugs.manager.impl.CommentManager;
-import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.manager.impl.UserManager;
 import ro.msg.edu.jbugs.manager.remote.CommentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
-
 import javax.ejb.EJB;
-import javax.jms.*;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,51 +33,12 @@ public class TestServlet extends HttpServlet {
     private NotificationManagerRemote notificationManager;
 
     public void init() throws ServletException {
-        message = "Hello, M.";
-
-        UserDTO testUser1 = new UserDTO(0, "test", "test", "077", "email",
-                "username", "passw", 0);
-        userManager.insertUser(testUser1);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         response.setContentType("text/html");
         PrintWriter out = response.getWriter();
-
-//        String text = request.getParameter("text") != null ? request.getParameter("text") : "Hello World";
-//
-//        try{
-//            Context ic = new InitialContext();
-//            ConnectionFactory cf = (ConnectionFactory) ic.lookup("java:comp/DefaultJMSConnectionFactory");
-//            Queue queue = (Queue) ic.lookup("tutorialQueue");
-//            Connection connection = cf.createConnection();
-//
-//            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-//            MessageProducer publisher = session.createProducer(queue);
-//            connection.start();
-//            TextMessage message = session.createTextMessage(text);
-//            publisher.send(message);
-//
-//        } catch (NamingException | JMSException e) {
-//            response.getWriter().println("Error while trying to send <" + text + "> message: " + e.getMessage());
-//        }
-//        response.getWriter().println("Message sent: " + text);
-
-
-
-        insertUser(0, "test5", "test5", "test5", "0123456", "test5", "test5", 1);
-
-        insertUser(0, "test6", "test6", "test6", "0123456", "test6", "test6", 1);
-
-        UserDTO userDTO = userManager.findUser(1);
-//        List<UserDTO> userDTOList = userManager.findAllUsers();
-//
-//        for(UserDTO userDTO : userDTOList){
-//
-//
-//            out.println("<br>" + userDTO.toString() + "<br>");
-//        }
 
         try{
             UserDTO userDTO1 = userManager.login("test5t", "test5");
@@ -110,9 +64,9 @@ public class TestServlet extends HttpServlet {
     }
 
     public void insertUser(Integer counter, String email, String fName, String lName, String phoneNr, String password,
-                           String username, Integer status){
+                           String username, Integer status) throws BusinessException {
 
-        userDTO = new UserDTO(counter, fName, lName, phoneNr, email, username, password, status);
+        userDTO = new UserDTO(0, fName, lName, username, password, counter, email, phoneNr, status, null);
         userManager.insertUser(userDTO);
     }
 

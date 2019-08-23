@@ -1,13 +1,20 @@
 package ro.msg.edu.jbugs.entity;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name="roles")
+@NamedQueries({
+    @NamedQuery(name = Role.QUERY_SELECT_BY_TYPE, query = "select r from Role r " +
+                "where r.type=:type ")
+})
 public class Role implements Serializable {
 
+    public static final String QUERY_SELECT_BY_TYPE = "Role.getRoleByType";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="ID")
@@ -20,13 +27,21 @@ public class Role implements Serializable {
     @JoinTable(name="users_roles",
             joinColumns = @JoinColumn(name="role_id"),
             inverseJoinColumns = @JoinColumn(name="user_id"))
-    private Set<User> users;
+    private Set<User> users = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name="roles_permissions",
                 joinColumns = @JoinColumn(name="role_id"),
                 inverseJoinColumns = @JoinColumn(name="permission_id"))
     private Set<Permission> permissions;
+
+    public Role() {
+    }
+
+    public Role(Integer id, String type) {
+        this.ID = id;
+        this.type = type;
+    }
 
     public Integer getID() {
         return ID;
@@ -52,11 +67,25 @@ public class Role implements Serializable {
         this.users = users;
     }
 
+    public void addUser(User user) {
+        this.users.add(user);
+    }
+
     public Set<Permission> getPermissions() {
         return permissions;
     }
 
     public void setPermissions(Set<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "ID=" + ID +
+                ", type='" + type + '\'' +
+                ", users=" + users +
+                ", permissions=" + permissions +
+                '}';
     }
 }
