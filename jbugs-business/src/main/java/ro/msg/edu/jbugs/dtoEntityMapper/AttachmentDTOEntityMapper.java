@@ -4,10 +4,10 @@ import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import ro.msg.edu.jbugs.entity.Attachment;
 
 /**
- * Document me.
+ * Entity Mapper class for {@link Attachment} & {@link AttachmentDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Sebastian Maier
  */
 public class AttachmentDTOEntityMapper {
 

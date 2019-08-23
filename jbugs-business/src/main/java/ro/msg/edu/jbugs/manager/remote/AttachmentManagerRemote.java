@@ -5,10 +5,9 @@ import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import javax.ejb.Remote;
 
 /**
- * Document me.
+ * Interface for Remote usage
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Sebastian Maier
  */
 @Remote
 public interface AttachmentManagerRemote {

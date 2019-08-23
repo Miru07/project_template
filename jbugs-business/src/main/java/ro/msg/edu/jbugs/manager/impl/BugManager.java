@@ -13,9 +13,13 @@ import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.interceptor.Interceptors;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Manager class for CRUD actions on {@link Bug} & {@link BugDTO} objects.
+ */
 @Stateless
 @Interceptors(TimeInterceptors.class)
 public class BugManager implements BugManagerRemote {
@@ -43,22 +47,17 @@ public class BugManager implements BugManagerRemote {
         return BugDTOEntityMapper.getBugDTOList(bugList);
     }
 
+    /**
+     * The function maps the {@link BugDTO} object to an {@link Bug} object.
+     * The latter object is then persisted inside the database.
+     *
+     * @param bugDTO is an {@link BugDTO} object that contains
+     *               the Bug details in a DTO format.
+     * @return an {@link BugDTO} object that has been persisted and contains and ID.
+     * @author Sebastian Maier
+     */
     @Override
-    public BugDTO insertBug(BugDTO bugDTO) {
-//        Bug bugToAdd = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
-//        Bug bugFlushedWithID = bugDao.insert(bugToAdd);
-//
-//        Attachment attachmentToAdd = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
-//        attachmentToAdd.setBugID(bugFlushedWithID);
-//
-//        Attachment attachmentFlushedWithID = attachmentDao.insert(attachmentToAdd);
-//
-//        return new BugAttachmentWrapperDTO(
-//                BugDTOEntityMapper.getBugDTO(bugFlushedWithID),
-//                AttachmentDTOEntityMapper.getAttachmentDTO(attachmentFlushedWithID)
-//        );
-
-
+    public BugDTO insertBug(@NotNull BugDTO bugDTO) {
         Bug bugToAdd = BugDTOEntityMapper.getBug(bugDTO);
         Bug bugWithFlushedID = bugDao.insert(bugToAdd);
 

@@ -8,20 +8,25 @@ import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.validation.constraints.NotNull;
 
 /**
- * Document me.
+ * Manager class for CRUD actions on {@link Attachment} & {@link AttachmentDTO} objects.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Sebastian Maier
  */
 @Stateless
 public class AttachmentManager implements AttachmentManagerRemote {
     @EJB
     AttachmentDao attachmentDao;
 
+    /**
+     * @param attachmentDTO is an {@link AttachmentDTO} object that will be persisted
+     *                      in the database.
+     * @return an {@link AttachmentDTO} with a persisted ID.
+     */
     @Override
-    public AttachmentDTO insertAttachment(AttachmentDTO attachmentDTO) {
+    public AttachmentDTO insertAttachment(@NotNull AttachmentDTO attachmentDTO) {
         Attachment attachmentToAdd = AttachmentDTOEntityMapper.getAttachment(attachmentDTO);
 
         Attachment attachmentWithFlushedID = attachmentDao.insert(attachmentToAdd);

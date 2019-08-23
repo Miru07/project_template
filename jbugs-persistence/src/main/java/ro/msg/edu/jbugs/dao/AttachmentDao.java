@@ -5,12 +5,13 @@ import ro.msg.edu.jbugs.entity.Attachment;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.validation.constraints.NotNull;
 
 /**
- * Document me.
+ * Data Access Object class for {@link Attachment} objects.
+ * It has direct access to the database and all {@link Attachment} related tables.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Sebastian Maier
  */
 @Stateless
 public class AttachmentDao {
@@ -18,7 +19,12 @@ public class AttachmentDao {
     @PersistenceContext(unitName = "jbugs-persistence")
     private EntityManager entityManager;
 
-    public Attachment insert(Attachment attachment) {
+    /**
+     * @param attachment is an {@link Attachment} object containing data to be
+     *                   persisted inside the database.
+     * @return an {@link Attachment} object with a persisted ID.
+     */
+    public Attachment insert(@NotNull Attachment attachment) {
 
         entityManager.persist(attachment);
         entityManager.flush();
