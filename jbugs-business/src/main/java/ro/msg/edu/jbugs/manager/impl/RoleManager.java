@@ -4,12 +4,14 @@ import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.PermissionDao;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dto.PermissionDTO;
+import ro.msg.edu.jbugs.dto.PermissionsInsertDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.PermissionDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Permission;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.RoleManagerRemote;
+import ro.msg.edu.jbugs.validators.RoleValidator;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
@@ -45,13 +47,14 @@ public class RoleManager implements RoleManagerRemote {
     }
 
     @Override
-    public void setRolePermissions(int roleId, PermissionDTO[] rolePermissions) throws BusinessException {
-        Role role = roleDao.findRole(roleId);
+    public void setRolePermissions(PermissionsInsertDTO permissionsInsertDTO) throws BusinessException {
+        RoleValidator.validatePermissionsInsertion(permissionsInsertDTO);
+        Role role = roleDao.findRole(permissionsInsertDTO.getRoleId());
         if (role == null)
             throw new BusinessException("msg2_301", "No role was found!");
 
         Set<Permission> actualPermissions = new HashSet<>();
-        for (PermissionDTO permissionDTO : rolePermissions) {
+        for (PermissionDTO permissionDTO : permissionsInsertDTO.getPermissions()) {
             actualPermissions.add(permissionDao.findPermission(permissionDTO.getId()));
         }
         role.setPermissions(actualPermissions);

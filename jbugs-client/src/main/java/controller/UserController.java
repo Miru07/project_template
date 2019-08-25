@@ -47,7 +47,7 @@ public class UserController extends HttpServlet {
             userManagerRemote.insertUser(userDTO);
             return Response.status(Response.Status.OK).entity(userDTO).build();
         } catch (BusinessException e) {
-            return Response.status(500).entity(e.getErrorCode()).build();
+            return Response.status(500).entity(e).build();
         }
     }
 

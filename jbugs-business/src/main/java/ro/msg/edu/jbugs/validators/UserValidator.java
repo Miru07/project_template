@@ -45,14 +45,13 @@ public class UserValidator {
 
     static boolean validateRoles(Set<RoleDTO> roles) {
         for (RoleDTO roleDTO : roles) {
-            if (roleDTO.getType().equals("Administrator")
-                    || roleDTO.getType().equals("Project Manager")
-                    || roleDTO.getType().equals("Test Manager")
-                    || roleDTO.getType().equals("Developer")
-                    || roleDTO.getType().equals("Tester"))
-                return true;
+            if (!roleDTO.getType().equals("Administrator")
+                    && !roleDTO.getType().equals("Project Manager")
+                    && !roleDTO.getType().equals("Test Manager")
+                    && !roleDTO.getType().equals("Developer")
+                    && !roleDTO.getType().equals("Tester"))
+                return false;
         }
-        ;
         return roles.size() > 0;
     }
 }

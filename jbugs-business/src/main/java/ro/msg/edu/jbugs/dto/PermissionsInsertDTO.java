@@ -1,12 +1,14 @@
 package ro.msg.edu.jbugs.dto;
 
+import java.io.Serializable;
+
 /**
  * Document me.
  *
  * @author msg systems AG; User Name.
  * @since 19.1.2
  */
-public class PermissionsInsertDTO {
+public class PermissionsInsertDTO implements Serializable {
     private Integer roleId;
     private PermissionDTO[] permissions;
 

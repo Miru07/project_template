@@ -48,7 +48,7 @@ public class RoleController extends HttpServlet {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response setRolePermissions(PermissionsInsertDTO permissionsReguest) {
         try {
-            roleManager.setRolePermissions(permissionsReguest.getRoleId(), permissionsReguest.getPermissions());
+            roleManager.setRolePermissions(permissionsReguest);
             return Response.status(Response.Status.OK).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();

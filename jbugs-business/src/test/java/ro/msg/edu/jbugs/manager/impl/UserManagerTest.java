@@ -36,6 +36,9 @@ public class UserManagerTest {
     @Mock
     private RoleDao roleDao;
 
+    @Mock
+    private NotificationManager notificationManager;
+
     public UserManagerTest() {
 
         userManager = new UserManager();
@@ -168,6 +171,7 @@ public class UserManagerTest {
         assertEquals(newUser.getUsername(), "test5t");
         assertTrue(newUser.getRoles().contains(role));
     }
+
 
     @Test(expected = BusinessException.class)
     public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
