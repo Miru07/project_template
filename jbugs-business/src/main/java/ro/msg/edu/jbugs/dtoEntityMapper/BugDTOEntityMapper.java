@@ -2,6 +2,10 @@ package ro.msg.edu.jbugs.dtoEntityMapper;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.entity.Bug;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class BugDTOEntityMapper {
 
     private BugDTOEntityMapper(){
@@ -36,6 +40,11 @@ public class BugDTOEntityMapper {
         bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getCREATED_ID()));
 
         return bugDTO;
+    }
+
+    public static List<BugDTO> getBugDTOList(List<Bug> bugList){
+
+        return bugList.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
 
 }

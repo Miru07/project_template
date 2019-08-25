@@ -16,8 +16,8 @@ public class BugDao {
     @PersistenceContext(unitName = "jbugs-persistence")
     private EntityManager entityManager;
 
-    public Bug find(Integer id) {
-        return entityManager.find(Bug.class, id);
+    public Bug getBugByID(Integer bugID) {
+        return entityManager.find(Bug.class, bugID);
     }
 
     public List<Bug> findBugCreatedBy(User user) {
@@ -34,18 +34,19 @@ public class BugDao {
 
     }
 
-    // status = closed daca s-a depasit targetDate
-    public Integer updateBugStatus(){
-
-        LocalDate date = LocalDate.now();
-
-        Query query = entityManager.createNativeQuery("UPDATE bugs b\n" +
-                "SET b.status = 'Closed'\n" +
-                "WHERE TIMESTAMPDIFF(DAY, ?1, b.targetDate) < 0 AND b.status <> 'Closed'");
-        query.setParameter(1, date);
-
-        return query.executeUpdate();
-
+    public List<Bug> getAllBugs()
+    {
+        return entityManager.createNamedQuery(Bug.FIND_ALL_BUGS, Bug.class).getResultList();
     }
+
+    public Integer updateBugStatus(String newStatus, int bugID){
+
+        Query updateBugStatusQuery = entityManager.createNamedQuery(Bug.UPDATE_BUG_STATUS, Bug.class);
+        updateBugStatusQuery.setParameter("newStatus", newStatus);
+        updateBugStatusQuery.setParameter("bugID", bugID);
+
+        return updateBugStatusQuery.executeUpdate();
+    }
+
 }
 
