@@ -35,7 +35,9 @@ public class BugDTOEntityMapper {
         bugDTO.setDescription(bug.getDescription());
         bugDTO.setTargetDate(bug.getTargetDate());
         bugDTO.setFixedVersion(bug.getFixedVersion());
-
+        bugDTO.setSeverity(bug.getSeverity());
+        bugDTO.setVersion(bug.getVersion());
+        bugDTO.setStatus(bug.getStatus());
         bugDTO.setASSIGNED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getASSIGNED_ID()));
         bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getCREATED_ID()));
 
