@@ -22,8 +22,8 @@ import java.util.Set;
 })
 public class User implements Serializable {
 
-    public static final Integer USER_STATUS_ACTIVE = 0;
-    public static final Integer USER_STATUS_INACTIVE = 1;
+    public static final Integer USER_STATUS_ACTIVE = 1;
+    public static final Integer USER_STATUS_INACTIVE = 0;
 
     public static final String QUERY_UPDATE_USER_STATUS_AND_COUNTER = "User.updateStatusAndCounter";
     public static final String QUERY_GET_PERMISSIONS = "User.getUserPermissions";
