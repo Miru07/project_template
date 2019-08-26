@@ -1,5 +1,7 @@
 package ro.msg.edu.jbugs.manager.remote;
 
+import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
+import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.dto.UserBugsDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
@@ -15,5 +17,6 @@ public interface UserManagerRemote {
     List<UserDTO> findAllUsers();
     List<UserBugsDTO> getUserBugs();
     //Integer deleteUser(Integer userID);
-    UserDTO login(String username, String password) throws BusinessException;
+    LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
+    boolean userHasPermission(Integer userId, String permission);
 }
