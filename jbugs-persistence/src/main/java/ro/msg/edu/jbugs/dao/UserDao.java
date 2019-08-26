@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.dao;
 
-import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -11,9 +10,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Set;
 
-import static com.google.common.hash.Hashing.*;
+import static com.google.common.hash.Hashing.sha256;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
 
 @Stateless
@@ -28,7 +26,6 @@ public class UserDao {
     }
 
     public User insertUser(User user){
-
         entityManager.persist(user);
         entityManager.flush();
         return user;

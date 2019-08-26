@@ -8,7 +8,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 
 /**
  * Document me.
@@ -21,6 +20,10 @@ import javax.persistence.Query;
 public class RoleDao {
     @PersistenceContext(unitName="jbugs-persistence")
     private EntityManager entityManager;
+
+    public Role findRole(Integer id) {
+        return entityManager.find(Role.class, id);
+    }
 
     public Role findRoleByType(String type) throws BusinessException {
 
