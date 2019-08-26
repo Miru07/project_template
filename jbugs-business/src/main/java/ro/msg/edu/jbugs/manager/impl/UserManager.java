@@ -9,7 +9,8 @@ import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
-import javax.ejb.*;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.google.common.hash.Hashing.*;
+import static com.google.common.hash.Hashing.sha256;
 
 @Stateless
 public class UserManager implements UserManagerRemote {
@@ -91,6 +92,9 @@ public class UserManager implements UserManagerRemote {
     public List<UserDTO> findAllUsers() {
 
         List<User> users = userDao.findAllUsers();
+
+        users.forEach(System.out::println);
+
         return UserDTOEntityMapper.getUserDTOListFromUserList(users);
     }
 

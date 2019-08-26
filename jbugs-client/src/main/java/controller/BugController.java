@@ -2,18 +2,16 @@ package controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import utils.TokenService;
 
 import javax.ejb.EJB;
+import javax.ejb.EJBException;
 import javax.servlet.http.HttpServlet;
-import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -59,19 +57,13 @@ public class BugController extends HttpServlet {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public boolean createBug(@NotNull BugAttachmentWrapperDTO bugAttachmentWrapperDTO) {
-        BugDTO bugToInsert = bugAttachmentWrapperDTO.getBug();
-        AttachmentDTO attachmentToInsert = bugAttachmentWrapperDTO.getAttachment();
-
-        String token = bugAttachmentWrapperDTO.getToken();
-        Integer id = TokenService.getCurrentUserID(token);
-        UserDTO createdUserDTO = userManagerRemote.findUser(id);
-        bugToInsert.setCREATED_ID(createdUserDTO);
-
-        BugDTO persistedBugWithID = bugManagerRemote.insertBug(bugToInsert);
-        attachmentToInsert.setBugID(persistedBugWithID);
-        AttachmentDTO persistedAttachmentWithID = attachmentManagerRemote.insertAttachment(attachmentToInsert);
-
-        return ((persistedAttachmentWithID != null) && (persistedBugWithID != null));
+    public boolean createBug(BugAttachmentWrapperDTO bugAttachmentWrapperDTO) {
+        try {
+            Integer createdID = TokenService.getCurrentUserID(bugAttachmentWrapperDTO.getToken());
+            BugAttachmentWrapperDTO persistedWrapper = bugManagerRemote.insertBug(bugAttachmentWrapperDTO, createdID);
+            return true;
+        } catch (EJBException x) {
+            return false;
+        }
     }
 }

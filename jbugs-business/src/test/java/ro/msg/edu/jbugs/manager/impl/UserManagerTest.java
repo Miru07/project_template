@@ -15,7 +15,8 @@ import ro.msg.edu.jbugs.exceptions.BusinessException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -125,7 +126,7 @@ public class UserManagerTest {
 
         assertEquals(persistedUser.getFirstName(), loginResponseUserDTO.getFirstName());
         assertEquals(persistedUser.getLastName(), loginResponseUserDTO.getLastName());
-        // assertEquals(1L, loginResponseUserDTO.getId());
+        // assertEquals(1L, loginResponseUserDTO.getID());
         assertEquals(persistedUser.getEmail(), loginResponseUserDTO.getEmail());
         assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
         // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());

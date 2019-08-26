@@ -1,10 +1,10 @@
 package ro.msg.edu.jbugs.manager.remote;
 
+import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 
 import javax.ejb.Remote;
-import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
@@ -21,5 +21,5 @@ public interface BugManagerRemote {
 
     List<BugDTO> getAllBugs();
 
-    BugDTO insertBug(@NotNull BugDTO bugDTO);
+    BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID);
 }

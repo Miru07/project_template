@@ -29,7 +29,7 @@ public class BugDTOEntityMapper {
         bug.setVersion(bugDTO.getVersion());
 
         bug.setASSIGNED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID()));
-        bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
+        //bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
 
         return bug;
     }

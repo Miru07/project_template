@@ -1,14 +1,7 @@
 package utils;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 public class TokenServiceTest {
@@ -25,7 +18,7 @@ public class TokenServiceTest {
     public void decodeJWT() {
         /*
         // testing:
-        // String decToken = TokenService.decodeJWT(jwtToken).getId();
+        // String decToken = TokenService.decodeJWT(jwtToken).getID();
         boolean userHasPerm = TokenService.currentUserHasPermission(userManager, jwtToken,
                 PermissionType.PERMISSION_MANAGEMENT.getActualString());
         boolean userHasPerm2 = TokenService.currentUserHasPermission(userManager, jwtToken,

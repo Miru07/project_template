@@ -14,6 +14,9 @@ public class UserDTO implements Serializable {
     private String mobileNumber;
     private Integer status;
 
+    public UserDTO() {
+    }
+
     public UserDTO(int id, String firstName, String lastName, String username, String password, int counter, String email, String mobileNumber, Integer status) {
         this.id = id;
         this.firstName = firstName;
