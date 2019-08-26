@@ -6,14 +6,25 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
+import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -29,6 +40,12 @@ public class UserManagerTest {
 
     @Mock
     private UserDao userDao;
+
+    @Mock
+    private RoleDao roleDao;
+
+    @Mock
+    private NotificationManager notificationManager;
 
     public UserManagerTest() {
 
@@ -78,6 +95,12 @@ public class UserManagerTest {
         user.setStatus(1);
 
         return user;
+    }
+    private UserDTO createUserDTO() {
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
+        return userDTO;
     }
 
     @Test
@@ -131,5 +154,79 @@ public class UserManagerTest {
         assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
         // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());
         assertEquals(persistedUser.getUsername(), loginResponseUserDTO.getUsername());
+    }
+
+    @Test
+    public void getActualRoleList() throws BusinessException{
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        Role role = new Role(1, "Administrator");
+        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+
+        Set<Role> actualRoles = userManager.getActualRoleList(roleDTOS);
+
+        assertTrue(actualRoles.contains(role));
+
+        roleDTOS.clear();
+        roleDTOS.add(new RoleDTO("wrong role"));
+        when(roleDao.findRoleByType("wrong role")).thenThrow(new BusinessException("test", "test"));
+        actualRoles = userManager.getActualRoleList(roleDTOS);
+        assertEquals(actualRoles.size(), 0);
+    }
+
+    @Test
+    public void createUserToInsert() throws BusinessException {
+        UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Administrator"));
+        userDTO.setRoles(roleDTOS);
+
+        Role role = new Role(1, "Administrator");
+        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+
+        when(userDao.isUsernameUnique("test5t")).thenReturn(true);
+
+        User newUser = userManager.createUserToInsert(userDTO);
+
+        assertEquals((Integer)newUser.getCounter(), (Integer)0);
+        assertEquals((Integer)newUser.getStatus(), (Integer)1);
+        assertEquals(newUser.getUsername(), "test5t");
+        assertTrue(newUser.getRoles().contains(role));
+    }
+
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("df34");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailLastnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setLastName("dff34");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailPhoneNumberIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setMobileNumber("456787654323456789876543456");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailEmailIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setEmail("mara@yahoo.com");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailRolesIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setRoles(new HashSet<>());
+        userManager.insertUser(userDTO);
     }
 }

@@ -20,6 +20,15 @@ public class Permission implements Serializable {
     @Column(name="type")
     private String type;
 
+    public Permission() {
+    }
+
+    public Permission(Integer id, String description, String type) {
+        this.ID = id;
+        this.description = description;
+        this.type = type;
+    }
+
     @ManyToMany(mappedBy = "permissions")
     private Set<Role> roles = new HashSet<>();
 

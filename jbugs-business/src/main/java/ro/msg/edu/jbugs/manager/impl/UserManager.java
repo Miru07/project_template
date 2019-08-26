@@ -1,23 +1,24 @@
 package ro.msg.edu.jbugs.manager.impl;
 
+import org.apache.log4j.Logger;
+import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.NotificationType;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
+import ro.msg.edu.jbugs.validators.UserValidator;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.hash.Hashing.sha256;
 
@@ -27,39 +28,63 @@ public class UserManager implements UserManagerRemote {
     @EJB
     private UserDao userDao;
     @EJB
+    private RoleDao roleDao;
+    @EJB
     private NotificationManagerRemote notificationManager;
 
+    private Logger logger = Logger.getLogger(UserManager.class.getName());
+
+
     @Override
-    public void insertUser(UserDTO userDTO) {
-
-        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
-        String username = generateUsername(user.getFirstName(), user.getLastName());
-        user.setUsername(username);
-
-
-        String hashPassword = sha256()
-                .hashString(user.getPassword(), StandardCharsets.UTF_8)
-                .toString();
-        user.setPassword(hashPassword);
-
-        User newUser = userDao.insertUser(user);
-        UserDTO userDTO1 = UserDTOEntityMapper.getDTOFromUser(newUser);
-        userDTO1.setPassword(userDTO.getPassword());
+    public void insertUser(UserDTO userDTO) throws BusinessException {
+        UserValidator.validate(userDTO);
+        User persistedUser =  userDao.insertUser(createUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 
-        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date), "Welcome: " + newUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString(), "", newUser);
+        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  persistedUser.toString(),
+                NotificationType.WELCOME_NEW_USER.toString() , "", persistedUser);
 
         notificationManager.insertNotification(notificationDTO);
     }
 
-    String generateUsername(String firstName, String lastName) {
+    public User createUserToInsert(UserDTO userDTO){
+        userDTO.setCounter(0);
+        userDTO.setStatus(1);
+        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
+        String username = generateUsername(user.getFirstName(), user.getLastName());
+        user.setUsername(username);
+
+        String generatedPassword = generatePassword();
+        String hashPassword = sha256()
+                .hashString(generatedPassword, StandardCharsets.UTF_8)
+                .toString();
+        user.setPassword(hashPassword);
+
+        user.setRoles(getActualRoleList(userDTO.getRoles()));
+
+        return user;
+    }
+    public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS){
+        Set<Role> actualRoles = new HashSet<>();
+        roleDTOS.forEach(roleDTO -> {
+            try {
+                actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
+            } catch (BusinessException e) {
+                logger.error(e);
+                return;
+            }
+        });
+        return actualRoles;
+    }
+
+    public String generateUsername(String firstName, String lastName){
 
         String firstPart;
-        if (lastName.length() >= 5) {
+        if(lastName.length() >= 5){
 
             firstPart = lastName.substring(0, 5);
-        } else {
+        }
+        else {
 
             firstPart = lastName;
         }
@@ -67,30 +92,33 @@ public class UserManager implements UserManagerRemote {
         int charPosition = 0;
         String username = (firstPart + firstName.charAt(charPosition)).toLowerCase();
 
-        while (!userDao.isUsernameUnique(username)) {
-
+        while(!userDao.isUsernameUnique(username)){
             charPosition++;
-            if (charPosition < firstName.length()) {
-
+            if(charPosition < firstName.length()){
                 username = (username + firstName.charAt(charPosition)).toLowerCase();
-            } else {
-
+            }
+            else{
                 username = username + "x";
             }
         }
         return username;
     }
 
-    @Override
-    public UserDTO findUser(Integer id) {
+    public String generatePassword(){
+        String password = new Random().ints(10, 33, 122).collect(StringBuilder::new,
+                StringBuilder::appendCodePoint, StringBuilder::append)
+                .toString();
+        return password;
+    }
 
+    @Override
+    public UserDTO findUser(Integer id){
         User user = userDao.findUser(id);
         return UserDTOEntityMapper.getDTOFromUser(user);
     }
 
     @Override
-    public List<UserDTO> findAllUsers() {
-
+    public List<UserDTO> findAllUsers(){
         List<User> users = userDao.findAllUsers();
 
         users.forEach(System.out::println);
@@ -99,12 +127,11 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public List<UserBugsDTO> getUserBugs() {
-
+    public List<UserBugsDTO> getUserBugs(){
         List<UserBugsDTO> userBugsDTOList = new ArrayList<>();
         List<Object[]> userBugsList = userDao.findUserBugs();
 
-        for (Object[] userBug : userBugsList) {
+        for(Object[] userBug : userBugsList){
 
             Long value = (Long) userBug[2];
             UserBugsDTO userBugsDTO = new UserBugsDTO(userBug[0].toString(), userBug[1].toString(), value.intValue());
@@ -131,7 +158,7 @@ public class UserManager implements UserManagerRemote {
             return loginResponseUserDTO;
         } catch (BusinessException busy) {
             loginResponseUserDTO = new LoginResponseUserDTO(); // init to 0 and null fields... token included
-            loginResponseUserDTO.setMessage(busy.getMessage()); // busy.getErrorCode()
+            loginResponseUserDTO.setMessageCode(busy.getErrorCode()); // busy.getMessage()
             return loginResponseUserDTO;
         }
     }

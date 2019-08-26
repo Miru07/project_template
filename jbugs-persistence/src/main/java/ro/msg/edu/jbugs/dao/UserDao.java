@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.google.common.hash.Hashing.*;
+import static com.google.common.hash.Hashing.sha256;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
 
 @Stateless
@@ -26,7 +26,6 @@ public class UserDao {
     }
 
     public User insertUser(User user){
-
         entityManager.persist(user);
         entityManager.flush();
         return user;
@@ -69,7 +68,7 @@ public class UserDao {
             user = this.findUserByUsername(username); // could throw exception
             // user.setStatus(User.USER_STATUS_ACTIVE);
             if(user.getStatus() == User.USER_STATUS_INACTIVE){
-                throw new BusinessException("msg-002", "User is inactive");
+                throw new BusinessException("LOGIN-002", "User is inactive");
             }
             
             String hashedPassword = this.getHashedPassword(password);
@@ -78,11 +77,11 @@ public class UserDao {
                 int PASS_MAX_NR_TRIES = 4;
                 if(user.getCounter() >= PASS_MAX_NR_TRIES){
                     user.setStatus(User.USER_STATUS_INACTIVE);
-                    throw new BusinessException("msg-003", "User was deactivated");
+                    throw new BusinessException("LOGIN-003", "User was deactivated");
                 }
                 else{
                     user.setCounter(user.getCounter()+1);
-                    throw new BusinessException("msg-004", "Incorrect password");
+                    throw new BusinessException("LOGIN-004", "Incorrect password");
                 }
             }
             user.setCounter(0); // if success, set counter for wrongPass to 0
@@ -105,7 +104,7 @@ public class UserDao {
                     .getSingleResult();
             return user;
         } catch(NoResultException e){
-            throw new BusinessException("msg-001", "Invalid username");
+            throw new BusinessException("LOGIN-001", "Invalid username");
         }
     }
     /**

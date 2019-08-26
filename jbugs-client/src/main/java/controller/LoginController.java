@@ -22,7 +22,7 @@ public class LoginController extends HttpServlet {
         // later on, to be added decrypt password from loginReceived
         // now, it receives password as plain text
         LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceived);
-        if(loginResponseUserDTO.getMessage() == LoginResponseUserDTO.SUCCESS) {
+        if(loginResponseUserDTO.getMessageCode() == LoginResponseUserDTO.SUCCESS) {
             String jwtToken = TokenService.generateJbugsToken(loginResponseUserDTO);
             loginResponseUserDTO.setToken(jwtToken);
         }
