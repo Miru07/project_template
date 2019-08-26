@@ -7,7 +7,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.time.LocalDate;
 import java.util.List;
 
 @Stateless
@@ -31,19 +30,13 @@ public class BugDao {
         entityManager.flush();
 
         return bug;
-
     }
 
     public Bug updateBugStatus(String newStatus, int bugID){
 
-//        Query updateBugStatusQuery = entityManager.createNamedQuery(Bug.UPDATE_BUG_STATUS, Bug.class);
-//        updateBugStatusQuery.setParameter("newStatus", newStatus);
-//        updateBugStatusQuery.setParameter("bugID", bugID);
-
         Bug bug = entityManager.find(Bug.class, bugID);
         bug.setStatus(newStatus);
 
-        //return query.executeUpdate();
         return bug;
     }
 
