@@ -1,7 +1,5 @@
 package ro.msg.edu.jbugs.dto;
 
-import ro.msg.edu.jbugs.entity.Role;
-
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -63,10 +61,6 @@ public class UserDTO implements Serializable {
         this.mobileNumber = mobileNumber;
         this.status = status;
         this.roles = roles;
-    }
-
-    public UserDTO(){
-
     }
 
     public Set<RoleDTO> getRoles() {

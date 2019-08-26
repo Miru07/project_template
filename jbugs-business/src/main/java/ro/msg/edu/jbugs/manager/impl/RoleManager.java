@@ -35,7 +35,7 @@ public class RoleManager implements RoleManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
-    private Logger logger = Logger.getLogger(RoleManager.class.getName());
+    //private Logger logger = Logger.getLogger(RoleManager.class.getName());
 
     @Override
     public Set<PermissionDTO> getRolePermissions(int id) throws BusinessException {

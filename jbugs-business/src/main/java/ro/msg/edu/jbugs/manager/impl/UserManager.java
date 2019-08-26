@@ -31,7 +31,7 @@ public class UserManager implements UserManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
-    private Logger logger = Logger.getLogger(UserManager.class.getName());
+    //private Logger logger = Logger.getLogger(UserManager.class.getName());
 
 
     @Override
@@ -69,7 +69,7 @@ public class UserManager implements UserManagerRemote {
             try {
                 actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
             } catch (BusinessException e) {
-                logger.error(e);
+                //logger.error(e);
                 return;
             }
         });
