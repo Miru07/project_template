@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/bugs")
@@ -38,7 +41,7 @@ public class BugController extends HttpServlet {
     public Response updateBugStatus(@PathParam("id") Integer bugID, String newStatus) {
 
         try {
-            int updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
+            BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
             return Response.status(Response.Status.OK).entity(updateResult).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e.getErrorCode()).build();

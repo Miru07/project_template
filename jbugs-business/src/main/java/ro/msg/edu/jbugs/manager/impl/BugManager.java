@@ -32,7 +32,7 @@ public class BugManager implements BugManagerRemote {
     }
 
     @Override
-    public Integer updateBugStatus(String newStatus, int bugID) throws BusinessException {
+    public BugDTO updateBugStatus(String newStatus, int bugID) throws BusinessException {
 
         Bug bug = bugDao.getBugByID(bugID);
 
@@ -47,7 +47,7 @@ public class BugManager implements BugManagerRemote {
         {
             throw new BusinessException("msg-101", "Cannot change status from " + bug.getStatus() + " to " + newStatus);
         }
-        return bugDao.updateBugStatus(newStatus, bugID);
+        return BugDTOEntityMapper.getBugDTO(bugDao.updateBugStatus(newStatus, bugID));
 
     }
 
@@ -57,4 +57,5 @@ public class BugManager implements BugManagerRemote {
 
         return BugDTOEntityMapper.getBugDTOList(bugList);
     }
+
 }

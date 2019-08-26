@@ -11,13 +11,13 @@ import java.util.List;
 @NamedQueries({
         @NamedQuery(name = Bug.FIND_BUGS_CREATED_ID, query = "SELECT b FROM Bug b WHERE b.CREATED_ID.ID = :var_user_id"),
         @NamedQuery(name = Bug.FIND_ALL_BUGS, query = "SELECT b FROM Bug b"),
-        @NamedQuery(name= Bug.UPDATE_BUG_STATUS, query = "UPDATE Bug b SET b.status = :newStatus WHERE b.ID = :bugID ")
+
 })
 public class Bug implements Serializable {
 
     public static final String FIND_BUGS_CREATED_ID = "findBugsCreatedByUser";
     public static final String FIND_ALL_BUGS = "findAllBugs";
-    public static final String UPDATE_BUG_STATUS = "updateBugStatus";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")

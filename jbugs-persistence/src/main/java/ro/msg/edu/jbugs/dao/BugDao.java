@@ -34,19 +34,22 @@ public class BugDao {
 
     }
 
+    public Bug updateBugStatus(String newStatus, int bugID){
+
+//        Query updateBugStatusQuery = entityManager.createNamedQuery(Bug.UPDATE_BUG_STATUS, Bug.class);
+//        updateBugStatusQuery.setParameter("newStatus", newStatus);
+//        updateBugStatusQuery.setParameter("bugID", bugID);
+
+        Bug bug = entityManager.find(Bug.class, bugID);
+        bug.setStatus(newStatus);
+
+        //return query.executeUpdate();
+        return bug;
+    }
+
     public List<Bug> getAllBugs()
     {
         return entityManager.createNamedQuery(Bug.FIND_ALL_BUGS, Bug.class).getResultList();
     }
-
-    public Integer updateBugStatus(String newStatus, int bugID){
-
-        Query updateBugStatusQuery = entityManager.createNamedQuery(Bug.UPDATE_BUG_STATUS, Bug.class);
-        updateBugStatusQuery.setParameter("newStatus", newStatus);
-        updateBugStatusQuery.setParameter("bugID", bugID);
-
-        return updateBugStatusQuery.executeUpdate();
-    }
-
 }
 
