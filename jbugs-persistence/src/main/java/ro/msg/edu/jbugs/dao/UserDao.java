@@ -11,7 +11,7 @@ import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static com.google.common.hash.Hashing.*;
+import static com.google.common.hash.Hashing.sha256;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
 
 @Stateless
@@ -26,7 +26,6 @@ public class UserDao {
     }
 
     public User insertUser(User user){
-
         entityManager.persist(user);
         entityManager.flush();
         return user;
