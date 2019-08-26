@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.manager.impl;
 
-import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
