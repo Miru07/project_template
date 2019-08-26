@@ -10,6 +10,6 @@ import java.util.List;
 public interface BugManagerRemote {
 
     List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
-    Integer updateBugStatus();
+    BugDTO updateBugStatus(String newStatus, int bugId);
     List<BugDTO> getAllBugs();
 }
