@@ -3,10 +3,7 @@ package ro.msg.edu.jbugs.manager.impl;
 import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.NotificationDTO;
-import ro.msg.edu.jbugs.dto.RoleDTO;
-import ro.msg.edu.jbugs.dto.UserBugsDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.NotificationType;
 import ro.msg.edu.jbugs.entity.Role;
@@ -67,7 +64,6 @@ public class UserManager implements UserManagerRemote {
 
         return user;
     }
-
     public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS){
         Set<Role> actualRoles = new HashSet<>();
         roleDTOS.forEach(roleDTO -> {
@@ -141,38 +137,32 @@ public class UserManager implements UserManagerRemote {
         return userBugsDTOList;
     }
 
-    public UserDTO login(String username, String password) throws BusinessException{
-        User userToLogin = userDao.findUserByUsername(username);
+    @Override
+    public LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO) {
+        LoginResponseUserDTO loginResponseUserDTO;
+        try {
+            User user = userDao.findByUsernameAndPassword(
+                    loginReceivedDTO.getUsername(), loginReceivedDTO.getPassword());
+            List<String> permissions = userDao.getPermissionsOfUser(user);
 
-        if(userToLogin != null){
-            String hashPassword = sha256().hashString(password, StandardCharsets.UTF_8).toString();
-            if(hashPassword.equals(userToLogin.getPassword())){
+            Set<String> stringPermissions = new HashSet<>();
+            permissions.forEach(permission -> stringPermissions.add(permission));
 
-                if(userToLogin.getStatus() == 0){
-                    throw new BusinessException("msg-003", "User is disabled");
-                }
-                else
-                {
-                    userToLogin.setCounter(0);
-                    return UserDTOEntityMapper.getDTOFromUser(userToLogin);
-                }
-            }
-            else
-            {
-                int userCounter = userToLogin.getCounter() + 1;
-                userToLogin.setCounter(userCounter);
-                if(userCounter == 5){
-                    userToLogin.setStatus(0);
-                    throw new BusinessException("msg-004", "Max number of tries");
-                }
-            }
+            UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(user);
+            loginResponseUserDTO = new LoginResponseUserDTO(userDTO, stringPermissions);
+            // previous init does NOT set TOKEN on response
+            // but sets MESSAGE on 'SUCCESS'
+            return loginResponseUserDTO;
+        } catch (BusinessException busy) {
+            loginResponseUserDTO = new LoginResponseUserDTO(); // init to 0 and null fields... token included
+            loginResponseUserDTO.setMessageCode(busy.getErrorCode()); // busy.getMessage()
+            return loginResponseUserDTO;
         }
-        else
-        {
-            throw new BusinessException("msg-005", "User not in DB");
-        }
-
-        return null;
+    }
+    @Override
+    public boolean userHasPermission(Integer userId, String permission){
+        List<String> permissions = userDao.getPermissionsOfUser(userId);
+        return permissions.contains(permission);
     }
 
     @Override

@@ -31,9 +31,9 @@ public class BugManager implements BugManagerRemote {
     }
 
     @Override
-    public Integer updateBugStatus(){
+    public BugDTO updateBugStatus(String newStatus, int bugID){
 
-        return bugDao.updateBugStatus();
+        return BugDTOEntityMapper.getBugDTO(bugDao.updateBugStatus(newStatus, bugID));
     }
 
     @Override
