@@ -12,6 +12,8 @@ import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -98,13 +100,6 @@ public class UserManagerTest {
         roleDTOS.add(new RoleDTO("Administrator"));
         UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
         return userDTO;
-    }
-
-    @Test(expected = BusinessException.class)
-    public void login3() throws BusinessException {
-
-        when(userDao.findUserByUsername("dinum")).thenReturn(null);
-        userManager.login("dinum", "parola");
     }
 
     @Test

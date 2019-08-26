@@ -36,6 +36,7 @@ public class UserDTO implements Serializable {
                    String username, String password, Integer status) {
 
         this.counter = counter;
+    }
     public UserDTO(int id, String firstName, String lastName, String username, String password, int counter, String email, String mobileNumber, Integer status, Set<RoleDTO> roles) {
         this.id = id;
         this.firstName = firstName;

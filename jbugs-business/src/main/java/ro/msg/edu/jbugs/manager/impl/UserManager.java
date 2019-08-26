@@ -3,10 +3,7 @@ package ro.msg.edu.jbugs.manager.impl;
 import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.NotificationDTO;
-import ro.msg.edu.jbugs.dto.UserBugsDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.dto.RoleDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.NotificationType;
 import ro.msg.edu.jbugs.entity.Role;
@@ -21,8 +18,7 @@ import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.hash.Hashing.sha256;
 
