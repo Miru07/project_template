@@ -51,4 +51,27 @@ public class UserController extends HttpServlet {
         }
     }
 
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response isDeactivatable(@PathParam("id") Integer id) {
+        try {
+            return Response.status(Response.Status.OK).entity(userManagerRemote.hasBugsAssigned(id)).build();
+        } catch (BusinessException e) {
+            return Response.status(500).entity(e).build();
+        }
+    }
+
+    @PUT
+    @Path("/edit-user")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateUser(UserDTO userDTO) throws JsonProcessingException {
+        try {
+            return Response.status(Response.Status.OK).entity(userManagerRemote.updateUser(userDTO)).build();
+        } catch (BusinessException e) {
+            return Response.status(500).entity(e).build();
+        }
+    }
+
 }

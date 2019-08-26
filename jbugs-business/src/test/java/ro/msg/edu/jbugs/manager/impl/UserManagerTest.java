@@ -3,6 +3,7 @@ package ro.msg.edu.jbugs.manager.impl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -11,6 +12,7 @@ import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
@@ -206,5 +208,97 @@ public class UserManagerTest {
         UserDTO userDTO = createUserDTO();
         userDTO.setRoles(new HashSet<>());
         userManager.insertUser(userDTO);
+    }
+
+    @Test
+    public void updateUserTestSuccess() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setStatus(0);
+        userDTO.setCounter(4);
+        Role role = new Role(1, "Administrator");
+        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+
+        when(userDao.findUser(1)).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
+
+        userDTO.setUsername("test");
+        userDTO.setFirstName("NewName");
+        userDTO.setStatus(1);
+
+        when(userDao.updateUser((Matchers.any(User.class)))).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
+
+        UserDTO updatedUser = userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailNull() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        when(userDao.findUser(1)).thenReturn(null);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailFirstnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("df34");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailLastnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setLastName("dff34");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailPhoneNumberIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setMobileNumber("456787654323456789876543456");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailEmailIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setEmail("mara@yahoo.com");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailRolesIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setRoles(new HashSet<>());
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailRolesIncorrect2() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Incorrect"));
+        userDTO.setRoles(roleDTOS);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test
+    public void hasBugsAssignedSuccess() throws BusinessException {
+        User user = createUser();
+        Set<Bug> bugs = new HashSet<>();
+        Bug bug = new Bug();
+        bug.setCREATED_ID(user);
+        bug.setASSIGNED_ID(user);
+        bugs.add(bug);
+        user.setAssignedBugs(bugs);
+        when(userDao.findUser(1)).thenReturn(user);
+        assertEquals(userManager.hasBugsAssigned(1), true);
+
+        user.setAssignedBugs(new HashSet<>());
+        assertEquals(userManager.hasBugsAssigned(1), false);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void hasBugsAssignedFailNull() throws BusinessException {
+        when(userDao.findUser(1)).thenReturn(null);
+        userManager.hasBugsAssigned(1);
     }
 }

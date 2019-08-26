@@ -36,10 +36,10 @@ public class Bug implements Serializable {
     private String severity;
 
     @ManyToOne(cascade=CascadeType.MERGE)
-    @JoinColumn(name = "CREATED_ID")
+    @JoinColumn(name = "CREATED_ID", referencedColumnName = "ID")
     private User CREATED_ID;
     @ManyToOne(cascade=CascadeType.MERGE)
-    @JoinColumn(name = "ASSIGNED_ID")
+    @JoinColumn(name = "ASSIGNED_ID", referencedColumnName = "ID")
     private User ASSIGNED_ID;
 
     @OneToMany(mappedBy = "bugID")

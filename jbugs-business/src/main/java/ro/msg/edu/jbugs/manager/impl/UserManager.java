@@ -175,4 +175,33 @@ public class UserManager implements UserManagerRemote {
         return null;
     }
 
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) throws BusinessException {
+        UserValidator.validate(userDTO);
+        User persistedUser = userDao.findUser(userDTO.getId());
+        if (persistedUser == null)
+            throw new BusinessException("msg8_10_1101", "No user was found!");
+
+        User newUser = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
+        String hashPassword = sha256()
+                .hashString(userDTO.getPassword(), StandardCharsets.UTF_8)
+                .toString();
+        newUser.setUsername(persistedUser.getUsername());
+        newUser.setPassword(hashPassword);
+        newUser.setRoles(getActualRoleList(userDTO.getRoles()));
+
+        if (persistedUser.getStatus() == 0 && newUser.getStatus() == 1)
+            newUser.setCounter(0);
+
+        User updatedUser = userDao.updateUser(newUser);
+        return UserDTOEntityMapper.getDTOFromUser(updatedUser);
+    }
+
+    @Override
+    public boolean hasBugsAssigned(Integer id) throws BusinessException {
+        User user = userDao.findUser(id);
+        if (user == null)
+            throw new BusinessException("msg8_10_1102", "No user was found!");
+        return user.getAssignedBugs().size() > 0;
+    }
 }

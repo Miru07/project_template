@@ -14,6 +14,9 @@ public interface UserManagerRemote {
     UserDTO findUser(Integer id);
     List<UserDTO> findAllUsers();
     List<UserBugsDTO> getUserBugs();
-    //Integer deleteUser(Integer userID);
     UserDTO login(String username, String password) throws BusinessException;
+
+    UserDTO updateUser(UserDTO userDTO) throws BusinessException;
+
+    boolean hasBugsAssigned(Integer id) throws BusinessException;
 }
