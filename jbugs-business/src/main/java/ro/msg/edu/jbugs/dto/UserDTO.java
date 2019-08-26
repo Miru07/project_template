@@ -32,6 +32,7 @@ public class UserDTO implements Serializable {
         this.status = status;
     }
 
+
     public UserDTO(Integer counter, String firstName, String lastName, String mobileNumber, String email,
                    String username, Integer status) {
 
@@ -43,13 +44,14 @@ public class UserDTO implements Serializable {
         this.username = username;
         this.password = "";
         this.status = status;
+        this.roles = new HashSet<>();
     }
 
     public UserDTO(Integer counter, String firstName, String lastName, String mobileNumber, String email,
                    String username, String password, Integer status) {
-
         this.counter = counter;
     }
+
     public UserDTO(int id, String firstName, String lastName, String username, String password, int counter, String email, String mobileNumber, Integer status, Set<RoleDTO> roles) {
         this.id = id;
         this.firstName = firstName;

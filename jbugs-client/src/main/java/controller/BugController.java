@@ -4,16 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
+import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import utils.TokenService;
 
 import javax.ejb.EJB;
-import javax.ejb.EJBException;
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 
@@ -25,10 +24,6 @@ public class BugController extends HttpServlet {
 
     @EJB
     private BugManagerRemote bugManagerRemote;
-    @EJB
-    private AttachmentManagerRemote attachmentManagerRemote;
-    @EJB
-    private UserManagerRemote userManagerRemote;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -56,14 +51,14 @@ public class BugController extends HttpServlet {
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public boolean createBug(BugAttachmentWrapperDTO bugAttachmentWrapperDTO) {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response createBug(BugAttachmentWrapperDTO bugAttachmentWrapperDTO) {
         try {
             Integer createdID = TokenService.getCurrentUserID(bugAttachmentWrapperDTO.getToken());
-            BugAttachmentWrapperDTO persistedWrapper = bugManagerRemote.insertBug(bugAttachmentWrapperDTO, createdID);
-            return true;
-        } catch (EJBException x) {
-            return false;
+            bugManagerRemote.insertBug(bugAttachmentWrapperDTO, createdID);
+            return Response.status(Response.Status.OK).entity("OK").build();
+        } catch (BusinessException ex) {
+            return Response.status(Response.Status.NOT_ACCEPTABLE).entity("ERROR").build();
         }
     }
 }

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.google.common.hash.Hashing.sha256;
 
@@ -123,6 +124,14 @@ public class UserManager implements UserManagerRemote {
         users.forEach(System.out::println);
 
         return UserDTOEntityMapper.getUserDTOListFromUserList(users);
+    }
+
+    @Override
+    public List<UserDTO> findAllUsersWithoutRoles() {
+        List<User> users = userDao.findAllUsers();
+
+        List<UserDTO> collect = users.stream().map(UserDTOEntityMapper::getUserDTOFromUserWithoutRoles).collect(Collectors.toList());
+        return collect;
     }
 
     @Override

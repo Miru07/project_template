@@ -13,6 +13,7 @@ import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.interceptors.TimeInterceptors;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 
@@ -68,25 +69,60 @@ public class BugManager implements BugManagerRemote {
      * @author Sebastian Maier
      */
     @Override
-    public BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) {
-        Bug bugToInsert = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
-        Attachment attachmentToInsert = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
-        User createdUserToAssign = userDao.findUser(createdID);
-        System.out.println("USER TO CREATE: " + createdUserToAssign.toString());
-        User assignedUserToAssign = userDao.findUser(bugToInsert.getASSIGNED_ID().getID());
-        System.out.println("USER TO ASSIGN: " + assignedUserToAssign.toString());
+    public void insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException {
+//        Bug bugToPersist = BugDTOEntityMapper.getBugWithUsersWithoutRoles(wrapperDTO.getBug());
+//
+//        User createdUserToSet = userDao.findUser(createdID);
+//        User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
+//
+//        bugToPersist.setCREATED_ID(createdUserToSet);
+//        bugToPersist.setASSIGNED_ID(assignedUserToSet);
+//
+//        Bug persistedBugWithID = bugDao.insert(bugToPersist);
+//
+//        Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
+//        attachmentToPersist.setBugID(persistedBugWithID);
+//
+//        Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToPersist);
 
-        bugToInsert.setCREATED_ID(createdUserToAssign);
-        bugToInsert.setASSIGNED_ID(assignedUserToAssign);
 
-        Bug persistedBugWithID = bugDao.insert(bugToInsert);
-        attachmentToInsert.setBugID(persistedBugWithID);
+//        BugDTO bugToPersist = wrapperDTO.getBug();
+//
+//        UserDTO createdUserToSet = UserDTOEntityMapper.getDTOFromUser(userDao.findUser(createdID));
+//        UserDTO assignedUserToSet = UserDTOEntityMapper.getDTOFromUser(userDao.findUser(bugToPersist.getASSIGNED_ID().getId()));
+//
+//        bugToPersist.setCREATED_ID(createdUserToSet);
+//        bugToPersist.setASSIGNED_ID(assignedUserToSet);
+//
+//        BugDTO persistedBugWithID = BugDTOEntityMapper.getBugDTO(bugDao.insert(BugDTOEntityMapper.getBug(bugToPersist)));
+//
+//        AttachmentDTO attachmentToPersist = wrapperDTO.getAttachment();
+//        attachmentToPersist.setBugID(persistedBugWithID);
+//
+//        AttachmentDTO persistedAttachmentWithID =
+//                AttachmentDTOEntityMapper.getAttachmentDTO(attachmentDao.insert(AttachmentDTOEntityMapper.getAttachment(attachmentToPersist)));
 
-        Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToInsert);
+        if (wrapperDTO.getBug() == null || wrapperDTO.getAttachment() == null || wrapperDTO.getToken() == null) {
+            throw new BusinessException("msg-500", "An Entity is empty.");
+        } else {
+            Bug bugToPersist = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
 
-        return new BugAttachmentWrapperDTO(
-                BugDTOEntityMapper.getBugDTO(persistedBugWithID), AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID),
-                null
-        );
+            User createdUserToSet = userDao.findUser(createdID);
+            User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
+
+            if (createdUserToSet == null || assignedUserToSet == null) {
+                throw new BusinessException("msg-501", "User does not exist");
+            } else {
+                bugToPersist.setCREATED_ID(createdUserToSet);
+                bugToPersist.setASSIGNED_ID(assignedUserToSet);
+
+                Bug persistedBugWithID = bugDao.insert(bugToPersist);
+
+                Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
+                attachmentToPersist.setBugID(persistedBugWithID);
+
+                Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToPersist);
+            }
+        }
     }
 }

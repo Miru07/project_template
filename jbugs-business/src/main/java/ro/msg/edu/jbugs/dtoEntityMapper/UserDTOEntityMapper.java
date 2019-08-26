@@ -13,6 +13,17 @@ public class UserDTOEntityMapper {
 
     }
 
+    public static User getUserFromUserDTOWithoutRoles(UserDTO userDTO) {
+        return new User(userDTO.getId(), userDTO.getCounter(), userDTO.getFirstName(), userDTO.getLastName(),
+                userDTO.getMobileNumber(), userDTO.getEmail(), userDTO.getUsername(), userDTO.getPassword(), userDTO.getStatus());
+    }
+
+    public static UserDTO getUserDTOFromUserWithoutRoles(User user) {
+        return new UserDTO(user.getID(), user.getFirstName(), user.getLastName(), user.getUsername(),
+                user.getPassword(), user.getCounter(), user.getEmail(), user.getMobileNumber(),
+                user.getStatus());
+    }
+
     public static User getUserFromUserDTO(UserDTO userDTO){
 
         User user = new User(
@@ -30,11 +41,11 @@ public class UserDTOEntityMapper {
     }
 
     public static UserDTO getDTOFromUser(User user){
-        UserDTO userDTO = new UserDTO
-                (user.getCounter(), user.getFirstName(), user.getLastName(), user.getMobileNumber()
-                        , user.getEmail(), user.getUsername(), user.getPassword(), user.getStatus());
-
-        userDTO.setId(user.getID());
+        UserDTO userDTO = new UserDTO(
+                user.getID(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(),
+                user.getCounter(), user.getEmail(), user.getMobileNumber(), user.getStatus(),
+                RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles())
+        );
         return userDTO;
     }
 
@@ -50,16 +61,17 @@ public class UserDTOEntityMapper {
         return userDTOList;
     }
 
-//    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList){
-//
-//        List<User> userList = new ArrayList<>();
-//
-//        for(UserDTO dto : userDTOList){
-//
-//            userList.add(getUserFromUserDTO(dto));
-//        }
-//
-//        return userList;
-//    }
+
+    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList) {
+
+        List<User> userList = new ArrayList<>();
+
+        for (UserDTO dto : userDTOList) {
+
+            userList.add(getUserFromUserDTO(dto));
+        }
+
+        return userList;
+    }
 
 }
