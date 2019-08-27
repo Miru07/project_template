@@ -21,6 +21,15 @@ public class Attachment implements Serializable {
     @JoinColumn(name="id_bug",referencedColumnName = "ID")
     private Bug bugID;
 
+    public Attachment() {
+    }
+
+    public Attachment(Integer id, byte[] attContent, Bug bugID) {
+        this.ID = id;
+        this.attContent = attContent;
+        this.bugID = bugID;
+    }
+
     public Integer getID() {
         return ID;
     }
@@ -28,7 +37,6 @@ public class Attachment implements Serializable {
     public void setID(Integer ID) {
         this.ID = ID;
     }
-
 
     public Bug getBugID() {
         return bugID;

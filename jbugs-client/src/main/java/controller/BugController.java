@@ -39,14 +39,14 @@ public class BugController extends HttpServlet {
 
 
     /**
-     * The Controller consumes a JSON and maps its content to the BugAttachmentWrapperDTO Object
-     * The BugDTO object is persisted first, so that the JPA assigns an ID to it.
-     * The newly persisted BugDTO object will be assigned to the AttachmentDTO object.
-     * The AttachmentDTO object will be persisted second.
+     * The Controller consumes a JSON and maps its content to the BugAttachmentWrapperDTO Object.
+     * We pass it to the {@link BugManagerRemote} interface to persist the data.
      *
      * @param bugAttachmentWrapperDTO is an {@link BugAttachmentWrapperDTO} object that contains
      *                                the data for persisting a Bug and Attachment object.
      * @return true if the wrapper is persisted; false if not
+     * @exception {@link BusinessException} bubbles up to here from {@link BugManagerRemote}.
+     * If it catches this exception, we return an ERROR response to the client.
      * @author Sebastian Maier
      */
     @POST

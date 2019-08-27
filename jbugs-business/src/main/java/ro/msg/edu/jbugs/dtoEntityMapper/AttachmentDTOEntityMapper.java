@@ -17,7 +17,7 @@ public class AttachmentDTOEntityMapper {
     public static Attachment getAttachment(AttachmentDTO attachmentDTO) {
         Attachment attachment = new Attachment();
 
-        attachment.setBugID(BugDTOEntityMapper.getBugWithUsersWithoutRoles(attachmentDTO.getBugID()));
+        attachment.setBugID(BugDTOEntityMapper.getBug(attachmentDTO.getBugID()));
         attachment.setID(attachmentDTO.getID());
         attachment.setAttContent(attachmentDTO.getAttContent());
 

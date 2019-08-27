@@ -16,7 +16,6 @@ public interface UserManagerRemote {
     UserDTO findUser(Integer id);
     List<UserDTO> findAllUsers();
 
-    List<UserDTO> findAllUsersWithoutRoles();
     List<UserBugsDTO> getUserBugs();
     //Integer deleteUser(Integer userID);
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
