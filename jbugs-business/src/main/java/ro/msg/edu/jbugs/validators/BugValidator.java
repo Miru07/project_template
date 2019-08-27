@@ -47,11 +47,11 @@ public class BugValidator {
     }
 
     private static boolean validateSeverity(String severity) {
-        return severity.equals("critical") || severity.equals("high") || severity.equals("medium") || severity.equals("low");
+        return severity.equals("CRITICAL") || severity.equals("HIGH") || severity.equals("MEDIUM") || severity.equals("LOW");
     }
 
     private static boolean validateStatus(String status) {
-        return status.equals("NEW") || status.equals("IN PROGRESS") || status.equals("FIXED") || status.equals("CLOSED")
-                || status.equals("REJECTED") || status.equals("INFO NEEDED");
+        return status.equals("NEW") || status.equals("IN_PROGRESS") || status.equals("FIXED") || status.equals("CLOSED")
+                || status.equals("REJECTED") || status.equals("INFO_NEEDED");
     }
 }

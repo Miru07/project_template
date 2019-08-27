@@ -56,38 +56,38 @@ public class BugValidatorTest {
         bugToTest.setVersion("1.1.1");
         bugToTest.setTargetDate(new Date(2019, 1, 1));
         bugToTest.setStatus("NEW");
-        bugToTest.setSeverity("low");
+        bugToTest.setSeverity("LOW");
         bugToTest.setASSIGNED_ID(new User());
 
         assertTrue(BugValidator.validate(bugToTest));
 
         bugToTest.setVersion("1.1.a");
-        bugToTest.setStatus("IN PROGRESS");
-        bugToTest.setSeverity("medium");
+        bugToTest.setStatus("IN_PROGRESS");
+        bugToTest.setSeverity("MEDIUM");
 
         assertTrue(BugValidator.validate(bugToTest));
 
         bugToTest.setVersion("1.a.a");
         bugToTest.setStatus("FIXED");
-        bugToTest.setSeverity("high");
+        bugToTest.setSeverity("HIGH");
 
         assertTrue(BugValidator.validate(bugToTest));
 
         bugToTest.setVersion("1.a.1");
         bugToTest.setStatus("CLOSED");
-        bugToTest.setSeverity("critical");
+        bugToTest.setSeverity("CRITICAL");
 
         assertTrue(BugValidator.validate(bugToTest));
 
         bugToTest.setVersion("a.1.a");
         bugToTest.setStatus("REJECTED");
-        bugToTest.setSeverity("medium");
+        bugToTest.setSeverity("MEDIUM");
 
         assertTrue(BugValidator.validate(bugToTest));
 
         bugToTest.setVersion("9.1");
-        bugToTest.setStatus("INFO NEEDED");
-        bugToTest.setSeverity("medium");
+        bugToTest.setStatus("INFO_NEEDED");
+        bugToTest.setSeverity("MEDIUM");
 
         assertTrue(BugValidator.validate(bugToTest));
     }
