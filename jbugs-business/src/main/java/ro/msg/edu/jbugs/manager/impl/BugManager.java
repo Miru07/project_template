@@ -99,8 +99,10 @@ public class BugManager implements BugManagerRemote {
             if (createdUserToSet == null || assignedUserToSet == null) {
                 throw new BusinessException("msg-501", "User does not exist");
             } else {
+                // We set the users and change the Status from NEW to OPEN.
                 bugToPersist.setCREATED_ID(createdUserToSet);
                 bugToPersist.setASSIGNED_ID(assignedUserToSet);
+                bugToPersist.setStatus("OPEN");
 
                 Bug persistedBugWithID = bugDao.insert(bugToPersist);
 
