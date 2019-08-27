@@ -120,7 +120,7 @@ public class UserManager implements UserManagerRemote {
     @Override
     public List<UserDTO> findAllUsers(){
         List<User> users = userDao.findAllUsers();
-        return UserDTOEntityMapper.getUserDTOListFromUserList(users);
+        return UserDTOEntityMapper.getUserDTOListWithRolesWithoutPasswFromUserList(users);
     }
 
     @Override
