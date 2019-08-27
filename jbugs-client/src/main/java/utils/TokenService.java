@@ -8,19 +8,27 @@ import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.ejb.EJB;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 
 public class TokenService {
+    @EJB
+    private static UserManagerRemote userManager;
 
     private static String SECRET_KEY = "oeRaYY7Wo24sDqKSX3IM9ASGmdGPmkTd9jo1QTy4b7P9Ze5_9hKolVX8xNrQDcNRfVEdTZNOuOyqEGhXEbdJI-ZQ19k_o9MI0y3eZN2lp9jow55FfXMiINEdt1XR85VipRLSOkT6kSpzs2x-jbLDiz9iFVzkd81YKxMgPA7VfZeQUm4n-mOmnWMaVX30zGFU4L3oPBctYKkl4dYfqYWqRNfrgPJVi5DGFjywgxx0ASEiJHtV72paI3fDR2XwlSkyhhmY-ICjCRmsJN4fX1pdoL8a18-aQrvyu4j0Os6dVPYIoPvvY0SAZtWYKHfM15g7A3HD4cVREf9cUsprCRK93w";
     private static String ISSUER = "teamC";
-    private static long EXPIRATION_TIME = 300000; // 5 min
+    private static long EXPIRATION_TIME = 300000*6; // 5 min * 6
 
-    public static String generateJbugsToken(LoginResponseUserDTO loginResponseUserDTO){
-        return generateJWT(loginResponseUserDTO.getId().toString(), ISSUER,
-                loginResponseUserDTO.getUsername(), EXPIRATION_TIME);
+    public static String generateLoginToken(LoginResponseUserDTO loginResponseUserDTO){
+        return generateNewJbugsToken(loginResponseUserDTO.getId(),
+                loginResponseUserDTO.getUsername());
+    }
+
+    public static String generateNewJbugsToken(Integer userID, String username){
+        return generateJWT(userID.toString(), ISSUER,
+                username, EXPIRATION_TIME);
     }
     private static String generateJWT(String id, String issuer, String subject, long ttlMillis) {
         //The JWT signature algorithm we will be using to sign the token
@@ -74,10 +82,9 @@ public class TokenService {
         // and a value greater than 0 if this Date is after the Date argument.
         return (expirationDateOfToken.compareTo(now) < 0);
     }
-    public static boolean currentUserHasPermission(UserManagerRemote userManager, String token,
-                                                   String permission) {
-        String id = decodeJWT(token).getId();
-        return userManager.userHasPermission(Integer.parseInt(id), permission);
+    public static boolean currentUserHasPermission(String token, String permission) {
+        Integer userID = Integer.parseInt(decodeJWT(token).getId());
+        return userManager.userHasPermission(userID, permission);
     }
     public static Integer getCurrentUserID(String token){
         return Integer.parseInt(decodeJWT(token).getId());
