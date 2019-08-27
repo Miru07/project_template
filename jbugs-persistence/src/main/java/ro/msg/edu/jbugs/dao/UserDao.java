@@ -31,23 +31,6 @@ public class UserDao {
         return user;
     }
 
-    public User updateUser(User user) {
-        User persistedUser = entityManager.find(User.class, user.getID());
-
-        persistedUser.setCounter(user.getCounter());
-        persistedUser.setEmail(user.getEmail());
-        persistedUser.setFirstName(user.getFirstName());
-        persistedUser.setLastName(user.getLastName());
-        persistedUser.setMobileNumber(user.getMobileNumber());
-        persistedUser.setPassword(user.getPassword());
-
-        persistedUser.setStatus(user.getStatus());
-
-        persistedUser.setRoles(user.getRoles());
-
-        return persistedUser;
-    }
-
     public boolean isUsernameUnique(String username){
         Long occurences = entityManager.createNamedQuery(User.QUERY_CHECK_USERNAME_UNIQUE, Long.class)
                 .setParameter("username", username)

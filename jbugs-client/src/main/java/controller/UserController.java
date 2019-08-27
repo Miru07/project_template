@@ -52,11 +52,12 @@ public class UserController extends HttpServlet {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("/is-deactivatable/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response isDeactivatable(@PathParam("id") Integer id) {
         try {
-            return Response.status(Response.Status.OK).entity(userManagerRemote.hasBugsAssigned(id)).build();
+            boolean response = userManagerRemote.hasBugsAssigned(id);
+            return Response.status(Response.Status.OK).entity(!response).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
         }
@@ -68,7 +69,20 @@ public class UserController extends HttpServlet {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateUser(UserDTO userDTO) throws JsonProcessingException {
         try {
-            return Response.status(Response.Status.OK).entity(userManagerRemote.updateUser(userDTO)).build();
+            userManagerRemote.updateUser(userDTO);
+            return Response.status(Response.Status.OK).entity(userDTO).build();
+        } catch (BusinessException e) {
+            return Response.status(500).entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUser(@PathParam("id") Integer id) {
+        try {
+            UserDTO userDTO = userManagerRemote.findUser(id);
+            return Response.status(Response.Status.OK).entity(userDTO).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
         }

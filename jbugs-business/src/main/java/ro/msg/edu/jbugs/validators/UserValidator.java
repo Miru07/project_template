@@ -29,6 +29,15 @@ public class UserValidator {
         if (!validateRoles(user.getRoles())) {
             throw new BusinessException("msg405", "Invalid Roles");
         }
+        if (!validateCounter(user.getCounter())) {
+            throw new BusinessException("msg406", "Invalid counter");
+        }
+        if (!validateStatus(user.getStatus())) {
+            throw new BusinessException("msg407", "Invalid status");
+        }
+        if (!validatePassword(user.getPassword())) {
+            throw new BusinessException("msg408", "Invalid password");
+        }
     }
 
     static boolean validateEmail(String email) {
@@ -43,6 +52,10 @@ public class UserValidator {
         return (name.length() > 2 && name.length() < 15) && name.matches("^[A-ZÜÄÖÂÎĂȚȘ][a-zA-Zșțăîâäöüß]*");
     }
 
+    static boolean validatePassword(String password) {
+        return (password.length() > 3 && password.length() < 20) || password.length() == 0;
+    }
+
     static boolean validateRoles(Set<RoleDTO> roles) {
         for (RoleDTO roleDTO : roles) {
             if (!roleDTO.getType().equals("Administrator")
@@ -53,5 +66,13 @@ public class UserValidator {
                 return false;
         }
         return roles.size() > 0;
+    }
+
+    static boolean validateCounter(Integer count) {
+        return count > -1 && count < 6;
+    }
+
+    static boolean validateStatus(Integer state) {
+        return state == 1 || state == 0;
     }
 }

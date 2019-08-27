@@ -112,9 +112,12 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public UserDTO findUser(Integer id){
+    public UserDTO findUser(Integer id) throws BusinessException {
         User user = userDao.findUser(id);
-        return UserDTOEntityMapper.getDTOFromUser(user);
+        if (user == null) {
+            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
+        }
+        return UserDTOEntityMapper.getDTOCompleteFromUser(user);
     }
 
     @Override
@@ -172,19 +175,29 @@ public class UserManager implements UserManagerRemote {
         if (persistedUser == null)
             throw new BusinessException("msg8_10_1101", "No user was found!");
 
-        User newUser = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
-        String hashPassword = sha256()
-                .hashString(userDTO.getPassword(), StandardCharsets.UTF_8)
-                .toString();
-        newUser.setUsername(persistedUser.getUsername());
-        newUser.setPassword(hashPassword);
-        newUser.setRoles(getActualRoleList(userDTO.getRoles()));
+        persistedUser.setCounter(userDTO.getCounter());
+        persistedUser.setEmail(userDTO.getEmail());
+        persistedUser.setFirstName(userDTO.getFirstName());
+        persistedUser.setLastName(userDTO.getLastName());
+        persistedUser.setMobileNumber(userDTO.getMobileNumber());
 
-        if (persistedUser.getStatus() == 0 && newUser.getStatus() == 1)
-            newUser.setCounter(0);
+        if (!userDTO.getPassword().equals("")) {
+            String hashPassword = sha256()
+                    .hashString(userDTO.getPassword(), StandardCharsets.UTF_8)
+                    .toString();
+            persistedUser.setPassword(hashPassword);
+        }
+        persistedUser.setRoles(getActualRoleList(userDTO.getRoles()));
 
-        User updatedUser = userDao.updateUser(newUser);
-        return UserDTOEntityMapper.getDTOFromUser(updatedUser);
+        if (persistedUser.getStatus() == 0 && userDTO.getStatus() == 1)
+            persistedUser.setCounter(0);
+
+        if (persistedUser.getStatus() == 1 && userDTO.getStatus() == 0 && persistedUser.getAssignedBugs().size() > 0)
+            persistedUser.setStatus(1);
+        else
+            persistedUser.setStatus(userDTO.getStatus());
+
+        return UserDTOEntityMapper.getDTOFromUser(persistedUser);
     }
 
     @Override

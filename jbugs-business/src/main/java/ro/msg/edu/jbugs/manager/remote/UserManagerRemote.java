@@ -13,15 +13,14 @@ import java.util.List;
 public interface UserManagerRemote {
 
     void insertUser(UserDTO userDTO) throws BusinessException;
-    UserDTO findUser(Integer id);
+
+    UserDTO findUser(Integer id) throws BusinessException;
     List<UserDTO> findAllUsers();
     List<UserBugsDTO> getUserBugs();
-    UserDTO login(String username, String password) throws BusinessException;
 
     UserDTO updateUser(UserDTO userDTO) throws BusinessException;
 
     boolean hasBugsAssigned(Integer id) throws BusinessException;
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
     boolean userHasPermission(Integer userId, String permission);
-}
 }

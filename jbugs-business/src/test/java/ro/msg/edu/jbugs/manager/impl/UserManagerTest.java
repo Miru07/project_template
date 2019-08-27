@@ -3,16 +3,15 @@ package ro.msg.edu.jbugs.manager.impl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.dto.RoleDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.Role;
@@ -20,13 +19,9 @@ import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -199,6 +194,13 @@ public class UserManagerTest {
     @Test(expected = BusinessException.class)
     public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
         UserDTO userDTO = createUserDTO();
+        userDTO.setPassword("x");
+        userManager.insertUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void insertUserTestFailPasswordIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
         userDTO.setFirstName("df34");
         userManager.insertUser(userDTO);
     }
@@ -244,10 +246,10 @@ public class UserManagerTest {
         userDTO.setUsername("test");
         userDTO.setFirstName("NewName");
         userDTO.setStatus(1);
-
-        when(userDao.updateUser((Matchers.any(User.class)))).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
+        userDTO.setPassword("");
 
         UserDTO updatedUser = userManager.updateUser(userDTO);
+        assertEquals(updatedUser.getPassword(), "test");
     }
 
     @Test(expected = BusinessException.class)
@@ -261,6 +263,13 @@ public class UserManagerTest {
     public void updateUserTestFailFirstnameIncorrect() throws BusinessException {
         UserDTO userDTO = createUserDTO();
         userDTO.setFirstName("df34");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailPasswordIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("x");
         userManager.updateUser(userDTO);
     }
 
@@ -298,6 +307,20 @@ public class UserManagerTest {
         Set<RoleDTO> roleDTOS = new HashSet<>();
         roleDTOS.add(new RoleDTO("Incorrect"));
         userDTO.setRoles(roleDTOS);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailCounterIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setCounter(10);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailStatusIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setStatus(10);
         userManager.updateUser(userDTO);
     }
 
