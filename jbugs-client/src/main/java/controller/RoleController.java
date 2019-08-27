@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.PermissionDTO;
 import ro.msg.edu.jbugs.dto.PermissionsInsertDTO;
+import ro.msg.edu.jbugs.entity.Permission;
+import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.RoleManagerRemote;
 
@@ -15,13 +17,10 @@ import javax.ws.rs.core.Response;
 import java.util.Set;
 
 /**
- * Document me.
+ * REST Controller for {@link Role} and {@link Permission} manipulation.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
-
-
 @Path("/roles")
 @Produces("application/json")
 public class RoleController extends HttpServlet {

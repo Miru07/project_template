@@ -19,10 +19,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Document me.
+ * Manager class for CRUD actions on {@link Role} & {@link Permission} objects.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 @Stateless
 public class RoleManager implements RoleManagerRemote {

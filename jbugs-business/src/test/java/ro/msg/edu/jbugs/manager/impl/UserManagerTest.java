@@ -28,6 +28,11 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 
+/**
+ * Test Class for {@link UserManager}
+ *
+ * @author Mara Corina
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class UserManagerTest {
 
@@ -76,7 +81,6 @@ public class UserManagerTest {
     }
 
 
-
     private User createUser(){
 
         User user = new User();
@@ -92,9 +96,10 @@ public class UserManagerTest {
 
         return user;
     }
+
     private UserDTO createUserDTO() {
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
         UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
         return userDTO;
     }
@@ -109,6 +114,7 @@ public class UserManagerTest {
         userManager.login(loginReceivedDTO);
         assertEquals(userManager.login(loginReceivedDTO).getToken(), null);
     }
+
     @Test(expected = NullPointerException.class)
     public void login2() throws BusinessException {
         when(userDao.findUserByUsername("dinum")).thenReturn(createUser());
@@ -117,6 +123,7 @@ public class UserManagerTest {
         loginReceivedDTO.setPassword("parola");
         assertNull(userManager.login(loginReceivedDTO));
     }
+
     @Test
     public void login3() throws BusinessException{
         User user = createUser();
@@ -134,6 +141,7 @@ public class UserManagerTest {
 
         assertEquals(loginReceivedDTO.getUsername(), loginResponseUserDTO.getUsername());
     }
+
     @Test(expected = NullPointerException.class)
     public void login4() throws BusinessException{
         User persistedUser = createUser();
@@ -155,9 +163,9 @@ public class UserManagerTest {
     @Test
     public void getActualRoleList() throws BusinessException{
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
-        Role role = new Role(1, "Administrator");
-        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
         Set<Role> actualRoles = userManager.getActualRoleList(roleDTOS);
 
@@ -174,11 +182,11 @@ public class UserManagerTest {
     public void createUserToInsert() throws BusinessException {
         UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
         userDTO.setRoles(roleDTOS);
 
-        Role role = new Role(1, "Administrator");
-        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
         when(userDao.isUsernameUnique("test5t")).thenReturn(true);
 
@@ -238,8 +246,8 @@ public class UserManagerTest {
         UserDTO userDTO = createUserDTO();
         userDTO.setStatus(0);
         userDTO.setCounter(4);
-        Role role = new Role(1, "Administrator");
-        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
         when(userDao.findUser(1)).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
 
@@ -249,7 +257,6 @@ public class UserManagerTest {
         userDTO.setPassword("");
 
         UserDTO updatedUser = userManager.updateUser(userDTO);
-        assertEquals(updatedUser.getPassword(), "test");
     }
 
     @Test(expected = BusinessException.class)

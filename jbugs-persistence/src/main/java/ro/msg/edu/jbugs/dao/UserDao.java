@@ -7,7 +7,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -39,17 +38,7 @@ public class UserDao {
     }
 
     public List<User> findAllUsers(){
-
         return entityManager.createNamedQuery(FIND_ALL_USERS, User.class).getResultList();
-    }
-
-    public List<Object[]> findUserBugs() {
-
-        Query query = entityManager.createNativeQuery("select u.first_name, u.last_name, count(b.CREATED_ID) as nrBugs\n" +
-                "from users u inner join bugs b on u.ID = b.CREATED_ID\n" +
-                "group by CREATED_ID");
-
-        return (List<Object[]>) query.getResultList();
     }
 
     private String getHashedPassword(String password){
