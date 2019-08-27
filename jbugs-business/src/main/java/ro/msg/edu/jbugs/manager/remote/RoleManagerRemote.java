@@ -8,10 +8,9 @@ import javax.ejb.Remote;
 import java.util.Set;
 
 /**
- * Document me.
+ * Interface for Remote usage
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 @Remote
 public interface RoleManagerRemote {

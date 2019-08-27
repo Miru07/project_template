@@ -26,7 +26,6 @@ public class RoleDao {
     }
 
     public Role findRoleByType(String type) throws BusinessException {
-
         try{
 
             return entityManager.createNamedQuery(Role.QUERY_SELECT_BY_TYPE, Role.class)

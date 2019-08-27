@@ -53,9 +53,9 @@ public class User implements Serializable {
     @Column (name="status")
     private Integer status;
 
-    @OneToMany
+    @OneToMany(mappedBy = "CREATED_ID")
     private Set<Bug> createdBugs = new HashSet<>();
-    @OneToMany
+    @OneToMany(mappedBy = "ASSIGNED_ID")
     private Set<Bug> assignedBugs = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH)
@@ -65,6 +65,19 @@ public class User implements Serializable {
     private Set<Role> roles = new HashSet<>();
 
     public User (){
+    }
+
+    public User(Integer id, Integer counter, String firstName, String lastName, String mobileNumber, String email,
+                String username, String password, Integer status) {
+        this.ID = id;
+        this.counter = counter;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.mobileNumber = mobileNumber;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.status = status;
     }
 
     public User(Integer counter, String firstName, String lastName, String mobileNumber, String email, String username,

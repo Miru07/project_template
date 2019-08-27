@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.manager.impl;
 
-import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.PermissionDao;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dto.PermissionDTO;
@@ -19,10 +18,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Document me.
+ * Manager class for CRUD actions on {@link Role} & {@link Permission} objects.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 @Stateless
 public class RoleManager implements RoleManagerRemote {
@@ -36,7 +34,7 @@ public class RoleManager implements RoleManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
-    private Logger logger = Logger.getLogger(RoleManager.class.getName());
+    //private Logger logger = Logger.getLogger(RoleManager.class.getName());
 
     @Override
     public Set<PermissionDTO> getRolePermissions(int id) throws BusinessException {

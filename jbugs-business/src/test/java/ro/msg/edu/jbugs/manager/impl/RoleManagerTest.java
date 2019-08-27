@@ -21,10 +21,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 /**
- * Document me.
+ * Test Class for {@link RoleManager}
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 @RunWith(MockitoJUnitRunner.class)
 public class RoleManagerTest {
