@@ -45,17 +45,11 @@ public class BugDao {
     }
 
     // status = closed daca s-a depasit targetDate
-    public Integer updateBugStatus(){
+    public Bug updateBugStatus(String newStatus, int bugID){
 
-        LocalDate date = LocalDate.now();
-
-        Query query = entityManager.createNativeQuery("UPDATE bugs b\n" +
-                "SET b.status = 'Closed'\n" +
-                "WHERE TIMESTAMPDIFF(DAY, ?1, b.targetDate) < 0 AND b.status <> 'Closed'");
-        query.setParameter(1, date);
-
-        return query.executeUpdate();
-
+        Bug bug = entityManager.find(Bug.class, bugID);
+        bug.setStatus(newStatus);
+        return bug;
     }
 
     public List<Bug> getAllBugs() {
