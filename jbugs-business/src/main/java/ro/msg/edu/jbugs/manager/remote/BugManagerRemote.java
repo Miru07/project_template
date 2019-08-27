@@ -18,7 +18,7 @@ public interface BugManagerRemote {
 
     List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
 
-    BugDTO updateBugStatus(String newStatus, int bugId);
+    BugDTO updateBugStatus(String newStatus, int bugId) throws BusinessException;
     List<BugDTO> getAllBugs();
 
     BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException;

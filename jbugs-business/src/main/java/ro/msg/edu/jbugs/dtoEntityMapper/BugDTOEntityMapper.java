@@ -7,6 +7,7 @@ import ro.msg.edu.jbugs.entity.Bug;
 import javax.ejb.EJB;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Entity Mapper class for {@link Bug} & {@link BugDTO} objects.
@@ -58,12 +59,6 @@ public class BugDTOEntityMapper {
 
     public static List<BugDTO> getBugDTOList(List<Bug> bugList){
 
-        List<BugDTO> bugDTOList = new ArrayList<>();
-
-        for(Bug b: bugList){
-            bugDTOList.add(getBugDTO(b));
-        }
-
-        return bugDTOList;
+        return bugList.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
 }

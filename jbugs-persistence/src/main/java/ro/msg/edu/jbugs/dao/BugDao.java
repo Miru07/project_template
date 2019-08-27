@@ -7,7 +7,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -20,8 +19,8 @@ public class BugDao {
     @PersistenceContext(unitName = "jbugs-persistence")
     private EntityManager entityManager;
 
-    public Bug find(Integer id) {
-        return entityManager.find(Bug.class, id);
+    public Bug getBugByID(Integer bugID) {
+        return entityManager.find(Bug.class, bugID);
     }
 
     public List<Bug> findBugCreatedBy(User user) {
@@ -41,14 +40,13 @@ public class BugDao {
         entityManager.flush();
 
         return bug;
-
     }
 
-    // status = closed daca s-a depasit targetDate
     public Bug updateBugStatus(String newStatus, int bugID){
 
-        Bug bug = entityManager.find(Bug.class, bugID);
+        Bug bug = getBugByID(bugID);
         bug.setStatus(newStatus);
+
         return bug;
     }
 

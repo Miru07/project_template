@@ -61,4 +61,18 @@ public class BugController extends HttpServlet {
             return Response.status(Response.Status.NOT_ACCEPTABLE).entity("ERROR").build();
         }
     }
+
+    @PUT
+    @Path("/update-bug-status/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response updateBugStatus(@PathParam("id") Integer bugID, String newStatus) {
+
+        try {
+            BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
+            return Response.status(Response.Status.OK).entity(updateResult).build();
+        } catch (BusinessException e) {
+            return Response.status(500).entity(e.getErrorCode()).build();
+        }
+    }
 }
