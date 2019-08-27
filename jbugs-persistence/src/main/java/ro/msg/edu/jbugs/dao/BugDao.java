@@ -34,7 +34,7 @@ public class BugDao {
 
     public Bug updateBugStatus(String newStatus, int bugID){
 
-        Bug bug = entityManager.find(Bug.class, bugID);
+        Bug bug = getBugByID(bugID);
         bug.setStatus(newStatus);
 
         return bug;

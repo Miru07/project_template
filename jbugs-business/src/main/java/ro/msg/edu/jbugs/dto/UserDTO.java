@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ro.msg.edu.jbugs.entity.Role;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -60,7 +59,4 @@ public class UserDTO implements Serializable {
                 '}';
     }
 
-    public String prettyPrint(){
-        return id + ". " + username;
-    }
 }

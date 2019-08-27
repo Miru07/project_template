@@ -32,6 +32,7 @@ public class BugManager implements BugManagerRemote {
 
         return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
+    //empty list for closed
 
     @Override
     public BugDTO updateBugStatus(String newStatus, int bugID) throws BusinessException {
@@ -39,7 +40,7 @@ public class BugManager implements BugManagerRemote {
         Bug bug = bugDao.getBugByID(bugID);
         List<StatusType> allowedStatuses = StatusHelper.getStatusForUpdate(StatusType.valueOf(bug.getStatus()));
 
-       if(allowedStatuses != null && allowedStatuses.contains(StatusType.valueOf(newStatus)))
+       if(allowedStatuses.isEmpty() && allowedStatuses.contains(StatusType.valueOf(newStatus)))
        {
            return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(newStatus, bugID));
        }

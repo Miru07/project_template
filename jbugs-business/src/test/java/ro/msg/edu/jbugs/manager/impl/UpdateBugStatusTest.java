@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.entity.Bug;
+import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import static org.mockito.Mockito.when;
@@ -31,19 +32,60 @@ public class UpdateBugStatusTest {
         bug.setStatus(status);
         bug.setFixedVersion("1.2");
         bug.setSeverity("low");
-        bug.setASSIGNED_ID(null);
-        bug.setCREATED_ID(null);
+        bug.setASSIGNED_ID(createUser());
+        bug.setCREATED_ID(createUser());
 
         return bug;
     }
 
-//    @Test
-//    public void updateStatusSuccessOpen() throws BusinessException {
-//
-//        when(bugDao.getBugByID(1)).thenReturn(this.createBug("OPEN"));
-//        bugManager.updateBugStatus("IN_PROGRESS", 1);
-//        //bugManager.updateBugStatus("REJECTED", 1);
-//    }
+    private User createUser(){
+
+        User user = new User();
+        user.setID(1);
+        user.setFirstName("test5");
+        user.setLastName("test5");
+        user.setEmail("test5");
+        user.setCounter(1);
+        user.setMobileNumber("123456");
+        user.setUsername("dinum");
+        user.setPassword("a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff");
+        user.setStatus(1);
+
+        return user;
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateStatusNonsenseStatus () throws BusinessException {
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("OPEN"));
+        bugManager.updateBugStatus("abchdhfk", 1);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateStatusEmptyStringStatus () throws BusinessException {
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("OPEN"));
+        bugManager.updateBugStatus("", 1);
+    }
+
+    @Test
+    public void updateStatusSuccessOpen1() throws BusinessException {
+
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("OPEN"));
+        when(bugDao.updateBugStatus("IN_PROGRESS", 1)).thenReturn(this.createBug("IN_PROGRESS"));
+
+        when(this.bugDao.updateBugStatus("IN_PROGRESS", 1)).thenReturn(this.createBug("IN_PROGRESS"));
+        bugManager.updateBugStatus("IN_PROGRESS", 1);
+        //bugManager.updateBugStatus("REJECTED", 1);
+    }
+
+    @Test
+    public void updateStatusSuccessOpen2() throws BusinessException {
+
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("OPEN"));
+        when(bugDao.updateBugStatus("REJECTED", 1)).thenReturn(this.createBug("REJECTED"));
+
+        when(this.bugDao.updateBugStatus("REJECTED", 1)).thenReturn(this.createBug("REJECTED"));
+        bugManager.updateBugStatus("REJECTED", 1);
+    }
 
     //Open into Open
     @Test(expected = BusinessException.class)
@@ -77,14 +119,27 @@ public class UpdateBugStatusTest {
         bugManager.updateBugStatus("CLOSED", 1);
     }
 
-//    @Test
-//    public void updateStatusSuccessFixed() throws BusinessException {
-//
-//        when(bugDao.getBugByID(1)).thenReturn(this.createBug("FIXED"));
-//        bugManager.updateBugStatus("OPEN", 1);
-//        bugManager.updateBugStatus("CLOSED", 1);
-//
-//    }
+    @Test
+    public void updateStatusSuccessFixed1() throws BusinessException {
+
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("FIXED"));
+        when(bugDao.updateBugStatus("OPEN", 1)).thenReturn(this.createBug("OPEN"));
+
+        when(this.bugDao.updateBugStatus("OPEN", 1)).thenReturn(this.createBug("OPEN"));
+        bugManager.updateBugStatus("OPEN", 1);
+
+    }
+
+    @Test
+    public void updateStatusSuccessFixed2() throws BusinessException {
+
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("FIXED"));
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(this.createBug("CLOSED"));
+
+        when(this.bugDao.updateBugStatus("CLOSED", 1)).thenReturn(this.createBug("CLOSED"));
+        bugManager.updateBugStatus("CLOSED", 1);
+
+    }
 
     //Fixed into Fixed
     @Test(expected = BusinessException.class)
@@ -118,14 +173,35 @@ public class UpdateBugStatusTest {
         bugManager.updateBugStatus("IN_PROGRESS", 1);
     }
 
-    /*@Test
-    public void updateStatusSuccessInProgress() throws BusinessException {
-        when(bugDao.getBugByID(1)).thenReturn(this.createBug("In progress"));
-        bugManager.updateBugStatus("Rejected", 1);
-        bugManager.updateBugStatus("Fixed", 1);
-        bugManager.updateBugStatus("Info needed", 1);
+    @Test
+    public void updateStatusSuccessInProgress1() throws BusinessException {
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("IN_PROGRESS"));
+        when(bugDao.updateBugStatus("REJECTED", 1)).thenReturn(this.createBug("REJECTED"));
 
-    }*/
+        when(this.bugDao.updateBugStatus("REJECTED", 1)).thenReturn(this.createBug("REJECTED"));
+        bugManager.updateBugStatus("REJECTED", 1);
+
+    }
+
+    @Test
+    public void updateStatusSuccessInProgress2() throws BusinessException {
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("IN_PROGRESS"));
+        when(bugDao.updateBugStatus("FIXED", 1)).thenReturn(this.createBug("FIXED"));
+
+        when(this.bugDao.updateBugStatus("FIXED", 1)).thenReturn(this.createBug("FIXED"));
+        bugManager.updateBugStatus("FIXED", 1);
+
+    }
+
+    @Test
+    public void updateStatusSuccessInProgress3() throws BusinessException {
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("IN_PROGRESS"));
+        when(bugDao.updateBugStatus("INFO_NEEDED", 1)).thenReturn(this.createBug("INFO_NEEDED"));
+
+        when(this.bugDao.updateBugStatus("INFO_NEEDED", 1)).thenReturn(this.createBug("INFO_NEEDED"));
+        bugManager.updateBugStatus("INFO_NEEDED", 1);
+
+    }
     //In progress into In progress
     @Test(expected = BusinessException.class)
     public void updateStatusErrorForInProgress1() throws BusinessException {
@@ -150,13 +226,15 @@ public class UpdateBugStatusTest {
         bugManager.updateBugStatus("CLOSED", 1);
     }
 
-/*    @Test
+   @Test
     public void updateStatusSuccessInfoNeeded() throws BusinessException {
-
         when(bugDao.getBugByID(1)).thenReturn(this.createBug("INFO_NEEDED"));
+        when(bugDao.updateBugStatus("IN_PROGRESS", 1)).thenReturn(this.createBug("IN_PROGRESS"));
+
+        when(this.bugDao.updateBugStatus("IN_PROGRESS", 1)).thenReturn(this.createBug("IN_PROGRESS"));
         bugManager.updateBugStatus("IN_PROGRESS", 1);
 
-    }*/
+    }
     //Info needed into Info needed
     @Test(expected = BusinessException.class)
     public void updateStatusErrorForInfoNeeded1() throws BusinessException {
@@ -245,12 +323,15 @@ public class UpdateBugStatusTest {
         bugManager.updateBugStatus("IN_PROGRESS", 1);
     }
 
-    /*@Test
+    @Test
     public void updateStatusSuccessRejected() throws BusinessException {
 
-        when(bugDao.getBugByID(1)).thenReturn(this.createBug("Rejected"));
-        bugManager.updateBugStatus("Closed", 1);
-    }*/
+        when(bugDao.getBugByID(1)).thenReturn(this.createBug("REJECTED"));
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(this.createBug("CLOSED"));
+
+        when(this.bugDao.updateBugStatus("CLOSED", 1)).thenReturn(this.createBug("CLOSED"));
+        bugManager.updateBugStatus("CLOSED", 1);
+    }
 
     //Rejected into Rejected
     @Test(expected = BusinessException.class)
