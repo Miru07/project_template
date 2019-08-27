@@ -53,9 +53,9 @@ public class User implements Serializable {
     @Column (name="status")
     private Integer status;
 
-    @OneToMany
+    @OneToMany(mappedBy = "CREATED_ID")
     private Set<Bug> createdBugs = new HashSet<>();
-    @OneToMany
+    @OneToMany(mappedBy = "ASSIGNED_ID")
     private Set<Bug> assignedBugs = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REFRESH)

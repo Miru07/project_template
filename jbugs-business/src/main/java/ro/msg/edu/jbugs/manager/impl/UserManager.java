@@ -17,11 +17,19 @@ import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static com.google.common.hash.Hashing.sha256;
 
+/**
+ * Manager class for CRUD actions on {@link User} objects.
+ *
+ * @author Mara Corina
+ */
 @Stateless
 public class UserManager implements UserManagerRemote {
 
@@ -37,7 +45,7 @@ public class UserManager implements UserManagerRemote {
 
     @Override
     public void insertUser(UserDTO userDTO) throws BusinessException {
-        UserValidator.validate(userDTO);
+        UserValidator.validateForAdd(userDTO);
         User persistedUser =  userDao.insertUser(createUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 
@@ -64,6 +72,7 @@ public class UserManager implements UserManagerRemote {
 
         return user;
     }
+
     public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS){
         Set<Role> actualRoles = new HashSet<>();
         roleDTOS.forEach(roleDTO -> {
@@ -83,8 +92,7 @@ public class UserManager implements UserManagerRemote {
         if(lastName.length() >= 5){
 
             firstPart = lastName.substring(0, 5);
-        }
-        else {
+        } else {
 
             firstPart = lastName;
         }
@@ -96,8 +104,7 @@ public class UserManager implements UserManagerRemote {
             charPosition++;
             if(charPosition < firstName.length()){
                 username = (username + firstName.charAt(charPosition)).toLowerCase();
-            }
-            else{
+            } else{
                 username = username + "x";
             }
         }
@@ -112,29 +119,18 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public UserDTO findUser(Integer id){
+    public UserDTO findUser(Integer id) throws BusinessException {
         User user = userDao.findUser(id);
-        return UserDTOEntityMapper.getDTOFromUser(user);
+        if (user == null) {
+            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
+        }
+        return UserDTOEntityMapper.getDTOCompleteFromUser(user);
     }
 
     @Override
     public List<UserDTO> findAllUsers(){
         List<User> users = userDao.findAllUsers();
         return UserDTOEntityMapper.getUserDTOListWithRolesWithoutPasswFromUserList(users);
-    }
-
-    @Override
-    public List<UserBugsDTO> getUserBugs(){
-        List<UserBugsDTO> userBugsDTOList = new ArrayList<>();
-        List<Object[]> userBugsList = userDao.findUserBugs();
-
-        for(Object[] userBug : userBugsList){
-
-            Long value = (Long) userBug[2];
-            UserBugsDTO userBugsDTO = new UserBugsDTO(userBug[0].toString(), userBug[1].toString(), value.intValue());
-            userBugsDTOList.add(userBugsDTO);
-        }
-        return userBugsDTOList;
     }
 
     @Override
@@ -159,9 +155,71 @@ public class UserManager implements UserManagerRemote {
             return loginResponseUserDTO;
         }
     }
+
     @Override
     public boolean userHasPermission(Integer userId, String permission){
         List<String> permissions = userDao.getPermissionsOfUser(userId);
         return permissions.contains(permission);
+    }
+
+    /**
+     * @param userDTO is an {@link UserDTO} object that contains the updated info
+     *                of the {@link User} object that will be updated in the database.
+     * @return an {@link UserDTO} object with the persisted informations
+     * @throws {@link BusinessException} if the {@link UserDTO} object is
+     *                invalid or doesn't have a corresponding object in the database
+     */
+    @Override
+    public UserDTO updateUser(UserDTO userDTO) throws BusinessException {
+        UserValidator.validateForUpdate(userDTO);
+        User persistedUser = userDao.findUser(userDTO.getId());
+        if (persistedUser == null)
+            throw new BusinessException("msg8_10_1101", "No user was found!");
+
+        //persist the updated info
+        persistedUser.setCounter(userDTO.getCounter());
+        persistedUser.setEmail(userDTO.getEmail());
+        persistedUser.setFirstName(userDTO.getFirstName());
+        persistedUser.setLastName(userDTO.getLastName());
+        persistedUser.setMobileNumber(userDTO.getMobileNumber());
+
+        //persist new password
+        //if password was not updated, keep the old one
+        if (!userDTO.getPassword().equals("")) {
+            //hash password
+            String hashPassword = sha256()
+                    .hashString(userDTO.getPassword(), StandardCharsets.UTF_8)
+                    .toString();
+            persistedUser.setPassword(hashPassword);
+        }
+
+        //take the coresponding roles from the database and persist them
+        persistedUser.setRoles(getActualRoleList(userDTO.getRoles()));
+
+        //set the counter to 0 if the user was activated
+        if (persistedUser.getStatus() == 0 && userDTO.getStatus() == 1)
+            persistedUser.setCounter(0);
+
+        //do not allow deactivation is user has assigned bugs
+        if (persistedUser.getStatus() == 1 && userDTO.getStatus() == 0 && persistedUser.getAssignedBugs().size() > 0)
+            persistedUser.setStatus(1);
+        else
+            persistedUser.setStatus(userDTO.getStatus());
+
+        return UserDTOEntityMapper.getDTOFromUser(persistedUser);
+    }
+
+    /**
+     * The method checks if the user with the specified id has any bugs assigned
+     * @param id is an {@link Integer}
+     * @return {@link Boolean}
+     * @throws {@link BusinessException} if there's no corresponding object in the database
+     */
+    @Override
+    public boolean hasBugsAssigned(Integer id) throws BusinessException {
+        User user = userDao.findUser(id);
+        if (user == null)
+            throw new BusinessException("msg8_10_1102", "No user was found!");
+        return user.getAssignedBugs().size() > 0;
     }
 }

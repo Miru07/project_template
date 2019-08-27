@@ -8,30 +8,31 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.dto.RoleDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 
+/**
+ * Test Class for {@link UserManager}
+ *
+ * @author Mara Corina
+ */
 @RunWith(MockitoJUnitRunner.class)
 public class UserManagerTest {
 
@@ -80,7 +81,6 @@ public class UserManagerTest {
     }
 
 
-
     private User createUser(){
 
         User user = new User();
@@ -96,9 +96,10 @@ public class UserManagerTest {
 
         return user;
     }
+
     private UserDTO createUserDTO() {
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
         UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
         return userDTO;
     }
@@ -113,6 +114,7 @@ public class UserManagerTest {
         userManager.login(loginReceivedDTO);
         assertEquals(userManager.login(loginReceivedDTO).getToken(), null);
     }
+
     @Test(expected = NullPointerException.class)
     public void login2() throws BusinessException {
         when(userDao.findUserByUsername("dinum")).thenReturn(createUser());
@@ -121,6 +123,7 @@ public class UserManagerTest {
         loginReceivedDTO.setPassword("parola");
         assertNull(userManager.login(loginReceivedDTO));
     }
+
     @Test
     public void login3() throws BusinessException{
         User user = createUser();
@@ -138,6 +141,7 @@ public class UserManagerTest {
 
         assertEquals(loginReceivedDTO.getUsername(), loginResponseUserDTO.getUsername());
     }
+
     @Test(expected = NullPointerException.class)
     public void login4() throws BusinessException{
         User persistedUser = createUser();
@@ -159,9 +163,9 @@ public class UserManagerTest {
     @Test
     public void getActualRoleList() throws BusinessException{
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
-        Role role = new Role(1, "Administrator");
-        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
         Set<Role> actualRoles = userManager.getActualRoleList(roleDTOS);
 
@@ -178,11 +182,11 @@ public class UserManagerTest {
     public void createUserToInsert() throws BusinessException {
         UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Administrator"));
+        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
         userDTO.setRoles(roleDTOS);
 
-        Role role = new Role(1, "Administrator");
-        when(roleDao.findRoleByType("Administrator")).thenReturn(role);
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
         when(userDao.isUsernameUnique("test5t")).thenReturn(true);
 
@@ -228,5 +232,117 @@ public class UserManagerTest {
         UserDTO userDTO = createUserDTO();
         userDTO.setRoles(new HashSet<>());
         userManager.insertUser(userDTO);
+    }
+
+    @Test
+    public void updateUserTestSuccess() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setStatus(0);
+        userDTO.setCounter(4);
+        Role role = new Role(1, "ADMINISTRATOR");
+        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
+
+        when(userDao.findUser(1)).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
+
+        userDTO.setUsername("test");
+        userDTO.setFirstName("NewName");
+        userDTO.setStatus(1);
+        userDTO.setPassword("");
+
+        UserDTO updatedUser = userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailNull() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        when(userDao.findUser(1)).thenReturn(null);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailFirstnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("df34");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailPasswordIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setFirstName("x");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailLastnameIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setLastName("dff34");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailPhoneNumberIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setMobileNumber("456787654323456789876543456");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailEmailIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setEmail("mara@yahoo.com");
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailRolesIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setRoles(new HashSet<>());
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailRolesIncorrect2() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        Set<RoleDTO> roleDTOS = new HashSet<>();
+        roleDTOS.add(new RoleDTO("Incorrect"));
+        userDTO.setRoles(roleDTOS);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailCounterIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setCounter(10);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateUserTestFailStatusIncorrect() throws BusinessException {
+        UserDTO userDTO = createUserDTO();
+        userDTO.setStatus(10);
+        userManager.updateUser(userDTO);
+    }
+
+    @Test
+    public void hasBugsAssignedSuccess() throws BusinessException {
+        User user = createUser();
+        Set<Bug> bugs = new HashSet<>();
+        Bug bug = new Bug();
+        bug.setCREATED_ID(user);
+        bug.setASSIGNED_ID(user);
+        bugs.add(bug);
+        user.setAssignedBugs(bugs);
+        when(userDao.findUser(1)).thenReturn(user);
+        assertEquals(userManager.hasBugsAssigned(1), true);
+
+        user.setAssignedBugs(new HashSet<>());
+        assertEquals(userManager.hasBugsAssigned(1), false);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void hasBugsAssignedFailNull() throws BusinessException {
+        when(userDao.findUser(1)).thenReturn(null);
+        userManager.hasBugsAssigned(1);
     }
 }
