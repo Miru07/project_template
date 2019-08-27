@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.manager.impl;
 
-import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.PermissionDao;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dto.PermissionDTO;
@@ -36,7 +35,7 @@ public class RoleManager implements RoleManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
-    private Logger logger = Logger.getLogger(RoleManager.class.getName());
+    //private Logger logger = Logger.getLogger(RoleManager.class.getName());
 
     @Override
     public Set<PermissionDTO> getRolePermissions(int id) throws BusinessException {

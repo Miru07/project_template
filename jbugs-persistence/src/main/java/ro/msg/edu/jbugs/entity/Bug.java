@@ -50,7 +50,19 @@ public class Bug implements Serializable {
 
 
     public Bug(){
+    }
 
+    public Bug(Integer id, String title, String description, String version, Date targetDate, String status, String fixedVersion, String severity, User CREATED_ID, User ASSIGNED_ID) {
+        this.ID = id;
+        this.title = title;
+        this.description = description;
+        this.version = version;
+        this.targetDate = targetDate;
+        this.status = status;
+        this.fixedVersion = fixedVersion;
+        this.severity = severity;
+        this.CREATED_ID = CREATED_ID;
+        this.ASSIGNED_ID = ASSIGNED_ID;
     }
 
     public User getCREATED_ID() {

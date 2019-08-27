@@ -1,31 +1,24 @@
-package ro.msg.edu.jbugs.entity;
+package ro.msg.edu.jbugs.dto;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Arrays;
 
-@Entity
-@Table(name="attachments")
-public class Attachment implements Serializable {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ID")
+/**
+ * Document me.
+ *
+ * @author msg systems AG; User Name.
+ * @since 19.1.2
+ */
+public class AttachmentDTO implements Serializable {
     private Integer ID;
-
-    @Lob
-    @Column(name="attContent")
     private byte[] attContent;
+    private BugDTO bugID;
 
-    @ManyToOne(cascade= CascadeType.MERGE)
-    @JoinColumn(name="id_bug",referencedColumnName = "ID")
-    private Bug bugID;
-
-    public Attachment() {
+    public AttachmentDTO() {
     }
 
-    public Attachment(Integer id, byte[] attContent, Bug bugID) {
-        this.ID = id;
+    public AttachmentDTO(Integer ID, byte[] attContent, BugDTO bugID) {
+        this.ID = ID;
         this.attContent = attContent;
         this.bugID = bugID;
     }
@@ -38,14 +31,6 @@ public class Attachment implements Serializable {
         this.ID = ID;
     }
 
-    public Bug getBugID() {
-        return bugID;
-    }
-
-    public void setBugID(Bug id_bug) {
-        this.bugID = id_bug;
-    }
-
     public byte[] getAttContent() {
         return attContent;
     }
@@ -54,9 +39,17 @@ public class Attachment implements Serializable {
         this.attContent = attContent;
     }
 
+    public BugDTO getBugID() {
+        return bugID;
+    }
+
+    public void setBugID(BugDTO bugID) {
+        this.bugID = bugID;
+    }
+
     @Override
     public String toString() {
-        return "Attachment{" +
+        return "AttachmentDTO{" +
                 "ID=" + ID +
                 ", attContent=" + Arrays.toString(attContent) +
                 ", bugID=" + bugID +

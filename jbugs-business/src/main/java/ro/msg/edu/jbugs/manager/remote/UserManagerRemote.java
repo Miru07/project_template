@@ -15,6 +15,7 @@ public interface UserManagerRemote {
     void insertUser(UserDTO userDTO) throws BusinessException;
     UserDTO findUser(Integer id);
     List<UserDTO> findAllUsers();
+
     List<UserBugsDTO> getUserBugs();
     //Integer deleteUser(Integer userID);
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);

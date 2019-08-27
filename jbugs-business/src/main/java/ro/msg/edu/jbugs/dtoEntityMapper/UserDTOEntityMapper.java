@@ -15,18 +15,26 @@ public class UserDTOEntityMapper {
 
     public static User getUserFromUserDTO(UserDTO userDTO){
 
-        User user = new User(userDTO.getCounter(), userDTO.getFirstName(), userDTO.getLastName(),
-                userDTO.getMobileNumber(), userDTO.getEmail(), userDTO.getUsername(), userDTO.getPassword(), userDTO.getStatus());
+        User user = new User(
+                userDTO.getCounter(),
+                userDTO.getFirstName(),
+                userDTO.getLastName(),
+                userDTO.getMobileNumber(),
+                userDTO.getEmail(),
+                userDTO.getUsername(),
+                userDTO.getPassword(),
+                userDTO.getStatus());
 
         user.setID(userDTO.getId());
         return user;
     }
 
     public static UserDTO getDTOFromUser(User user){
-        UserDTO userDTO = new UserDTO(user.getCounter(), user.getFirstName(), user.getLastName(),
-                user.getMobileNumber(), user.getEmail(), user.getUsername(), user.getStatus());
-
-        userDTO.setId(user.getID());
+        UserDTO userDTO = new UserDTO(
+                user.getID(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(),
+                user.getCounter(), user.getEmail(), user.getMobileNumber(), user.getStatus(),
+                RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles())
+        );
         return userDTO;
     }
 
@@ -74,16 +82,17 @@ public class UserDTOEntityMapper {
         return userDTOList;
     }
 
-//    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList){
-//
-//        List<User> userList = new ArrayList<>();
-//
-//        for(UserDTO dto : userDTOList){
-//
-//            userList.add(getUserFromUserDTO(dto));
-//        }
-//
-//        return userList;
-//    }
+
+    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList) {
+
+        List<User> userList = new ArrayList<>();
+
+        for (UserDTO dto : userDTOList) {
+
+            userList.add(getUserFromUserDTO(dto));
+        }
+
+        return userList;
+    }
 
 }
