@@ -2,9 +2,6 @@ package ro.msg.edu.jbugs.dtoEntityMapper;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.entity.Bug;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,10 +35,9 @@ public class BugDTOEntityMapper {
         bugDTO.setDescription(bug.getDescription());
         bugDTO.setTargetDate(bug.getTargetDate());
         bugDTO.setFixedVersion(bug.getFixedVersion());
-        bugDTO.setStatus(bug.getStatus());
         bugDTO.setVersion(bug.getVersion());
+        bugDTO.setStatus(bug.getStatus());
         bugDTO.setSeverity(bug.getSeverity());
-
         bugDTO.setASSIGNED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getASSIGNED_ID()));
         bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getCREATED_ID()));
 

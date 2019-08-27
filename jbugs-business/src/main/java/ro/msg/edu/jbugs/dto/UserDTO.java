@@ -1,6 +1,10 @@
 package ro.msg.edu.jbugs.dto;
 
+import ro.msg.edu.jbugs.entity.Role;
+
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UserDTO implements Serializable {
 
@@ -13,9 +17,10 @@ public class UserDTO implements Serializable {
     private String email;
     private String mobileNumber;
     private Integer status;
+    private Set<RoleDTO> roles = new HashSet<>();
 
     public UserDTO(Integer counter, String firstName, String lastName, String mobileNumber, String email,
-                   String username, String password, Integer status) {
+                   String username, Integer status) {
 
         this.counter = counter;
         this.firstName = firstName;
@@ -23,12 +28,38 @@ public class UserDTO implements Serializable {
         this.mobileNumber = mobileNumber;
         this.email = email;
         this.username = username;
-        this.password = password;
+        this.password = "";
         this.status = status;
+    }
+
+    public UserDTO(Integer counter, String firstName, String lastName, String mobileNumber, String email,
+                   String username, String password, Integer status) {
+
+        this.counter = counter;
+    }
+    public UserDTO(int id, String firstName, String lastName, String username, String password, int counter, String email, String mobileNumber, Integer status, Set<RoleDTO> roles) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.password = password;
+        this.counter = counter;
+        this.email = email;
+        this.mobileNumber = mobileNumber;
+        this.status = status;
+        this.roles = roles;
     }
 
     public UserDTO(){
 
+    }
+
+    public Set<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleDTO> roles) {
+        this.roles = roles;
     }
 
     public int getId() {
@@ -106,15 +137,16 @@ public class UserDTO implements Serializable {
     @Override
     public String toString() {
         return "UserDTO{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", counter=" + counter +
+                "counter=" + counter +
                 ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", id=" + id +
+                ", lastName='" + lastName + '\'' +
                 ", mobileNumber='" + mobileNumber + '\'' +
+                ", password='" + password + '\'' +
                 ", status=" + status +
+                ", roles=" + roles +
+                ", username='" + username + '\'' +
                 '}';
     }
 

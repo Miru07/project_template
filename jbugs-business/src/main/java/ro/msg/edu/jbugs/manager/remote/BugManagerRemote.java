@@ -11,6 +11,6 @@ import java.util.List;
 public interface BugManagerRemote {
 
     List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
-    BugDTO updateBugStatus(String newStatus, int bugID) throws BusinessException;
-    List <BugDTO> getAllBugs();
+    BugDTO updateBugStatus(String newStatus, int bugId);
+    List<BugDTO> getAllBugs();
 }
