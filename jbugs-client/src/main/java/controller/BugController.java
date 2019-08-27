@@ -68,11 +68,12 @@ public class BugController extends HttpServlet {
     @Consumes(MediaType.TEXT_PLAIN)
     public Response updateBugStatus(@PathParam("id") Integer bugID, String newStatus) {
 
+
         try {
             BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
-            return Response.status(Response.Status.OK).entity(updateResult).build();
+            return Response.status(Response.Status.OK).entity("OK").build();
         } catch (BusinessException e) {
-            return Response.status(500).entity(e.getErrorCode()).build();
+            return Response.status(500).entity(e).build();
         }
     }
 }
