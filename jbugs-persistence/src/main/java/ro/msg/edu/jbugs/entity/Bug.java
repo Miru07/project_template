@@ -31,7 +31,6 @@ public class Bug implements Serializable {
     @Column(name = "targetDate")
     private java.sql.Date targetDate;
     @Column(name = "status")
-    //@Enumerated(EnumType.STRING)
     private String status;
     @Column(name = "fixedVersion")
     private String fixedVersion;
