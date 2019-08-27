@@ -45,7 +45,6 @@ public class BugManager implements BugManagerRemote {
 
         return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
-    //empty list for closed
 
     @Override
     public BugDTO updateBugStatus(String newStatus, int bugID) throws BusinessException {
@@ -60,7 +59,6 @@ public class BugManager implements BugManagerRemote {
        else {
            throw new BusinessException("msg-241", "Cannot modify " + bug.getStatus() + " into " + newStatus);
        }
-
     }
 
     @Override
