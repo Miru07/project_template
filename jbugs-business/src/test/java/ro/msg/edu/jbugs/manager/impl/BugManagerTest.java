@@ -51,7 +51,7 @@ public class BugManagerTest {
         UserDTO userDTO = new UserDTO(1, "name", "name", "admin", "admin", 0,
                 "email", "077", 1);
         BugDTO bugDTO = new BugDTO(0, "test", "test", "1.1.1",
-                new Date(2019, 1, 1), "test", "", "Low",
+                new Date(2019, 1, 1), "NEW", "", "LOW",
                 userDTO, userDTO);
         AttachmentDTO attachmentDTO = new AttachmentDTO(0, null, bugDTO);
 
@@ -62,7 +62,7 @@ public class BugManagerTest {
         UserDTO userDTO = new UserDTO(1, "name", "name", "admin", "admin", 0,
                 "email", "077", 1);
         BugDTO bugDTO = new BugDTO(1, "test", "test", "1.1",
-                new Date(2019, 1, 1), "NEW", "", "low",
+                new Date(2019, 1, 1), "NEW", "", "LOW",
                 userDTO, userDTO);
         AttachmentDTO attachmentDTO = new AttachmentDTO(1, null, bugDTO);
 
@@ -76,12 +76,12 @@ public class BugManagerTest {
 
     public Bug testObjectBugIDZero() {
         return new Bug(0, "test", "test", "1.1.1", new Date(2019, 1, 1),
-                "NEW", "", "Low", testObjectUser(), testObjectUser());
+                "NEW", "", "LOW", testObjectUser(), testObjectUser());
     }
 
     public Bug testObjectBug() {
         return new Bug(1, "test", "test", "1.1", new Date(2019, 1, 1),
-                "NEW", "", "low", testObjectUser(), testObjectUser());
+                "NEW", "", "LOW", testObjectUser(), testObjectUser());
     }
 
     public Attachment testObjectAttachment() {

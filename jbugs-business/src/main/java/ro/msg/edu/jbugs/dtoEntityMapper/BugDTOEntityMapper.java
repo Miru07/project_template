@@ -29,7 +29,7 @@ public class BugDTOEntityMapper {
         bug.setDescription(bugDTO.getDescription());
         bug.setTargetDate(bugDTO.getTargetDate());
         bug.setFixedVersion(bugDTO.getFixedVersion());
-        bug.setSeverity(bugDTO.getSeverity());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
         bug.setStatus(bugDTO.getStatus());
         bug.setVersion(bugDTO.getVersion());
 
