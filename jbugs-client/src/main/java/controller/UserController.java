@@ -40,18 +40,6 @@ public class UserController extends HttpServlet {
         return listOfUsersJSON;
     }
 
-//    @GET
-//    @Path("/noRoles")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    public String getUsersWithoutRoles() throws JsonProcessingException {
-//        List<UserDTO> listOfAllUsers = userManagerRemote.findAllUsersWithoutRoles();
-//
-//        ObjectMapper jsonTransformer = new ObjectMapper();
-//        String listOfUsersJSON = jsonTransformer.writeValueAsString(listOfAllUsers);
-//        return listOfUsersJSON;
-//    }
-
-
     @POST
     @Path("/create-user")
     @Produces(MediaType.APPLICATION_JSON)

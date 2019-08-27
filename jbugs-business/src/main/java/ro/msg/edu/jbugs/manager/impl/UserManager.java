@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static com.google.common.hash.Hashing.sha256;
 
@@ -31,7 +32,7 @@ public class UserManager implements UserManagerRemote {
     @EJB
     private NotificationManagerRemote notificationManager;
 
-    //private Logger logger = Logger.getLogger(UserManager.class.getName());
+    private Logger logger = Logger.getLogger(UserManager.class.getName());
 
 
     @Override
@@ -119,9 +120,6 @@ public class UserManager implements UserManagerRemote {
     @Override
     public List<UserDTO> findAllUsers(){
         List<User> users = userDao.findAllUsers();
-
-        users.forEach(System.out::println);
-
         return UserDTOEntityMapper.getUserDTOListFromUserList(users);
     }
 
