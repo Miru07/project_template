@@ -6,7 +6,6 @@ import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
-import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
@@ -54,7 +53,7 @@ public class BugManager implements BugManagerRemote {
         Bug bug = bugDao.getBugByID(bugID);
         List<StatusType> allowedStatuses = StatusHelper.getStatusForUpdate(StatusType.valueOf(bug.getStatus()));
 
-       if(allowedStatuses.isEmpty() && allowedStatuses.contains(StatusType.valueOf(newStatus)))
+       if(!allowedStatuses.isEmpty() && allowedStatuses.contains(StatusType.valueOf(newStatus)))
        {
            return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(newStatus, bugID));
        }
