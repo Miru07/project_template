@@ -9,6 +9,10 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.util.List;
 
+/**
+ * Data Access Object class for {@link Bug} objects.
+ * It has direct access to the database and all {@link Bug} related tables.
+ */
 @Stateless
 public class BugDao {
 
@@ -24,6 +28,12 @@ public class BugDao {
         return query.setParameter("var_user_id", user.getID()).getResultList();
     }
 
+    /**
+     * @param bug is an {@link Bug} object that contains the data to be
+     *            persisted inside the database.
+     * @return {@link Bug} object with persisted ID.
+     * @author Sebastian Maier.
+     */
     public Bug insert(Bug bug) {
 
         entityManager.persist(bug);
@@ -40,8 +50,7 @@ public class BugDao {
         return bug;
     }
 
-    public List<Bug> getAllBugs()
-    {
+    public List<Bug> getAllBugs() {
         return entityManager.createNamedQuery(Bug.FIND_ALL_BUGS, Bug.class).getResultList();
     }
 }
