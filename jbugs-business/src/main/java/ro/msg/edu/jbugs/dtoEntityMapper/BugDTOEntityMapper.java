@@ -1,15 +1,28 @@
 package ro.msg.edu.jbugs.dtoEntityMapper;
+
+import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.entity.Bug;
 
+import javax.ejb.EJB;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+/**
+ * Entity Mapper class for {@link Bug} & {@link BugDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
+ *
+ * @author Sebastian Maier
+ */
 public class BugDTOEntityMapper {
+    @EJB
+    private UserDao userDao;
 
     private BugDTOEntityMapper(){
 
     }
+
     public static Bug getBug(BugDTO bugDTO){
         Bug bug = new Bug();
         bug.setID(bugDTO.getID());
@@ -17,16 +30,16 @@ public class BugDTOEntityMapper {
         bug.setDescription(bugDTO.getDescription());
         bug.setTargetDate(bugDTO.getTargetDate());
         bug.setFixedVersion(bugDTO.getFixedVersion());
-        bug.setSeverity(bugDTO.getSeverity());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
         bug.setStatus(bugDTO.getStatus());
         bug.setVersion(bugDTO.getVersion());
 
         bug.setASSIGNED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID()));
-        bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
-
+        //bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
 
         return bug;
     }
+
     public static BugDTO getBugDTO(Bug bug){
         BugDTO bugDTO = new BugDTO();
         bugDTO.setID(bug.getID());
@@ -37,6 +50,7 @@ public class BugDTOEntityMapper {
         bugDTO.setVersion(bug.getVersion());
         bugDTO.setStatus(bug.getStatus());
         bugDTO.setSeverity(bug.getSeverity());
+
         bugDTO.setASSIGNED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getASSIGNED_ID()));
         bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getCREATED_ID()));
 
@@ -45,13 +59,6 @@ public class BugDTOEntityMapper {
 
     public static List<BugDTO> getBugDTOList(List<Bug> bugList){
 
-        List<BugDTO> bugDTOList = new ArrayList<>();
-
-        for(Bug b: bugList){
-            bugDTOList.add(getBugDTO(b));
-        }
-
-        return bugDTOList;
+        return bugList.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
-
 }

@@ -16,8 +16,15 @@ public class UserDTOEntityMapper {
 
     public static User getUserFromUserDTO(UserDTO userDTO){
 
-        User user = new User(userDTO.getCounter(), userDTO.getFirstName(), userDTO.getLastName(),
-                userDTO.getMobileNumber(), userDTO.getEmail(), userDTO.getUsername(), userDTO.getPassword(), userDTO.getStatus());
+        User user = new User(
+                userDTO.getCounter(),
+                userDTO.getFirstName(),
+                userDTO.getLastName(),
+                userDTO.getMobileNumber(),
+                userDTO.getEmail(),
+                userDTO.getUsername(),
+                userDTO.getPassword(),
+                userDTO.getStatus());
 
         user.setID(userDTO.getId());
         return user;
@@ -85,16 +92,17 @@ public class UserDTOEntityMapper {
         return userDTOList;
     }
 
-//    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList){
-//
-//        List<User> userList = new ArrayList<>();
-//
-//        for(UserDTO dto : userDTOList){
-//
-//            userList.add(getUserFromUserDTO(dto));
-//        }
-//
-//        return userList;
-//    }
+
+    public static List<User> getUserListFromDTOList(List<UserDTO> userDTOList) {
+
+        List<User> userList = new ArrayList<>();
+
+        for (UserDTO dto : userDTOList) {
+
+            userList.add(getUserFromUserDTO(dto));
+        }
+
+        return userList;
+    }
 
 }

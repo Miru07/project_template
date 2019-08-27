@@ -1,6 +1,5 @@
 package ro.msg.edu.jbugs.manager.impl;
 
-import org.apache.log4j.Logger;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
@@ -22,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import static com.google.common.hash.Hashing.sha256;
 
@@ -79,7 +79,7 @@ public class UserManager implements UserManagerRemote {
             try {
                 actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
             } catch (BusinessException e) {
-                logger.error(e);
+                //logger.error(e);
                 return;
             }
         });

@@ -153,7 +153,7 @@ public class UserManagerTest {
 
         assertEquals(persistedUser.getFirstName(), loginResponseUserDTO.getFirstName());
         assertEquals(persistedUser.getLastName(), loginResponseUserDTO.getLastName());
-        // assertEquals(1L, loginResponseUserDTO.getId());
+        // assertEquals(1L, loginResponseUserDTO.getID());
         assertEquals(persistedUser.getEmail(), loginResponseUserDTO.getEmail());
         assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
         // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());

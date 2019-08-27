@@ -10,12 +10,14 @@ import java.util.List;
 @Table(name = "bugs")
 @NamedQueries({
         @NamedQuery(name = Bug.FIND_BUGS_CREATED_ID, query = "SELECT b FROM Bug b WHERE b.CREATED_ID.ID = :var_user_id"),
-        @NamedQuery(name = Bug.FIND_ALL_BUGS, query = "SELECT b FROM Bug b")
+        @NamedQuery(name = Bug.FIND_ALL_BUGS, query = "SELECT b FROM Bug b"),
+
 })
 public class Bug implements Serializable {
 
     public static final String FIND_BUGS_CREATED_ID = "findBugsCreatedByUser";
     public static final String FIND_ALL_BUGS = "findAllBugs";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
@@ -29,6 +31,7 @@ public class Bug implements Serializable {
     @Column(name = "targetDate")
     private java.sql.Date targetDate;
     @Column(name = "status")
+    //@Enumerated(EnumType.STRING)
     private String status;
     @Column(name = "fixedVersion")
     private String fixedVersion;
@@ -50,8 +53,22 @@ public class Bug implements Serializable {
 
 
     public Bug(){
-
     }
+
+    public Bug(Integer id, String title, String description, String version, Date targetDate, String status, String fixedVersion, String severity, User CREATED_ID, User ASSIGNED_ID) {
+        this.ID = id;
+        this.title = title;
+        this.description = description;
+        this.version = version;
+        this.targetDate = targetDate;
+        this.status = status;
+        this.fixedVersion = fixedVersion;
+        this.severity = severity;
+        this.CREATED_ID = CREATED_ID;
+        this.ASSIGNED_ID = ASSIGNED_ID;
+    }
+
+
 
     public User getCREATED_ID() {
         return CREATED_ID;

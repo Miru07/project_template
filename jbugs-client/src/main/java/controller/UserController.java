@@ -29,11 +29,12 @@ public class UserController extends HttpServlet {
     @Produces(MediaType.APPLICATION_JSON)
     public String getUsers() throws JsonProcessingException {
         List<UserDTO> listOfAllUsers = userManagerRemote.findAllUsers();
+        System.out.println("List Of Users");
+        listOfAllUsers.forEach(System.out::println);
 
         ObjectMapper jsonTransformer = new ObjectMapper();
         return jsonTransformer.writeValueAsString(listOfAllUsers);
     }
-
 
     @POST
     @Path("/create-user")
