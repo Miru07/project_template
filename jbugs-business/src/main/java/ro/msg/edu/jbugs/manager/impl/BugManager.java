@@ -71,38 +71,6 @@ public class BugManager implements BugManagerRemote {
      */
     @Override
     public BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException {
-//        Bug bugToPersist = BugDTOEntityMapper.getBugWithUsersWithoutRoles(wrapperDTO.getBug());
-//
-//        User createdUserToSet = userDao.findUser(createdID);
-//        User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
-//
-//        bugToPersist.setCREATED_ID(createdUserToSet);
-//        bugToPersist.setASSIGNED_ID(assignedUserToSet);
-//
-//        Bug persistedBugWithID = bugDao.insert(bugToPersist);
-//
-//        Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
-//        attachmentToPersist.setBugID(persistedBugWithID);
-//
-//        Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToPersist);
-
-
-//        BugDTO bugToPersist = wrapperDTO.getBug();
-//
-//        UserDTO createdUserToSet = UserDTOEntityMapper.getDTOFromUser(userDao.findUser(createdID));
-//        UserDTO assignedUserToSet = UserDTOEntityMapper.getDTOFromUser(userDao.findUser(bugToPersist.getASSIGNED_ID().getId()));
-//
-//        bugToPersist.setCREATED_ID(createdUserToSet);
-//        bugToPersist.setASSIGNED_ID(assignedUserToSet);
-//
-//        BugDTO persistedBugWithID = BugDTOEntityMapper.getBugDTO(bugDao.insert(BugDTOEntityMapper.getBug(bugToPersist)));
-//
-//        AttachmentDTO attachmentToPersist = wrapperDTO.getAttachment();
-//        attachmentToPersist.setBugID(persistedBugWithID);
-//
-//        AttachmentDTO persistedAttachmentWithID =
-//                AttachmentDTOEntityMapper.getAttachmentDTO(attachmentDao.insert(AttachmentDTOEntityMapper.getAttachment(attachmentToPersist)));
-
         if (wrapperDTO.getBug() == null || wrapperDTO.getAttachment() == null || wrapperDTO.getToken() == null) {
             throw new BusinessException("msg-500", "An Entity is empty.");
         } else {

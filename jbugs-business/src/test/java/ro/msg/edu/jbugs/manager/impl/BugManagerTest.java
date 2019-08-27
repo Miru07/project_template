@@ -61,8 +61,8 @@ public class BugManagerTest {
     public BugAttachmentWrapperDTO testObjectPersisted() {
         UserDTO userDTO = new UserDTO(1, "name", "name", "admin", "admin", 0,
                 "email", "077", 1);
-        BugDTO bugDTO = new BugDTO(1, "test", "test", "1.1.1",
-                new Date(2019, 1, 1), "test", "", "Low",
+        BugDTO bugDTO = new BugDTO(1, "test", "test", "1.1",
+                new Date(2019, 1, 1), "NEW", "", "low",
                 userDTO, userDTO);
         AttachmentDTO attachmentDTO = new AttachmentDTO(1, null, bugDTO);
 
@@ -80,8 +80,8 @@ public class BugManagerTest {
     }
 
     public Bug testObjectBug() {
-        return new Bug(1, "test", "test", "1.1.1", new Date(2019, 1, 1),
-                "NEW", "", "Low", testObjectUser(), testObjectUser());
+        return new Bug(1, "test", "test", "1.1", new Date(2019, 1, 1),
+                "NEW", "", "low", testObjectUser(), testObjectUser());
     }
 
     public Attachment testObjectAttachment() {
