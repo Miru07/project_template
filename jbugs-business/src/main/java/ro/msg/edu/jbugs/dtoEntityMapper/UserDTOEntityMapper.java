@@ -13,17 +13,6 @@ public class UserDTOEntityMapper {
 
     }
 
-    public static User getUserFromUserDTOWithoutRoles(UserDTO userDTO) {
-        return new User(userDTO.getId(), userDTO.getCounter(), userDTO.getFirstName(), userDTO.getLastName(),
-                userDTO.getMobileNumber(), userDTO.getEmail(), userDTO.getUsername(), userDTO.getPassword(), userDTO.getStatus());
-    }
-
-    public static UserDTO getUserDTOFromUserWithoutRoles(User user) {
-        return new UserDTO(user.getID(), user.getFirstName(), user.getLastName(), user.getUsername(),
-                user.getPassword(), user.getCounter(), user.getEmail(), user.getMobileNumber(),
-                user.getStatus());
-    }
-
     public static User getUserFromUserDTO(UserDTO userDTO){
 
         User user = new User(
