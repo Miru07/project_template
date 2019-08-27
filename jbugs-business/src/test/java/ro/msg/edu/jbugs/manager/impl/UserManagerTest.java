@@ -202,13 +202,6 @@ public class UserManagerTest {
     @Test(expected = BusinessException.class)
     public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
         UserDTO userDTO = createUserDTO();
-        userDTO.setPassword("x");
-        userManager.insertUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailPasswordIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
         userDTO.setFirstName("df34");
         userManager.insertUser(userDTO);
     }
