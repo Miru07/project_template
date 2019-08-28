@@ -1,6 +1,8 @@
+import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import ro.msg.edu.jbugs.type.PermissionType;
 import utils.TokenService;
 
+import javax.ejb.EJB;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
@@ -8,6 +10,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * intercepts all requests from frontend
@@ -15,6 +18,9 @@ import java.io.IOException;
  */
 @Provider
 public class TokenAuthenticationFilter implements ContainerRequestFilter {
+
+    @EJB
+    UserManagerRemote userManager;
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {
@@ -31,30 +37,64 @@ public class TokenAuthenticationFilter implements ContainerRequestFilter {
         String authorizationHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
+        /**
+        ********************following lines are for testing purposes***********************
+        * intercept all methods and requst paths
+         */
+        String reqpath = containerRequestContext.getUriInfo().getRequestUri().getPath();
+        String method = containerRequestContext.getMethod();
+
+        MultivaluedMap<String, String> headerss = containerRequestContext.getHeaders();
+        /**
+         ********************previous lines are for testing purposes***********************
+         * intercept all methods and requst paths
+         */
+
+        if (TokenService.isTokenExpired(token)) {
+            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("TOKEN_EXPIRED")
+                    .build());
+            return;
+        }
         /*
          ************************************USERS*******************************************
          */
         // GET users
-        if(containerRequestContext.getUriInfo().getRequestUri().getPath().endsWith("/jbugs/api/users")
-         && containerRequestContext.getMethod().equals("GET")){
-            // boolean hasP = TokenService.currentUserHasPermission(token, PermissionType.USER_MANAGEMENT.getActualString());
-            return;
-            /*
-            if(TokenService.currentUserHasPermission(token, PermissionType.USER_MANAGEMENT.getActualString())){
+        if(containerRequestContext.getMethod().equals("GET")
+            && containerRequestContext.getUriInfo().getRequestUri().getPath().endsWith("/jbugs/api/users"))
+        {
+            if(TokenService.currentUserHasPermission(userManager, token, PermissionType.USER_MANAGEMENT.getActualString())){
                 return;
             }
-             */
+            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("ACCESS_DENIED")
+                    .build());
+            return;
         }
-            // containerRequestContext.abortWith(null);
+        // CREATE user
+        if(containerRequestContext.getMethod().equals("POST")
+                && containerRequestContext.getUriInfo().getRequestUri().getPath().endsWith("/jbugs/api/users/create-user"))
+        {
+            if(TokenService.currentUserHasPermission(userManager, token, PermissionType.USER_MANAGEMENT.getActualString())){
+                return;
+            }
+            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("ACCESS_DENIED")
+                    .build());
+            return;
+        }
 
-        String reqpath = containerRequestContext.getUriInfo().getRequestUri().getPath();
-        String method = containerRequestContext.getMethod();
-        String a = "aaa";
-        String b = "bbb";
+        // for the sake of TESTING, accept any unhandled request
+        return;
 
-        MultivaluedMap<String, String> headerss = containerRequestContext.getHeaders();
+        /*
 
-        String msg = "Filter executed.";
-        System.out.println(msg);
+        // (do not modify) if none of the previous match, then abort with unauthorized
+        containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
+                .entity("ACCESS_DENIED")
+                .build());
+        return;
+
+        */
     }
 }
