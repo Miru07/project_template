@@ -15,7 +15,7 @@ public enum RegisteredRequestType {
     CREATE_USER("POST", "/jbugs/api/users/create-user", PermissionType.USER_MANAGEMENT.getActualString()),
     IS_DEACTIVATABLE_ID("GET", "/jbugs/api/users/is-deactivatable/{id}", PermissionType.USER_MANAGEMENT.getActualString()),
     EDIT_USER("PUT", "/jbugs/api/users/edit-user", PermissionType.USER_MANAGEMENT.getActualString()),
-    GET_USER_ID("PUT", "/jbugs/api/users/{id}", PermissionType.USER_MANAGEMENT.getActualString()),
+    GET_USER_ID("GET", "/jbugs/api/users/{id}", PermissionType.USER_MANAGEMENT.getActualString()),
 
     GET_BUGS("GET", "/jbugs/api/bugs", PermissionType.BUG_MANAGEMENT.getActualString()),
     CREATE_BUG("POST", "/jbugs/api/bugs", PermissionType.BUG_MANAGEMENT.getActualString()),
