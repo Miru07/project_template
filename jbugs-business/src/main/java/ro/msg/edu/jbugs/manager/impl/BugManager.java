@@ -16,6 +16,7 @@ import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.helpers.StatusHelper;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
+import ro.msg.edu.jbugs.type.PermissionType;
 import ro.msg.edu.jbugs.validators.BugValidator;
 
 import javax.ejb.EJB;
@@ -86,7 +87,7 @@ public class BugManager implements BugManagerRemote {
      *
      * @param wrapperDTO is an {@link BugAttachmentWrapperDTO} object that contains
      *               the Bug details and Attachment details in a DTO format.
-     * @throws {@link BusinessException}
+     * @throws {@link BusinessException} if the request is incomplete/incorrect.
      * @author Sebastian Maier
      */
     @Override
@@ -130,6 +131,71 @@ public class BugManager implements BugManagerRemote {
                                 } else
                                     return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
                                             AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * The function breaks and maps the {@link BugDTO} object to an {@link Bug} object.
+     * We check for the User who has created the request, with the help of its ID.
+     * If that user exists and has the permission to update Bugs, we check to see if
+     * the Bug to be updated exists in the database with the help of its ID.
+     * If it exists, we update it and persist it.
+     *
+     * @param requestUserID is the ID of the User who makes the request
+     * @param bugID         is the ID of the Bug who the function updates
+     * @param bugToUpdate   contains the new attributes of the Bug to be updated
+     * @return {@link BugDTO} object that is the updated entity in the database.
+     * @throws {@link BusinessException} if the user does not exist/doesn't have the rights, the Bug doesn't exist
+     *                or the details to be updated are incomplete/incorrect.
+     * @author Sebastian Maier
+     */
+    @Override
+    public BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException {
+        if (requestUserID == null || requestUserID == 0 || bugID == null || bugID == 0 || bugToUpdate == null) {
+            throw new BusinessException("msg-600", "Contents are empty");
+        } else {
+            User requestUser = userDao.findUser(requestUserID);
+            if (requestUser == null) {
+                throw new BusinessException("msg-601", "User does not exist");
+            } else {
+                boolean hasUpdatePermission = userDao.getPermissionsOfUser(requestUserID).
+                        contains(PermissionType.BUG_MANAGEMENT.getActualString());
+                if (!hasUpdatePermission) {
+                    throw new BusinessException("msg-602", "User does not have permission");
+                } else {
+                    Bug bugInDatabase = bugDao.getBugByID(bugID);
+                    if (bugInDatabase == null) {
+                        throw new BusinessException("msg-603", "Bug does not exist");
+                    } else {
+                        if (bugToUpdate.getCREATED_ID() == null || bugToUpdate.getASSIGNED_ID() == null) {
+                            throw new BusinessException("msg-604", "Bug has assigned Users that are empty.");
+                        } else {
+                            Bug bugMappedToUpdate = BugDTOEntityMapper.getBugWithUserCreatedAndAssigned(bugToUpdate);
+
+                            User createdUserFromBugToUpdate = userDao.findUser(bugMappedToUpdate.getCREATED_ID().getID());
+                            User assignedUserFromBugToUpdate = userDao.findUser(bugMappedToUpdate.getASSIGNED_ID().getID());
+
+                            if (createdUserFromBugToUpdate == null || assignedUserFromBugToUpdate == null) {
+                                throw new BusinessException("msg-605", "User from updated Bug does not exist in database.");
+                            } else {
+                                if (!BugValidator.validate(bugInDatabase)) {
+                                    throw new BusinessException("msg-606", "Updated Bug is not valid!");
+                                } else {
+                                    bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
+                                    bugInDatabase.setDescription(bugMappedToUpdate.getDescription());
+                                    bugInDatabase.setVersion(bugMappedToUpdate.getVersion());
+                                    bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
+                                    // Skipping status
+                                    bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
+                                    bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity());
+
+                                    return BugDTOEntityMapper.getBugDTO(bugInDatabase);
+                                }
                             }
                         }
                     }

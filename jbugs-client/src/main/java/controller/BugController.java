@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
+import ro.msg.edu.jbugs.dto.BugDTOWrapper;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 import utils.TokenService;
@@ -74,6 +75,21 @@ public class BugController extends HttpServlet {
             return Response.status(Response.Status.OK).entity("OK").build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
+        }
+    }
+
+    @PUT
+    @Path("/update-bug/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updateBug(@PathParam("id") Integer bugID, BugDTOWrapper wrapperDTO) {
+        try {
+            Integer requestUserID = TokenService.getCurrentUserID(wrapperDTO.getToken());
+            BugDTO bugToUpdate = wrapperDTO.getBugDTO();
+            bugManagerRemote.updateBug(requestUserID, bugID, bugToUpdate);
+            return Response.status(Response.Status.OK).entity("OK").build();
+        } catch (BusinessException ex) {
+            return Response.status(Response.Status.OK).entity("ERROR").build();
         }
     }
 }

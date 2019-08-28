@@ -33,6 +33,10 @@ public class BugValidator {
             if (!bug.getVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
         } else return false;
 
+        if (!bug.getFixedVersion().equals("")) {
+            if (!bug.getFixedVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
+        }
+
         if (bug.getSeverity() != null) {
             if (!validateSeverity(bug.getSeverity())) return false;
         }
@@ -52,6 +56,6 @@ public class BugValidator {
 
     private static boolean validateStatus(String status) {
         return status.equals("NEW") || status.equals("IN_PROGRESS") || status.equals("FIXED") || status.equals("CLOSED")
-                || status.equals("REJECTED") || status.equals("INFO_NEEDED");
+                || status.equals("REJECTED") || status.equals("INFO_NEEDED") || status.equals("OPEN");
     }
 }

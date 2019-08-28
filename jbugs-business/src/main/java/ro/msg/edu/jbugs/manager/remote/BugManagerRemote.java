@@ -22,4 +22,6 @@ public interface BugManagerRemote {
     List<BugDTO> getAllBugs();
 
     BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException;
+
+    BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException;
 }
