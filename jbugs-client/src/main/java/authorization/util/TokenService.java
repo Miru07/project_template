@@ -1,4 +1,4 @@
-package utils;
+package authorization.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
@@ -28,6 +28,7 @@ public class TokenService {
         return generateJWT(userID.toString(), ISSUER,
                 username, EXPIRATION_TIME);
     }
+    @SuppressWarnings( "deprecation" )
     private static String generateJWT(String id, String issuer, String subject, long ttlMillis) {
         //The JWT signature algorithm we will be using to sign the token
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;

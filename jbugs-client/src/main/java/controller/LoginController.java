@@ -3,7 +3,7 @@ package controller;
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
-import utils.TokenService;
+import authorization.util.TokenService;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServlet;
