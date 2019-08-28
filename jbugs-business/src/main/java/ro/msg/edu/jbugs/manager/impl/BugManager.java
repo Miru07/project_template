@@ -44,6 +44,13 @@ public class BugManager implements BugManagerRemote {
         return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
     }
 
+    /**
+     * @param newStatus is a {@link String} that contains the new status of the bug with the bugID id
+     * @param bugID is a {@link Integer} that contains the bug id whose status is to be changed
+     * @return {@link Bug} object with the new status
+     * @throws BusinessException if newStatus contains a wrong string or no available statuses are found
+     * @author Miruna Dinu
+     */
     @Override
     public BugDTO updateBugStatus(String newStatus, int bugID) throws BusinessException {
 
@@ -59,6 +66,10 @@ public class BugManager implements BugManagerRemote {
        }
     }
 
+    /**
+     * @return a list of {@link Bug} objects with all the bugs from the database
+     * @author Miruna Dinu
+     */
     @Override
     public List<BugDTO> getAllBugs(){
         List<Bug> bugList = bugDao.getAllBugs();
