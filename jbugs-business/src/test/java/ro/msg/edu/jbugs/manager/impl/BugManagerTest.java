@@ -53,7 +53,14 @@ public class BugManagerTest {
         BugDTO bugDTO = new BugDTO(0, "test", "test", "1.1.1",
                 new Date(2019, 1, 1), "NEW", "", "LOW",
                 userDTO, userDTO);
-        AttachmentDTO attachmentDTO = new AttachmentDTO(0, null, bugDTO);
+
+        String string = "test";
+        int len = string.length();
+        byte[] attContent = new byte[len/2];
+        for (int i = 0; i<len; i+=2){
+            attContent[i / 2] = (byte) ((Character.digit(string.charAt(i), 16) << 4)
+                    + Character.digit(string.charAt(i+1), 16));}
+        AttachmentDTO attachmentDTO = new AttachmentDTO(0, attContent, bugDTO);
 
         return new BugAttachmentWrapperDTO(bugDTO, attachmentDTO, "token");
     }
@@ -64,7 +71,14 @@ public class BugManagerTest {
         BugDTO bugDTO = new BugDTO(1, "test", "test", "1.1",
                 new Date(2019, 1, 1), "NEW", "", "LOW",
                 userDTO, userDTO);
-        AttachmentDTO attachmentDTO = new AttachmentDTO(1, null, bugDTO);
+
+        String string = "test";
+        int len = string.length();
+        byte[] attContent = new byte[len/2];
+        for (int i = 0; i<len; i+=2){
+            attContent[i / 2] = (byte) ((Character.digit(string.charAt(i), 16) << 4)
+                    + Character.digit(string.charAt(i+1), 16));}
+        AttachmentDTO attachmentDTO = new AttachmentDTO(1, attContent, bugDTO);
 
         return new BugAttachmentWrapperDTO(bugDTO, attachmentDTO, "token");
     }

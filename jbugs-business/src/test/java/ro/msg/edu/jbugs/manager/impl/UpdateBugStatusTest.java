@@ -12,7 +12,6 @@ import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public class UpdateBugStatusTest {
 

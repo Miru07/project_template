@@ -34,4 +34,13 @@ public class StatusHelperTest {
         statusTypeList = StatusHelper.getStatusForUpdate(StatusType.CLOSED);
         assertEquals(Collections.emptyList(), statusTypeList);
     }
+
+    @Test
+    public void getStatusToClose(){
+
+        List<StatusType> statusTypeList;
+
+        statusTypeList = StatusHelper.getStatusesToClose();
+        assertEquals( Arrays.asList(StatusType.FIXED, StatusType.REJECTED), statusTypeList);
+    }
 }
