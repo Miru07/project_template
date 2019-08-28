@@ -19,6 +19,12 @@ public class BugDao {
     @PersistenceContext(unitName = "jbugs-persistence")
     private EntityManager entityManager;
 
+
+    /**
+     * @param bugID is a {@link Integer} that contains a bug id
+     * @return {@link Bug} object with the id bugID
+     * @author Miruna Dinu
+     */
     public Bug getBugByID(Integer bugID) {
         return entityManager.find(Bug.class, bugID);
     }
@@ -42,6 +48,12 @@ public class BugDao {
         return bug;
     }
 
+    /**
+     * @param newStatus is a {@link String} that contains the new status of the bug with the bugID id
+     * @param bugID is a {@link Integer} that contains the bug id whose status is to be changed
+     * @return {@link Bug} object with the new status
+     * @author Miruna Dinu
+     */
     public Bug updateBugStatus(String newStatus, int bugID){
 
         Bug bug = getBugByID(bugID);
@@ -50,6 +62,10 @@ public class BugDao {
         return bug;
     }
 
+    /**
+     * @return a list of {@link Bug} objects with all the bugs from the database
+     * @author Miruna Dinu
+     */
     public List<Bug> getAllBugs() {
         return entityManager.createNamedQuery(Bug.FIND_ALL_BUGS, Bug.class).getResultList();
     }
