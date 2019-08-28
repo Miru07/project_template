@@ -15,13 +15,11 @@ import ro.msg.edu.jbugs.entity.StatusType;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.helpers.StatusHelper;
-import ro.msg.edu.jbugs.interceptors.TimeInterceptors;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 import ro.msg.edu.jbugs.validators.BugValidator;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import javax.interceptor.Interceptors;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +27,7 @@ import java.util.stream.Collectors;
  * Manager class for CRUD actions on {@link Bug}, {@link BugDTO} & {@link BugAttachmentWrapperDTO} objects.
  */
 @Stateless
-@Interceptors(TimeInterceptors.class)
+//@Interceptors(TimeInterceptors.class)
 public class BugManager implements BugManagerRemote {
     @EJB
     BugDao bugDao;
@@ -85,38 +83,46 @@ public class BugManager implements BugManagerRemote {
         if (wrapperDTO.getBug() == null || wrapperDTO.getAttachment() == null || wrapperDTO.getToken() == null) {
             throw new BusinessException("msg-500", "An Entity is empty.");
         } else {
-            Bug bugToPersist = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
-
-            if (!BugValidator.validate(bugToPersist)) {
-                throw new BusinessException("msg-501", "Entity is not valid.");
-            }
-
-            User createdUserToSet = userDao.findUser(createdID);
-            User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
-
-            if (createdUserToSet == null || assignedUserToSet == null) {
-                throw new BusinessException("msg-501", "User does not exist");
+            if (wrapperDTO.getBug().getASSIGNED_ID() == null) {
+                throw new BusinessException("msg-504", "User is empty");
             } else {
-                // We set the users and change the Status from NEW to OPEN.
-                bugToPersist.setCREATED_ID(createdUserToSet);
-                bugToPersist.setASSIGNED_ID(assignedUserToSet);
-                bugToPersist.setStatus("OPEN");
+                Bug bugToPersist = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
 
-                Bug persistedBugWithID = bugDao.insert(bugToPersist);
-
-                if (persistedBugWithID.getID().equals(0) || persistedBugWithID.getID() == null) {
-                    throw new BusinessException("msg-502", "Bug could not be added");
+                if (!BugValidator.validate(bugToPersist)) {
+                    throw new BusinessException("msg-501", "Entity is not valid.");
                 } else {
-                    Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
-                    attachmentToPersist.setBugID(persistedBugWithID);
 
-                    Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToPersist);
-                    if (persistedAttachmentWithID.getID().equals(0) || persistedAttachmentWithID.getID() == null) {
-                        throw new BusinessException("msg-503", "Attachment could not be added");
-                    } else return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
-                            AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
+                    User createdUserToSet = userDao.findUser(createdID);
+                    User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
+                    if (createdUserToSet == null || assignedUserToSet == null) {
+                        throw new BusinessException("msg-501", "User does not exist");
+                    } else {
+                        // We set the users and change the Status from NEW to OPEN.
+                        bugToPersist.setCREATED_ID(createdUserToSet);
+                        bugToPersist.setASSIGNED_ID(assignedUserToSet);
+                        bugToPersist.setStatus("OPEN");
+
+                        Bug persistedBugWithID = bugDao.insert(bugToPersist);
+
+                        if (persistedBugWithID.getID().equals(0) || persistedBugWithID.getID() == null) {
+                            throw new BusinessException("msg-502", "Bug could not be added");
+                        } else {
+                            if (wrapperDTO.getAttachment().getAttContent() == null || wrapperDTO.getAttachment().getAttContent().length == 0) {
+                                throw new BusinessException("msg-504", "Bug has to have an attachment");
+                            } else {
+                                Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(wrapperDTO.getAttachment());
+                                attachmentToPersist.setBugID(persistedBugWithID);
+
+                                Attachment persistedAttachmentWithID = attachmentDao.insert(attachmentToPersist);
+                                if (persistedAttachmentWithID.getID().equals(0) || persistedAttachmentWithID.getID() == null) {
+                                    throw new BusinessException("msg-503", "Attachment could not be added");
+                                } else
+                                    return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
+                                            AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
+                            }
+                        }
+                    }
                 }
-
             }
         }
     }

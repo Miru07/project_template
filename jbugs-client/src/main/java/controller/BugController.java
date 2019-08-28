@@ -58,7 +58,7 @@ public class BugController extends HttpServlet {
             bugManagerRemote.insertBug(bugAttachmentWrapperDTO, createdID);
             return Response.status(Response.Status.OK).entity("OK").build();
         } catch (BusinessException ex) {
-            return Response.status(Response.Status.NOT_ACCEPTABLE).entity("ERROR").build();
+            return Response.status(Response.Status.OK).entity("ERROR").build();
         }
     }
 
