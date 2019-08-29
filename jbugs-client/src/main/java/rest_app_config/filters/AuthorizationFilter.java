@@ -39,6 +39,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             RegisteredRequestType.GET_USER_ID,
 
             RegisteredRequestType.GET_BUGS,
+            RegisteredRequestType.GET_BUG_ID,
             RegisteredRequestType.CREATE_BUG,
             RegisteredRequestType.UPDATE_BUG_ID,
             RegisteredRequestType.UPDATE_BUG,
@@ -59,6 +60,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         }
         if (requestType.matches(RegisteredRequestType.LOGIN)) {
             return; // no auth needed
+        }
+        if (requestType.matches(RegisteredRequestType.GET_BUG_ID)) {
+            return; // no permission needed (notifications)
         }
 
         // get TOKEN from authorization header:
@@ -81,7 +85,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     private boolean isRequestPermitted(RequestType requestType, String token) {
         for (RegisteredRequestType regReq : registeredRequestTypes) {
             if (requestType.matches(regReq)) {
-                if(isRequestOPTIONSorLOGIN(regReq)) {
+                if(isRequestOPTIONSorLOGINorGETbugID(regReq)) {
                     return true;
                 }
                 if (isRequestPermitted(token, regReq)) {
@@ -97,8 +101,9 @@ public class AuthorizationFilter implements ContainerRequestFilter {
                 .entity(msg)
                 .build());
     }
-    private boolean isRequestOPTIONSorLOGIN(RegisteredRequestType regReq){
-        if(regReq == RegisteredRequestType.OPTIONS || regReq == RegisteredRequestType.LOGIN) {
+    private boolean isRequestOPTIONSorLOGINorGETbugID(RegisteredRequestType regReq){
+        if(regReq == RegisteredRequestType.OPTIONS || regReq == RegisteredRequestType.LOGIN
+                || regReq == RegisteredRequestType.GET_BUG_ID) {
             return true;
         }
         return false;
