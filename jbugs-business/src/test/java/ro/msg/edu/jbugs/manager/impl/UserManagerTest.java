@@ -24,10 +24,7 @@ import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -57,6 +54,9 @@ public class UserManagerTest {
 
     @Mock
     private NotificationManager notificationManager;
+
+    @Mock
+    private BusinessException businessException;
 
     public UserManagerTest() {
 
@@ -104,16 +104,7 @@ public class UserManagerTest {
     }
 
     private User createUserLogIn() {
-        User user = new User();
-        user.setID(1);
-        user.setFirstName("test5");
-        user.setLastName("test5");
-        user.setEmail("test5");
-        user.setCounter(1);
-        user.setMobileNumber("123456");
-        user.setUsername("dinum");
-        user.setPassword("a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff");
-        user.setStatus(1);
+        User user = new User(1, 0, "Corina", "Mara", "0743170363", "mara.corina@msggroup.com", "marac", "test",1);
         return user;
     }
 
@@ -177,6 +168,7 @@ public class UserManagerTest {
         assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
         assertEquals(persistedUser.getUsername(), loginResponseUserDTO.getUsername());
     }
+    // updated in refactoring branch @Diana
 
 
     @Test
@@ -311,5 +303,23 @@ public class UserManagerTest {
         users.add(user);
         when(userDao.findAllUsers()).thenReturn(users);
         assertEquals(userManager.findAllUsers().size(), 1);
+    }
+
+    @Test
+    public void getUserNotificationsSuccess() throws BusinessException {
+        User user = createUser();
+        Set<Notification> notifications = new HashSet<>();
+        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER.toString(), "", user);
+        notifications.add(notification);
+        user.setNotifications(notifications);
+
+        when(userDao.findUserByUsername("marac")).thenReturn(user);
+        assertEquals(userManager.getUserNotifications("marac").size(), 1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void getUserNotificationsNull() throws BusinessException {
+        when(userDao.findUserByUsername("marac")).thenReturn(null);
+        userManager.getUserNotifications("marac");
     }
 }

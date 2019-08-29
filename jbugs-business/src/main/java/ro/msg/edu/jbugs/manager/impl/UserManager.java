@@ -3,7 +3,9 @@ package ro.msg.edu.jbugs.manager.impl;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
+import ro.msg.edu.jbugs.dtoEntityMapper.NotificationDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
+import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
@@ -59,7 +61,7 @@ public class UserManager implements UserManagerRemote {
         LocalDate date = LocalDate.now();
 
         NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  persistedUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString() , "", persistedUser);
+                NotificationType.WELCOME_NEW_USER.toString(), "", UserDTOEntityMapper.getDTOFromUser(persistedUser));
 
         notificationManager.insertNotification(notificationDTO);
     }
@@ -173,6 +175,21 @@ public class UserManager implements UserManagerRemote {
         return UserDTOEntityMapper.getDTOCompleteFromUser(user);
     }
 
+    /**
+     * Returns a set of {@link NotificationDTO} objects that wrap the {@link Notification} objects
+     * corresponding to the user with the username given as parameter from the database
+     *
+     * @throws {@link BusinessException} if there is no user with the given username in the database
+     */
+    @Override
+    public Set<NotificationDTO> getUserNotifications(String username) throws BusinessException {
+        User user = userDao.findUserByUsername(username);
+        if (user == null) {
+            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
+        }
+        return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(user.getNotifications());
+    }
+
     @Override
     public List<UserDTO> findAllUsers(){
         List<User> users = userDao.findAllUsers();
@@ -205,7 +222,10 @@ public class UserManager implements UserManagerRemote {
     @Override
     public boolean userHasPermission(Integer userId, String permission) {
         List<PermissionType> permissions = userDao.getPermissionsOfUser(userId);
-        return permissions.contains(permission);
+        Set<String> setPermissions = new HashSet<>();
+
+        permissions.forEach(p -> setPermissions.add(p));
+        return setPermissions.contains(permission);
     }
 
     /**

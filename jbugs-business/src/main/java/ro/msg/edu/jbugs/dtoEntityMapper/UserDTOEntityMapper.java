@@ -18,7 +18,6 @@ public class UserDTOEntityMapper {
     }
 
     public static User getUserFromUserDTO(UserDTO userDTO){
-
         User user = new User();
         if (userDTO != null) {
             user.setID(userDTO.getId());
@@ -31,10 +30,8 @@ public class UserDTOEntityMapper {
             user.setPassword(userDTO.getPassword());
             user.setStatus(userDTO.getStatus());
         }
-
         return user;
     }
-
     public static UserDTO getDTOFromUser(User user){
         UserDTO userDTO = new UserDTO();
         if (user != null) {
@@ -48,10 +45,8 @@ public class UserDTOEntityMapper {
             userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
             userDTO.setId(user.getID());
         }
-
         return userDTO;
     }
-
     public static UserDTO getDTOCompleteFromUser(User user) {
         UserDTO userDTO = getDTOFromUser(user);
         if (user != null) {
