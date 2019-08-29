@@ -2,6 +2,8 @@ package ro.msg.edu.jbugs.validators;
 
 import ro.msg.edu.jbugs.entity.Bug;
 
+import java.time.LocalDate;
+
 /**
  * Validator class for {@link Bug} class.
  *
@@ -26,6 +28,9 @@ public class BugValidator {
             if (bug.getDescription().length() > 250) return false;
         } else return false;
 
+        LocalDate date = bug.getTargetDate().toLocalDate();
+
+        if (date.getYear() == 2000) return false;
         /* The RegEx matches cases such as:
            1.1.1, 1.2.a etc;
          */
@@ -44,8 +49,6 @@ public class BugValidator {
         if (bug.getStatus() != null) {
             if (!validateStatus(bug.getStatus())) return false;
         }
-
-        if (bug.getASSIGNED_ID() == null) return false;
 
         return true;
     }

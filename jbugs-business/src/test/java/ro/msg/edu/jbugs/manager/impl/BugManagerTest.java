@@ -212,11 +212,6 @@ public class BugManagerTest {
 
     // ============== BUG UPDATE ===============
 
-//    public Set<RoleDTO> setRoles(){
-//        Set<RoleDTO> newSet = new HashSet<>();
-//        newSet.add()
-//    }
-
     public UserDTO testObjectUserDTO() {
         return new UserDTO(1, "test", "test", "test", "test",
                 0, "test", "077", 1);
@@ -311,22 +306,6 @@ public class BugManagerTest {
     }
 
     @Test(expected = BusinessException.class)
-    public void updateBug_bugToUpdateMappedCreatedUserIDNull_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
-
-        BugDTO bugDTO = testObjectBugDTO();
-        Bug bug = BugDTOEntityMapper.getBug(bugDTO);
-
-        when(userDao.findUser(any())).thenReturn(testObjectUser());
-        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
-        when(bugDao.getBugByID(any())).thenReturn(bug);
-        when(userDao.findUser(any())).thenReturn(null);
-
-        bugManager.updateBug(1, 1, bugDTO);
-    }
-
-    @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdateMappedAssignedUserIDNull_BussinessException() throws BusinessException {
         List<String> permission = new LinkedList<>();
         permission.add("BUG_MANAGEMENT");
@@ -337,7 +316,6 @@ public class BugManagerTest {
         when(userDao.findUser(any())).thenReturn(testObjectUser());
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(bug);
-        when(userDao.findUser(any())).thenReturn(testObjectUser());
         when(userDao.findUser(any())).thenReturn(null);
 
         bugManager.updateBug(1, 1, bugDTO);
@@ -356,7 +334,6 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(bug);
         when(userDao.findUser(any())).thenReturn(testObjectUser());
-        when(userDao.findUser(any())).thenReturn(testObjectUser());
 
         bugManager.updateBug(1, 1, bugDTO);
     }
@@ -373,7 +350,6 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(bug);
         when(userDao.findUser(any())).thenReturn(testObjectUser());
-        when(userDao.findUser(any())).thenReturn(testObjectUser());
 
         BugDTO updatedBugDTO = bugManager.updateBug(1, 1, bugDTO);
 
@@ -387,6 +363,7 @@ public class BugManagerTest {
         Assert.assertEquals(updatedBugDTO.getTargetDate(), bugDTO.getTargetDate());
     }
 
+    //TODO : this
 
 
 }

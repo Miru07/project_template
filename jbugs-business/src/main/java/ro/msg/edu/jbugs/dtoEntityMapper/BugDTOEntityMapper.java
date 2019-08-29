@@ -22,6 +22,20 @@ public class BugDTOEntityMapper {
 
     }
 
+    public static Bug getBugWithoutUsers(BugDTO bugDTO) {
+        Bug bug = new Bug();
+        bug.setID(bugDTO.getID());
+        bug.setTitle(bugDTO.getTitle());
+        bug.setDescription(bugDTO.getDescription());
+        bug.setTargetDate(bugDTO.getTargetDate());
+        bug.setFixedVersion(bugDTO.getFixedVersion());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
+        bug.setStatus(bugDTO.getStatus());
+        bug.setVersion(bugDTO.getVersion());
+
+        return bug;
+    }
+
     public static Bug getBugWithUserCreatedAndAssigned(BugDTO bugDTO) {
         Bug bug = new Bug();
         bug.setID(bugDTO.getID());
