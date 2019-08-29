@@ -7,8 +7,8 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.manager.impl.UserManager;
-import ro.msg.edu.jbugs.type.PermissionType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -62,26 +62,26 @@ public class TokenServiceTest {
 
         String token = TokenService.generateLoginToken(loginResponseUserDTO);
 
-        List<String> permissionsLIST = new ArrayList<>();
-        permissionsLIST.add(PermissionType.BUG_CLOSE.getActualString());
-        permissionsLIST.add(PermissionType.BUG_MANAGEMENT.getActualString());
-        permissionsLIST.add(PermissionType.USER_MANAGEMENT.getActualString());
+        List<PermissionType> permissionsLIST = new ArrayList<>();
+        permissionsLIST.add(PermissionType.BUG_CLOSE);
+        permissionsLIST.add(PermissionType.BUG_MANAGEMENT);
+        permissionsLIST.add(PermissionType.USER_MANAGEMENT);
 
         Set<String> permissionsSET = new HashSet<>();
-        permissionsLIST.forEach(permission -> permissionsSET.add(permission));
+        permissionsLIST.forEach(permission -> permissionsSET.add(permission.getActualString()));
 
         loginResponseUserDTO.setPermissions(permissionsSET);
 
         when(userDao.getPermissionsOfUser(1)).thenReturn(permissionsLIST);
 
         assertFalse(TokenService.currentUserHasPermission(userManager, token,
-                PermissionType.PERMISSION_MANAGEMENT.getActualString()));
+                PermissionType.PERMISSION_MANAGEMENT));
         assertTrue(TokenService.currentUserHasPermission(userManager, token,
-                PermissionType.USER_MANAGEMENT.getActualString()));
+                PermissionType.USER_MANAGEMENT));
         assertTrue(TokenService.currentUserHasPermission(userManager, token,
-                PermissionType.BUG_CLOSE.getActualString()));
+                PermissionType.BUG_CLOSE));
         assertTrue(TokenService.currentUserHasPermission(userManager, token,
-                PermissionType.BUG_MANAGEMENT.getActualString()));
+                PermissionType.BUG_MANAGEMENT));
     }
 
     @Test

@@ -3,6 +3,7 @@ package rest_app_config.filters;
 import authorization.util.TokenService;
 import rest_app_config.type.util.RegisteredRequestType;
 import rest_app_config.type.util.RequestType;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.ejb.EJB;
@@ -10,6 +11,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +19,7 @@ import java.util.Set;
 /**
  * intercepts all requests from frontend
  */
-//@Provider
+@Provider
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     @EJB
@@ -40,8 +42,8 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             RegisteredRequestType.CREATE_BUG,
             RegisteredRequestType.UPDATE_BUG_ID,
             RegisteredRequestType.UPDATE_BUG,
-            // rest_app_config.type.util.RegisteredRequestType.CLOSE_BUG, // TODO Miruna?
-            // rest_app_config.type.util.RegisteredRequestType.GET_USER_FOR_BUG, // TODO Miruna?
+            // RegisteredRequestType.CLOSE_BUG, // TODO Miruna?
+            // RegisteredRequestType.GET_USER_FOR_BUG, // TODO Miruna?
 
             RegisteredRequestType.SET_PERMISSIONS,
             RegisteredRequestType.GET_PERMISSIONS
@@ -49,7 +51,6 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {
-
         RequestType requestType = new RequestType(containerRequestContext.getMethod(),
                 containerRequestContext.getUriInfo().getRequestUri().getPath());
 
@@ -103,7 +104,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
         return false;
     }
     private boolean isRequestPermitted(String token, RegisteredRequestType regReq){
-        if (TokenService.currentUserHasPermission(userManager, token, regReq.getPermission())) {
+        if (TokenService.currentUserHasPermission(userManager, token, PermissionType.get(regReq.getPermission()))) {
             return true;
         }
         return false;
