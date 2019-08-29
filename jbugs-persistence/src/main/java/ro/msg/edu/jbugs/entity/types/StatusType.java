@@ -1,4 +1,4 @@
-package ro.msg.edu.jbugs.entity;
+package ro.msg.edu.jbugs.entity.types;
 
 public enum StatusType {
     OPEN("OPEN"),

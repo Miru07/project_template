@@ -4,9 +4,12 @@ import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.entity.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Entity Mapper class for {@link User} & {@link UserDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
+ */
 public class UserDTOEntityMapper {
 
 
@@ -16,35 +19,45 @@ public class UserDTOEntityMapper {
 
     public static User getUserFromUserDTO(UserDTO userDTO){
 
-        User user = new User(
-                userDTO.getCounter(),
-                userDTO.getFirstName(),
-                userDTO.getLastName(),
-                userDTO.getMobileNumber(),
-                userDTO.getEmail(),
-                userDTO.getUsername(),
-                userDTO.getPassword(),
-                userDTO.getStatus());
+        User user = new User();
+        if (userDTO != null) {
+            user.setID(userDTO.getId());
+            user.setCounter(userDTO.getCounter());
+            user.setFirstName(userDTO.getFirstName());
+            user.setLastName(userDTO.getLastName());
+            user.setMobileNumber(userDTO.getMobileNumber());
+            user.setEmail(userDTO.getEmail());
+            user.setUsername(userDTO.getUsername());
+            user.setPassword(userDTO.getPassword());
+            user.setStatus(userDTO.getStatus());
+        }
 
-        user.setID(userDTO.getId());
         return user;
     }
 
     public static UserDTO getDTOFromUser(User user){
-        UserDTO userDTO = new UserDTO(user.getCounter(), user.getFirstName(), user.getLastName(),
-                user.getMobileNumber(), user.getEmail(), user.getUsername(), user.getStatus());
-        userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
+        UserDTO userDTO = new UserDTO();
+        if (user != null) {
+            userDTO.setCounter(user.getCounter());
+            userDTO.setFirstName(user.getFirstName());
+            userDTO.setLastName(user.getLastName());
+            userDTO.setMobileNumber(user.getMobileNumber());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setStatus(user.getStatus());
+            userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
+            userDTO.setId(user.getID());
+        }
 
-        userDTO.setId(user.getID());
         return userDTO;
     }
 
     public static UserDTO getDTOCompleteFromUser(User user) {
-        UserDTO userDTO = new UserDTO(user.getID(), user.getFirstName(), user.getLastName(), user.getUsername(), user.getPassword(),
-                user.getCounter(), user.getEmail(), user.getMobileNumber(), user.getStatus(), new HashSet<>());
-        userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
+        UserDTO userDTO = getDTOFromUser(user);
+        if (user != null) {
+            userDTO.setPassword(user.getPassword());
+        }
 
-        userDTO.setId(user.getID());
         return userDTO;
     }
 
@@ -54,21 +67,11 @@ public class UserDTOEntityMapper {
      * @return UserDTO without password, with array of roles
      */
     public static UserDTO getDTOWithRolesWithoutPasswFromUser(User user){
-        UserDTO userDTO = new UserDTO();
-
-        userDTO.setId(user.getID());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setMobileNumber(user.getMobileNumber());
-        userDTO.setStatus(user.getStatus());
-        userDTO.setCounter(user.getCounter());
+        UserDTO userDTO = getDTOFromUser(user);
         userDTO.setPassword("");
-
-        userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
         return userDTO;
     }
+
     /***************************************VIEW_USERS********************************************
      *
      * @param users

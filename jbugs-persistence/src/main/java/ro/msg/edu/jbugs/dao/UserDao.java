@@ -1,6 +1,7 @@
 package ro.msg.edu.jbugs.dao;
 
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import javax.ejb.Stateless;
@@ -13,23 +14,45 @@ import java.util.List;
 import static com.google.common.hash.Hashing.sha256;
 import static ro.msg.edu.jbugs.entity.User.FIND_ALL_USERS;
 
+
+/**
+ * Data Access Object class for {@link User} objects.
+ * It has direct access to the database and all {@link User} related tables.
+ *
+ * @author Mara Corina
+ */
 @Stateless
 public class UserDao {
 
     @PersistenceContext(unitName="jbugs-persistence")
     private EntityManager entityManager;
 
+
+    /**
+     * @param id is an {@link Integer}
+     * @return {@link User} object
+     */
     public User findUser(Integer id){
 
         return entityManager.find(User.class, id);
     }
 
+    /**
+     * @param user is an {@link User} object containing data to be
+     *                   persisted inside the database.
+     * @return an {@link User} object with a persisted ID.
+     */
     public User insertUser(User user){
         entityManager.persist(user);
         entityManager.flush();
         return user;
     }
 
+    /**
+     * Checks if the given username is unique in the database
+     * @param username is a {@link String}
+     * @return {@link Boolean}
+     */
     public boolean isUsernameUnique(String username){
         Long occurences = entityManager.createNamedQuery(User.QUERY_CHECK_USERNAME_UNIQUE, Long.class)
                 .setParameter("username", username)
@@ -37,13 +60,23 @@ public class UserDao {
         return occurences == 0;
     }
 
+
+    /**
+     * @return a list of {@link User} objects with all the users from the database
+     */
     public List<User> findAllUsers(){
         return entityManager.createNamedQuery(FIND_ALL_USERS, User.class).getResultList();
     }
 
+    /**
+     * Hashes the given password
+     * @param password is a {@link String}
+     * @return {@link String}
+     */
     private String getHashedPassword(String password){
         return sha256().hashString(password, StandardCharsets.UTF_8).toString();
     }
+
     /**
      ************************************LOGIN********************************************
      * @param username
@@ -59,7 +92,7 @@ public class UserDao {
             if(user.getStatus() == User.USER_STATUS_INACTIVE){
                 throw new BusinessException("LOGIN-002", "User is inactive");
             }
-            
+
             String hashedPassword = this.getHashedPassword(password);
 
             if(!user.getPassword().equals(hashedPassword)){
@@ -67,8 +100,7 @@ public class UserDao {
                 if(user.getCounter() >= PASS_MAX_NR_TRIES){
                     user.setStatus(User.USER_STATUS_INACTIVE);
                     throw new BusinessException("LOGIN-003", "User was deactivated");
-                }
-                else{
+                } else{
                     user.setCounter(user.getCounter()+1);
                     throw new BusinessException("LOGIN-004", "Incorrect password");
                 }
@@ -79,6 +111,7 @@ public class UserDao {
             throw e;
         }
     }
+
     /**
      ************************************LOGIN********************************************
      * @param username
@@ -96,6 +129,7 @@ public class UserDao {
             throw new BusinessException("LOGIN-001", "Invalid username");
         }
     }
+
     /**
      * **********************************LOGIN********************not sure if needed just yet
      * @param user
@@ -112,16 +146,18 @@ public class UserDao {
         }
         return false;
     }
+
     /**
      ************************************LOGIN********************************************
      * @param user
      * @return List<String> // permission type...
      */
-    public List<String> getPermissionsOfUser(User user){
+    public List<PermissionType> getPermissionsOfUser(User user){
         return this.getPermissionsOfUser(user.getID());
     }
-    public List<String> getPermissionsOfUser(Integer userId){
-        List<String> permissions = entityManager.createNamedQuery(User.QUERY_GET_PERMISSIONS, String.class)
+
+    public List<PermissionType> getPermissionsOfUser(Integer userId) {
+        List<PermissionType> permissions = entityManager.createNamedQuery(User.QUERY_GET_PERMISSIONS, PermissionType.class)
                 .setParameter("user_id", userId)
                 .getResultList();
         return permissions;

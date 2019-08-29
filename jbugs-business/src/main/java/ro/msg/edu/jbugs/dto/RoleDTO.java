@@ -1,28 +1,30 @@
 package ro.msg.edu.jbugs.dto;
 
+import ro.msg.edu.jbugs.entity.Role;
+import ro.msg.edu.jbugs.entity.types.RoleType;
+
 import java.io.Serializable;
 
 /**
- * Document me.
+ * The class maps a {@link Role} object.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 public class RoleDTO implements Serializable {
-    private String type;
+    private RoleType type;
 
     public RoleDTO() {
     }
 
-    public RoleDTO(String type) {
+    public RoleDTO(RoleType type) {
         this.type = type;
     }
 
-    public String getType() {
+    public RoleType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(RoleType type) {
         this.type = type;
     }
 }

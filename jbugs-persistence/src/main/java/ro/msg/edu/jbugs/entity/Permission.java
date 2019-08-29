@@ -1,5 +1,7 @@
 package ro.msg.edu.jbugs.entity;
 
+import ro.msg.edu.jbugs.entity.types.PermissionType;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -18,12 +20,13 @@ public class Permission implements Serializable {
     private String description;
 
     @Column(name="type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private PermissionType type;
 
     public Permission() {
     }
 
-    public Permission(Integer id, String description, String type) {
+    public Permission(Integer id, String description, PermissionType type) {
         this.ID = id;
         this.description = description;
         this.type = type;
@@ -48,11 +51,11 @@ public class Permission implements Serializable {
         this.description = description;
     }
 
-    public String getType() {
+    public PermissionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(PermissionType type) {
         this.type = type;
     }
 

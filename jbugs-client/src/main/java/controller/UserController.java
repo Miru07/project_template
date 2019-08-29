@@ -25,6 +25,11 @@ public class UserController extends HttpServlet {
     @EJB
     private UserManagerRemote userManagerRemote;
 
+
+    /**
+     * The Controller returns and array of {@link UserDTO} Objects that
+     * map all the {@link User} objects from the database
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getUsers() throws JsonProcessingException {
@@ -36,6 +41,17 @@ public class UserController extends HttpServlet {
         return jsonTransformer.writeValueAsString(listOfAllUsers);
     }
 
+    /**
+     * The Controller consumes a {@link UserDTO} Object that
+     *         maps the corresponding {@link User} object data that
+     *         will be persisted in the database.
+     *
+     * @param userDTO is an {@link UserDTO} object
+     * @return a success response containing the {@link UserDTO} object that maps the object
+     *          persisted
+     * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
+     *                and we return an ERROR response to the client containing the thrown exception
+     */
     @POST
     @Path("/create-user")
     @Produces(MediaType.APPLICATION_JSON)
@@ -58,7 +74,6 @@ public class UserController extends HttpServlet {
      * @return a success response containing the {@link Boolean} value
      * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
      *                and we return an ERROR response to the client containing the thrown exception
-     * @author Mara Corina
      */
     @GET
     @Path("/is-deactivatable/{id}")
@@ -81,7 +96,6 @@ public class UserController extends HttpServlet {
      * @return a success response containing the {@link UserDTO} object that maps the updated data
      * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
      *                and we return an ERROR response to the client containing the thrown exception
-     * @author Mara Corina
      */
     @PUT
     @Path("/edit-user")
@@ -104,7 +118,6 @@ public class UserController extends HttpServlet {
      * from teh database
      * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
      *                and we return an ERROR response to the client containing the thrown exception
-     * @author Mara Corina
      */
     @GET
     @Path("/{id}")

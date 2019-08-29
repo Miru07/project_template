@@ -3,27 +3,34 @@ package ro.msg.edu.jbugs.manager.impl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import ro.msg.edu.jbugs.dao.NotificationDao;
 import ro.msg.edu.jbugs.dao.RoleDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
-import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
-import ro.msg.edu.jbugs.dto.RoleDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
+import ro.msg.edu.jbugs.dtoEntityMapper.NotificationDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Bug;
+import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.NotificationType;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
+import ro.msg.edu.jbugs.entity.types.RoleType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -46,6 +53,9 @@ public class UserManagerTest {
     private RoleDao roleDao;
 
     @Mock
+    private NotificationDao notificationDao;
+
+    @Mock
     private NotificationManager notificationManager;
 
     public UserManagerTest() {
@@ -64,6 +74,10 @@ public class UserManagerTest {
         assertEquals("baloz", userManager.generateUsername("Zsolt", "Balo"));
 
         Mockito.verify(userDao, Mockito.times(2)).isUsernameUnique(anyString());
+
+        when(userDao.isUsernameUnique("dinutm")).thenReturn(true);
+
+        assertEquals("dinutm", userManager.generateUsername("Miruna", "Dinuttt"));
     }
 
     @Test
@@ -83,6 +97,13 @@ public class UserManagerTest {
 
     private User createUser(){
 
+        User user = new User(1, 0, "Corina", "Mara", "0743170363",
+                "mara@msggroup.com", "marac", "test", 1);
+
+        return user;
+    }
+
+    private User createUserLogIn() {
         User user = new User();
         user.setID(1);
         user.setFirstName("test5");
@@ -93,144 +114,132 @@ public class UserManagerTest {
         user.setUsername("dinum");
         user.setPassword("a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff");
         user.setStatus(1);
-
         return user;
     }
 
     private UserDTO createUserDTO() {
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
-        UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test", 0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
+        roleDTOS.add(new RoleDTO(RoleType.ADMINISTRATOR));
+        UserDTO userDTO = new UserDTO(1, "Corina", "Mara", "marac", "test",
+                0, "mara@msggroup.com", "0743170363", 1, roleDTOS);
         return userDTO;
     }
 
     @Test
-    public void login() throws BusinessException {
+    public void loginNoToken() throws BusinessException {
         //noinspection unchecked
         when(userDao.findByUsernameAndPassword("dinum", "parola")).thenThrow(BusinessException.class);
         LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
         loginReceivedDTO.setUsername("dinum");
-        loginReceivedDTO.setPassword("parola");
-        userManager.login(loginReceivedDTO);
-        assertEquals(userManager.login(loginReceivedDTO).getToken(), null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void login2() throws BusinessException {
-        when(userDao.findUserByUsername("dinum")).thenReturn(createUser());
-        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("dinum");
-        loginReceivedDTO.setPassword("parola");
-        assertNull(userManager.login(loginReceivedDTO));
+        loginReceivedDTO.setPassword("wrongparola");
+        assertEquals(userManager.login(loginReceivedDTO).getToken(), "");
     }
 
     @Test
-    public void login3() throws BusinessException{
-        User user = createUser();
-        when(userDao.findByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
-        List<String> permissions = new ArrayList<String>();
-        permissions.add("a");
-        when(userDao.getPermissionsOfUser(user)).thenReturn(permissions);
-
+    public void loginExceptionFromDAO() throws BusinessException {
+        BusinessException businessException = new BusinessException("LOGIN-001", "");
+        // for username not found / inactive / wrong passw / deactivated
+        when(userDao.findByUsernameAndPassword("dinum", "parola")).thenThrow(businessException);
         LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("testuser");
-        loginReceivedDTO.setPassword("test");
-
-        LoginResponseUserDTO loginResponseUserDTO = new LoginResponseUserDTO();
-        loginResponseUserDTO.setUsername(loginReceivedDTO.getUsername());
-
+        loginReceivedDTO.setUsername("dinum");
+        loginReceivedDTO.setPassword("parola");
+        LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceivedDTO);
+        assertEquals(loginResponseUserDTO.getMessageCode(), businessException.getErrorCode());
+    }
+    @Test
+    public void loginPermissions() throws BusinessException {
+        User user = createUserLogIn();
+        when(userDao.findByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
+        List<PermissionType> permissions = new ArrayList<>();
+        permissions.add(PermissionType.PERMISSION_MANAGEMENT);
+        when(userDao.getPermissionsOfUser(user)).thenReturn(permissions);
+        Set<PermissionType> permissionsSet = new HashSet<>();
+        permissions.forEach(p -> permissionsSet.add(p));
+        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
+        loginReceivedDTO.setUsername(user.getUsername());
+        loginReceivedDTO.setPassword(user.getPassword());
+        LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceivedDTO);
         assertEquals(loginReceivedDTO.getUsername(), loginResponseUserDTO.getUsername());
+        assertEquals(loginResponseUserDTO.getPermissions().toArray()[0], PermissionType.PERMISSION_MANAGEMENT.getActualString());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void login4() throws BusinessException{
+    @Test
+    public void loginResponseFields() throws BusinessException {
         User persistedUser = createUser();
-        when(userDao.findUserByUsername("test5")).thenReturn(persistedUser);
+        when(userDao.findByUsernameAndPassword("dinum", "test5")).thenReturn(persistedUser);
         LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("test5");
+        loginReceivedDTO.setUsername("dinum");
         loginReceivedDTO.setPassword("test5");
         LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceivedDTO);
-
         assertEquals(persistedUser.getFirstName(), loginResponseUserDTO.getFirstName());
         assertEquals(persistedUser.getLastName(), loginResponseUserDTO.getLastName());
-        // assertEquals(1L, loginResponseUserDTO.getID());
         assertEquals(persistedUser.getEmail(), loginResponseUserDTO.getEmail());
         assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
-        // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());
         assertEquals(persistedUser.getUsername(), loginResponseUserDTO.getUsername());
     }
+
 
     @Test
     public void getActualRoleList() throws BusinessException{
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
-        Role role = new Role(1, "ADMINISTRATOR");
-        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
+        roleDTOS.add(new RoleDTO(RoleType.ADMINISTRATOR));
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
+        List<Role> roles = new ArrayList<>();
+        roles.add(role);
+        Set<RoleType> types = new HashSet<>();
+        types.add(RoleType.ADMINISTRATOR);
+        when(roleDao.getRolesByTypes(types)).thenReturn(roles);
 
         Set<Role> actualRoles = userManager.getActualRoleList(roleDTOS);
 
         assertTrue(actualRoles.contains(role));
-
-        roleDTOS.clear();
-        roleDTOS.add(new RoleDTO("wrong role"));
-        when(roleDao.findRoleByType("wrong role")).thenThrow(new BusinessException("test", "test"));
-        actualRoles = userManager.getActualRoleList(roleDTOS);
-        assertEquals(actualRoles.size(), 0);
     }
 
     @Test
     public void createUserToInsert() throws BusinessException {
         UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(createUser());
         Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("ADMINISTRATOR"));
+        roleDTOS.add(new RoleDTO(RoleType.ADMINISTRATOR));
         userDTO.setRoles(roleDTOS);
 
-        Role role = new Role(1, "ADMINISTRATOR");
-        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
+        List<Role> roles = new ArrayList<>();
+        roles.add(role);
+        Set<RoleType> types = new HashSet<>();
+        types.add(RoleType.ADMINISTRATOR);
+        when(roleDao.getRolesByTypes(types)).thenReturn(roles);
 
-        when(userDao.isUsernameUnique("test5t")).thenReturn(true);
+        when(userDao.isUsernameUnique("marac")).thenReturn(true);
 
         User newUser = userManager.createUserToInsert(userDTO);
 
         assertEquals((Integer)newUser.getCounter(), (Integer)0);
         assertEquals((Integer)newUser.getStatus(), (Integer)1);
-        assertEquals(newUser.getUsername(), "test5t");
+        assertEquals(newUser.getUsername(), "marac");
         assertTrue(newUser.getRoles().contains(role));
     }
 
 
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailFirstnameIncorrect() throws BusinessException {
+    @Test
+    public void insertUserTestSuccess() throws BusinessException {
         UserDTO userDTO = createUserDTO();
-        userDTO.setFirstName("df34");
-        userManager.insertUser(userDTO);
-    }
+        User persistedUser = createUser();
+        when(userDao.insertUser(Matchers.any(User.class))).thenReturn(persistedUser);
 
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailLastnameIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setLastName("dff34");
-        userManager.insertUser(userDTO);
-    }
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
+        List<Role> roles = new ArrayList<>();
+        roles.add(role);
+        Set<RoleType> types = new HashSet<>();
+        types.add(RoleType.ADMINISTRATOR);
+        when(roleDao.getRolesByTypes(types)).thenReturn(roles);
 
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailPhoneNumberIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setMobileNumber("456787654323456789876543456");
-        userManager.insertUser(userDTO);
-    }
+        when(userDao.isUsernameUnique("marac")).thenReturn(true);
 
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailEmailIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setEmail("mara@yahoo.com");
-        userManager.insertUser(userDTO);
-    }
+        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(LocalDate.now()), "Welcome: " + persistedUser.toString(),
+                NotificationType.WELCOME_NEW_USER.toString(), "", persistedUser);
+        Notification notification = NotificationDTOEntityMapper.getNotificationFromDTO(notificationDTO);
+        when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(notification);
 
-    @Test(expected = BusinessException.class)
-    public void insertUserTestFailRolesIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setRoles(new HashSet<>());
         userManager.insertUser(userDTO);
     }
 
@@ -239,8 +248,8 @@ public class UserManagerTest {
         UserDTO userDTO = createUserDTO();
         userDTO.setStatus(0);
         userDTO.setCounter(4);
-        Role role = new Role(1, "ADMINISTRATOR");
-        when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
+        when(roleDao.findRoleByType(RoleType.ADMINISTRATOR)).thenReturn(role);
 
         when(userDao.findUser(1)).thenReturn(UserDTOEntityMapper.getUserFromUserDTO(userDTO));
 
@@ -256,71 +265,6 @@ public class UserManagerTest {
     public void updateUserTestFailNull() throws BusinessException {
         UserDTO userDTO = createUserDTO();
         when(userDao.findUser(1)).thenReturn(null);
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailFirstnameIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setFirstName("df34");
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailPasswordIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setFirstName("x");
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailLastnameIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setLastName("dff34");
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailPhoneNumberIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setMobileNumber("456787654323456789876543456");
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailEmailIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setEmail("mara@yahoo.com");
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailRolesIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setRoles(new HashSet<>());
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailRolesIncorrect2() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        Set<RoleDTO> roleDTOS = new HashSet<>();
-        roleDTOS.add(new RoleDTO("Incorrect"));
-        userDTO.setRoles(roleDTOS);
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailCounterIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setCounter(10);
-        userManager.updateUser(userDTO);
-    }
-
-    @Test(expected = BusinessException.class)
-    public void updateUserTestFailStatusIncorrect() throws BusinessException {
-        UserDTO userDTO = createUserDTO();
-        userDTO.setStatus(10);
         userManager.updateUser(userDTO);
     }
 
@@ -344,5 +288,28 @@ public class UserManagerTest {
     public void hasBugsAssignedFailNull() throws BusinessException {
         when(userDao.findUser(1)).thenReturn(null);
         userManager.hasBugsAssigned(1);
+    }
+
+    @Test
+    public void findUserSuccess() throws BusinessException {
+        User user = createUser();
+        when(userDao.findUser(1)).thenReturn(user);
+        UserDTO userDTO = userManager.findUser(1);
+        assertEquals(userDTO.getId(), 1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void findUserFailNull() throws BusinessException {
+        when(userDao.findUser(1)).thenReturn(null);
+        userManager.findUser(1);
+    }
+
+    @Test
+    public void findAllUsers() {
+        User user = createUser();
+        List<User> users = new ArrayList<>();
+        users.add(user);
+        when(userDao.findAllUsers()).thenReturn(users);
+        assertEquals(userManager.findAllUsers().size(), 1);
     }
 }

@@ -36,6 +36,14 @@ public class RoleManager implements RoleManagerRemote {
 
     //private Logger logger = Logger.getLogger(RoleManager.class.getName());
 
+
+    /**
+     * Gets the permissions of the role corresponding to the id given
+     *
+     * @param id is an {@link Integer} object
+     * @throws {@link BusinessException} the given id doesn't exist in the database
+     *                or request is invalid
+     */
     @Override
     public Set<PermissionDTO> getRolePermissions(int id) throws BusinessException {
         Role role = roleDao.findRole(id);
@@ -44,6 +52,14 @@ public class RoleManager implements RoleManagerRemote {
         return PermissionDTOEntityMapper.getPermissionDTOListFromPermissionList(role.getPermissions());
     }
 
+
+    /**
+     * Sets the new permissions to a user
+     * @param permissionsInsertDTO is a {@link PermissionsInsertDTO} object
+     *      that maps the {@link Role} object id and the array of {@link PermissionDTO} objects
+     * @throws {@link BusinessException} is the corresponding role to the given id doesn't exist in the database
+     *      or request is invalid
+     */
     @Override
     public void setRolePermissions(PermissionsInsertDTO permissionsInsertDTO) throws BusinessException {
         RoleValidator.validatePermissionsInsertion(permissionsInsertDTO);
@@ -51,10 +67,26 @@ public class RoleManager implements RoleManagerRemote {
         if (role == null)
             throw new BusinessException("msg2_301", "No role was found!");
 
-        Set<Permission> actualPermissions = new HashSet<>();
-        for (PermissionDTO permissionDTO : permissionsInsertDTO.getPermissions()) {
-            actualPermissions.add(permissionDao.findPermission(permissionDTO.getId()));
-        }
+        Set<Permission> actualPermissions = getActualPermissions(permissionsInsertDTO.getPermissions());
         role.setPermissions(actualPermissions);
+    }
+
+
+    /**
+     * Returnes a set containing the corresponding {@link Permission} objects from the database
+     * using de role type
+     *
+     * @param permissionDTOS is a set of {@link PermissionDTO} objects
+     * @return a set of {@link Permission} object
+     */
+    private Set<Permission> getActualPermissions(PermissionDTO[] permissionDTOS) {
+        Set<Integer> ids = new HashSet<>();
+        for (PermissionDTO permissionDTO : permissionDTOS) {
+            ids.add(permissionDTO.getId());
+        }
+        ;
+
+        Set<Permission> actualPermissions = new HashSet<>(permissionDao.getPermissionsByIds(ids));
+        return actualPermissions;
     }
 }

@@ -1,7 +1,6 @@
-package ro.msg.edu.jbugs.entity;
+package ro.msg.edu.jbugs.entity.types;
 
 public enum NotificationType {
-
     WELCOME_NEW_USER,
     USER_UPDATED,
     USER_DELETED,
