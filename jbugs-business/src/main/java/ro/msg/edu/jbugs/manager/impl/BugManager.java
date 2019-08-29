@@ -5,6 +5,8 @@ import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
+import ro.msg.edu.jbugs.dto.BugViewDTO;
+import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
@@ -15,6 +17,7 @@ import ro.msg.edu.jbugs.entity.types.StatusType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.helpers.StatusHelper;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
+import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import ro.msg.edu.jbugs.validators.BugValidator;
 
 import javax.ejb.EJB;
@@ -33,6 +36,8 @@ public class BugManager implements BugManagerRemote {
     UserDao userDao;
     @EJB
     AttachmentDao attachmentDao;
+    @EJB
+    UserManagerRemote userManager;
 
 //    @Override
 //    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO) {
@@ -41,6 +46,27 @@ public class BugManager implements BugManagerRemote {
 //
 //        return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
 //    }
+
+    /**
+     * @param bugID is the id of the {@link Bug} to be closed
+     * @return a {@link BugDTO} object with the status changed to "CLOSED"
+     * @throws BusinessException if the status of the {@link Bug} object cannot be changed to "CLOSED"
+     * @author Miruna Dinu
+     */
+    @Override
+    public BugDTO closeBug(int bugID) throws BusinessException{
+
+        Bug bug = bugDao.getBugByID(bugID);
+        List<StatusType> statusToClose = StatusHelper.getStatusesToClose();
+
+        if(statusToClose.contains(StatusType.valueOf(bug.getStatus()))){
+
+            return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID));
+        }
+        else{
+            throw new BusinessException("msg-242", "Cannot close bug");
+        }
+    }
 
     /**
      * @return a list of {@link Bug} objects with all the bugs from the database
@@ -181,5 +207,14 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
 
         return BugDTOEntityMapper.getBugDTO(bugInDatabase);
+    }
+
+
+    @Override
+    public BugViewDTO getBugViewDTO(){
+
+        List<BugDTO> bugDTOList = this.getAllBugs();
+        List<UserDTO> userDTOList = this.userManager.findAllUsers();
+        return new BugViewDTO(bugDTOList, userDTOList);
     }
 }

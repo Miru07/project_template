@@ -36,4 +36,11 @@ public class StatusHelper {
 
         return Collections.emptyList();
     }
+
+    /**
+     * @return - a list of statuses that can be changed into closed
+     */
+    public static List<StatusType> getStatusesToClose(){
+        return Arrays.asList(StatusType.FIXED, StatusType.REJECTED);
+    }
 }
