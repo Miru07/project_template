@@ -37,7 +37,7 @@ public class BugManager implements BugManagerRemote {
     AttachmentDao attachmentDao;
 
     @Override
-    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO){
+    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO) {
         User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
         List<Bug> bugs = bugDao.findBugCreatedBy(user);
 
@@ -46,7 +46,7 @@ public class BugManager implements BugManagerRemote {
 
     /**
      * @param newStatus is a {@link String} that contains the new status of the bug with the bugID id
-     * @param bugID is a {@link Integer} that contains the bug id whose status is to be changed
+     * @param bugID     is a {@link Integer} that contains the bug id whose status is to be changed
      * @return {@link Bug} object with the new status
      * @throws BusinessException if newStatus contains a wrong string or no available statuses are found
      * @author Miruna Dinu
@@ -57,13 +57,11 @@ public class BugManager implements BugManagerRemote {
         Bug bug = bugDao.getBugByID(bugID);
         List<StatusType> allowedStatuses = StatusHelper.getStatusForUpdate(StatusType.valueOf(bug.getStatus()));
 
-       if(!allowedStatuses.isEmpty() && allowedStatuses.contains(StatusType.valueOf(newStatus)))
-       {
-           return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(newStatus, bugID));
-       }
-       else {
-           throw new BusinessException("msg-241", "Cannot modify " + bug.getStatus() + " into " + newStatus);
-       }
+        if (!allowedStatuses.isEmpty() && allowedStatuses.contains(StatusType.valueOf(newStatus))) {
+            return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(newStatus, bugID));
+        } else {
+            throw new BusinessException("msg-241", "Cannot modify " + bug.getStatus() + " into " + newStatus);
+        }
     }
 
     /**
@@ -71,10 +69,16 @@ public class BugManager implements BugManagerRemote {
      * @author Miruna Dinu
      */
     @Override
-    public List<BugDTO> getAllBugs(){
+    public List<BugDTO> getAllBugs() {
         List<Bug> bugList = bugDao.getAllBugs();
 
         return BugDTOEntityMapper.getBugDTOList(bugList);
+    }
+
+    @Override
+    public BugDTO getBugById(Integer id) {
+        Bug bug = bugDao.getBugByID(id);
+        return BugDTOEntityMapper.getBugDTO(bug);
     }
 
     /**
@@ -85,7 +89,7 @@ public class BugManager implements BugManagerRemote {
      * the {@link Attachment} object and then persisted into the database.
      *
      * @param wrapperDTO is an {@link BugAttachmentWrapperDTO} object that contains
-     *               the Bug details and Attachment details in a DTO format.
+     *                   the Bug details and Attachment details in a DTO format.
      * @throws {@link BusinessException}
      * @author Sebastian Maier
      */
