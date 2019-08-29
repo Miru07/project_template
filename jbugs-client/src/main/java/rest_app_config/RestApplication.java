@@ -1,12 +1,7 @@
 package rest_app_config;
 
-import rest_app_config.filters.CorsFilter;
-import rest_app_config.filters.TokenAuthenticationFilter;
-
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Rest App registers providers specifically.
@@ -23,7 +18,7 @@ public class RestApplication extends Application {
 
         // Register my custom providers
         classes.add(CorsFilter.class); // response
-        classes.add(TokenAuthenticationFilter.class); // request
+        classes.add(AuthorizationFilter.class); // request
         return classes;
     }
      */

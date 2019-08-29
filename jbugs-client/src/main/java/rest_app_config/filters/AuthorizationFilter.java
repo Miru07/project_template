@@ -19,7 +19,7 @@ import java.util.Set;
  * intercepts all requests from frontend
  */
 @Provider
-public class TokenAuthenticationFilter implements ContainerRequestFilter {
+public class AuthorizationFilter implements ContainerRequestFilter {
 
     @EJB
     UserManagerRemote userManager;
@@ -27,7 +27,7 @@ public class TokenAuthenticationFilter implements ContainerRequestFilter {
     private static final String ACCESS_DENIED_MESSAGE = "ACCESS_DENIED";
     private static final String TOKEN_EXPIRED_MESSAGE = "TOKEN_EXPIRED";
 
-    Set<RegisteredRequestType> registeredRequestTypes = new HashSet<>(Arrays.asList(
+    private Set<RegisteredRequestType> registeredRequestTypes = new HashSet<>(Arrays.asList(
             RegisteredRequestType.OPTIONS,
             RegisteredRequestType.LOGIN,
 
@@ -66,13 +66,11 @@ public class TokenAuthenticationFilter implements ContainerRequestFilter {
         String token = authorizationHeader.substring("Bearer".length()).trim();
 
         if (TokenService.isTokenExpired(token)) {
-            containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
-                    .entity(TOKEN_EXPIRED_MESSAGE)
-                    .build());
+            abortRequestWithMessage(containerRequestContext, TOKEN_EXPIRED_MESSAGE);
             return;
         }
 
-        if(requestMatchesAnyRegisteredRequestWithPermissionCheck(requestType, token)){
+        if(isRequestPermitted(requestType, token)){
             return;
         }
 
@@ -80,13 +78,13 @@ public class TokenAuthenticationFilter implements ContainerRequestFilter {
         return;
     }
 
-    boolean requestMatchesAnyRegisteredRequestWithPermissionCheck(RequestType requestType, String token) {
+    private boolean isRequestPermitted(RequestType requestType, String token) {
         for (RegisteredRequestType regReq : registeredRequestTypes) {
             if (requestType.matches(regReq)) {
-                if(regReq == RegisteredRequestType.OPTIONS || regReq == RegisteredRequestType.LOGIN) {
+                if(isRequestOPTIONSorLOGIN(regReq)) {
                     return true;
                 }
-                if (TokenService.currentUserHasPermission(userManager, token, regReq.getPermission())) {
+                if (isRequestPermitted(token, regReq)) {
                     return true;
                 }
                 return false;
@@ -94,10 +92,22 @@ public class TokenAuthenticationFilter implements ContainerRequestFilter {
         }
         return false;
     }
-    void abortRequestWithMessage(ContainerRequestContext containerRequestContext, String msg){
+    private void abortRequestWithMessage(ContainerRequestContext containerRequestContext, String msg){
         containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED)
                 .entity(msg)
                 .build());
+    }
+    private boolean isRequestOPTIONSorLOGIN(RegisteredRequestType regReq){
+        if(regReq == RegisteredRequestType.OPTIONS || regReq == RegisteredRequestType.LOGIN) {
+            return true;
+        }
+        return false;
+    }
+    private boolean isRequestPermitted(String token, RegisteredRequestType regReq){
+        if (TokenService.currentUserHasPermission(userManager, token, regReq.getPermission())) {
+            return true;
+        }
+        return false;
     }
 }
 

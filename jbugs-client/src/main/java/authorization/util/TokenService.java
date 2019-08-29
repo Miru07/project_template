@@ -8,7 +8,6 @@ import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.crypto.spec.SecretKeySpec;
-import javax.ejb.EJB;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
