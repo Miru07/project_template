@@ -13,15 +13,10 @@ import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
-import ro.msg.edu.jbugs.entity.Bug;
-import ro.msg.edu.jbugs.entity.Role;
-import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.*;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyString;
@@ -82,17 +77,7 @@ public class UserManagerTest {
 
 
     private User createUser(){
-
-        User user = new User();
-        user.setID(1);
-        user.setFirstName("test5");
-        user.setLastName("test5");
-        user.setEmail("test5");
-        user.setCounter(1);
-        user.setMobileNumber("123456");
-        user.setUsername("dinum");
-        user.setPassword("a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff");
-        user.setStatus(1);
+        User user = new User(1, 0, "Corina", "Mara", "0743170363", "mara.corina@msggroup.com", "marac", "test", 1);
 
         return user;
     }
@@ -188,13 +173,13 @@ public class UserManagerTest {
         Role role = new Role(1, "ADMINISTRATOR");
         when(roleDao.findRoleByType("ADMINISTRATOR")).thenReturn(role);
 
-        when(userDao.isUsernameUnique("test5t")).thenReturn(true);
+        when(userDao.isUsernameUnique("marac")).thenReturn(true);
 
         User newUser = userManager.createUserToInsert(userDTO);
 
         assertEquals((Integer)newUser.getCounter(), (Integer)0);
         assertEquals((Integer)newUser.getStatus(), (Integer)1);
-        assertEquals(newUser.getUsername(), "test5t");
+        assertEquals(newUser.getUsername(), "marac");
         assertTrue(newUser.getRoles().contains(role));
     }
 
@@ -344,5 +329,23 @@ public class UserManagerTest {
     public void hasBugsAssignedFailNull() throws BusinessException {
         when(userDao.findUser(1)).thenReturn(null);
         userManager.hasBugsAssigned(1);
+    }
+
+    @Test
+    public void getUserNotificationsSuccess() throws BusinessException {
+        User user = createUser();
+        Set<Notification> notifications = new HashSet<>();
+        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER.toString(), "", user);
+        notifications.add(notification);
+        user.setNotifications(notifications);
+
+        when(userDao.findUserByUsername("marac")).thenReturn(user);
+        assertEquals(userManager.getUserNotifications("marac").size(), 1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void getUserNotificationsNull() throws BusinessException {
+        when(userDao.findUserByUsername("marac")).thenReturn(null);
+        userManager.getUserNotifications("marac");
     }
 }

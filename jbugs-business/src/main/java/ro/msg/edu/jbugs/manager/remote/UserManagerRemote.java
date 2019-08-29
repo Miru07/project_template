@@ -2,11 +2,13 @@ package ro.msg.edu.jbugs.manager.remote;
 
 import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.dto.NotificationDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import javax.ejb.Remote;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Interface for Remote usage
@@ -19,6 +21,8 @@ public interface UserManagerRemote {
     void insertUser(UserDTO userDTO) throws BusinessException;
 
     UserDTO findUser(Integer id) throws BusinessException;
+
+    Set<NotificationDTO> getUserNotifications(String username) throws BusinessException;
 
     List<UserDTO> findAllUsers();
 

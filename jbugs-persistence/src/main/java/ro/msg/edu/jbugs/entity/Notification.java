@@ -24,12 +24,21 @@ public class Notification implements Serializable {
     @JoinColumn(name="user_id",referencedColumnName = "ID")
     private User user;
 
-    public Notification(Date date, String message, String type, String url, User user_id) {
+    public Notification(Integer id, Date date, String message, String type, String url, User user) {
+        this.ID = id;
         this.date = date;
         this.message = message;
         this.type = type;
         this.url = url;
-        this.user = user_id;
+        this.user = user;
+    }
+
+    public Notification(Date date, String message, String type, String url, User user) {
+        this.date = date;
+        this.message = message;
+        this.type = type;
+        this.url = url;
+        this.user = user;
     }
 
     public Notification() {
