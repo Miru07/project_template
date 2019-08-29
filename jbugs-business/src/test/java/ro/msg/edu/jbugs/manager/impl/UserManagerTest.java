@@ -43,6 +43,9 @@ public class UserManagerTest {
     @Mock
     private NotificationManager notificationManager;
 
+    @Mock
+    private BusinessException businessException;
+
     public UserManagerTest() {
 
         userManager = new UserManager();
@@ -89,61 +92,7 @@ public class UserManagerTest {
         return userDTO;
     }
 
-    @Test
-    public void login() throws BusinessException {
-        //noinspection unchecked
-        when(userDao.findByUsernameAndPassword("dinum", "parola")).thenThrow(BusinessException.class);
-        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("dinum");
-        loginReceivedDTO.setPassword("parola");
-        userManager.login(loginReceivedDTO);
-        assertEquals(userManager.login(loginReceivedDTO).getToken(), null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void login2() throws BusinessException {
-        when(userDao.findUserByUsername("dinum")).thenReturn(createUser());
-        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("dinum");
-        loginReceivedDTO.setPassword("parola");
-        assertNull(userManager.login(loginReceivedDTO));
-    }
-
-    @Test
-    public void login3() throws BusinessException{
-        User user = createUser();
-        when(userDao.findByUsernameAndPassword(anyString(), anyString())).thenReturn(user);
-        List<String> permissions = new ArrayList<String>();
-        permissions.add("a");
-        when(userDao.getPermissionsOfUser(user)).thenReturn(permissions);
-
-        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("testuser");
-        loginReceivedDTO.setPassword("test");
-
-        LoginResponseUserDTO loginResponseUserDTO = new LoginResponseUserDTO();
-        loginResponseUserDTO.setUsername(loginReceivedDTO.getUsername());
-
-        assertEquals(loginReceivedDTO.getUsername(), loginResponseUserDTO.getUsername());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void login4() throws BusinessException{
-        User persistedUser = createUser();
-        when(userDao.findUserByUsername("test5")).thenReturn(persistedUser);
-        LoginReceivedDTO loginReceivedDTO = new LoginReceivedDTO();
-        loginReceivedDTO.setUsername("test5");
-        loginReceivedDTO.setPassword("test5");
-        LoginResponseUserDTO loginResponseUserDTO = userManager.login(loginReceivedDTO);
-
-        assertEquals(persistedUser.getFirstName(), loginResponseUserDTO.getFirstName());
-        assertEquals(persistedUser.getLastName(), loginResponseUserDTO.getLastName());
-        // assertEquals(1L, loginResponseUserDTO.getID());
-        assertEquals(persistedUser.getEmail(), loginResponseUserDTO.getEmail());
-        assertEquals(persistedUser.getMobileNumber(), loginResponseUserDTO.getMobileNumber());
-        // assertEquals(persistedUser.getPassword(), loginResponseUserDTO.getPassword());
-        assertEquals(persistedUser.getUsername(), loginResponseUserDTO.getUsername());
-    }
+    // updated in refactoring branch @Diana
 
     @Test
     public void getActualRoleList() throws BusinessException{

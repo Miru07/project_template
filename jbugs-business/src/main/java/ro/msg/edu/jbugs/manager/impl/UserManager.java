@@ -176,7 +176,10 @@ public class UserManager implements UserManagerRemote {
     @Override
     public boolean userHasPermission(Integer userId, String permission){
         List<String> permissions = userDao.getPermissionsOfUser(userId);
-        return permissions.contains(permission);
+        Set<String> setPermissions = new HashSet<>();
+
+        permissions.forEach(p -> setPermissions.add(p));
+        return setPermissions.contains(permission);
     }
 
     /**
