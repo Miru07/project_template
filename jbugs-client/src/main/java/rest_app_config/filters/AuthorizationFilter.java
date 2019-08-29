@@ -1,16 +1,15 @@
 package rest_app_config.filters;
 
+import authorization.util.TokenService;
 import rest_app_config.type.util.RegisteredRequestType;
 import rest_app_config.type.util.RequestType;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
-import authorization.util.TokenService;
 
 import javax.ejb.EJB;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +17,7 @@ import java.util.Set;
 /**
  * intercepts all requests from frontend
  */
-@Provider
+//@Provider
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     @EJB

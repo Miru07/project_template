@@ -228,7 +228,7 @@ public class UserManagerTest {
         when(userDao.isUsernameUnique("marac")).thenReturn(true);
 
         NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(LocalDate.now()), "Welcome: " + persistedUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString(), "", persistedUser);
+                NotificationType.WELCOME_NEW_USER.toString(), "", UserDTOEntityMapper.getDTOFromUser(persistedUser));
         Notification notification = NotificationDTOEntityMapper.getNotificationFromDTO(notificationDTO);
         when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(notification);
 

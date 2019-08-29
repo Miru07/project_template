@@ -6,7 +6,6 @@ import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.NotificationDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Notification;
-import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.entity.types.NotificationType;
@@ -222,7 +221,7 @@ public class UserManager implements UserManagerRemote {
     @Override
     public boolean userHasPermission(Integer userId, String permission) {
         List<PermissionType> permissions = userDao.getPermissionsOfUser(userId);
-        Set<String> setPermissions = new HashSet<>();
+        Set<PermissionType> setPermissions = new HashSet<>();
 
         permissions.forEach(p -> setPermissions.add(p));
         return setPermissions.contains(permission);
