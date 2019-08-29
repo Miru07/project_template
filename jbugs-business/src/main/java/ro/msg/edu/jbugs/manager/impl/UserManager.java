@@ -6,9 +6,11 @@ import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.NotificationDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Notification;
-import ro.msg.edu.jbugs.entity.NotificationType;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.NotificationType;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
+import ro.msg.edu.jbugs.entity.types.RoleType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
@@ -29,8 +31,6 @@ import static com.google.common.hash.Hashing.sha256;
 
 /**
  * Manager class for CRUD actions on {@link User} objects.
- *
- * @author Mara Corina
  */
 @Stateless
 public class UserManager implements UserManagerRemote {
@@ -45,6 +45,14 @@ public class UserManager implements UserManagerRemote {
     private Logger logger = Logger.getLogger(UserManager.class.getName());
 
 
+    /**
+     * @param userDTO is an {@link UserDTO} object that maps the {@link User}
+     *                object that will be persisted in the database.
+     *                Inserts a WELCOME_NEW_USER {@link Notification} object in the database
+     * @throws {@link BusinessException} if the {@link UserDTO} object is
+     *                invalid
+     * @author Mara Corina
+     */
     @Override
     public void insertUser(UserDTO userDTO) throws BusinessException {
         UserValidator.validateForAdd(userDTO);
@@ -57,13 +65,26 @@ public class UserManager implements UserManagerRemote {
         notificationManager.insertNotification(notificationDTO);
     }
 
-    public User createUserToInsert(UserDTO userDTO){
+    /**
+     * Creates the {@link User} object to be persisted
+     * @param userDTO is an {@link UserDTO} object that maps the {@link User}
+     *                    object that will be persisted in the database.
+     * @return a {@link User} object
+     * @author Mara Corina
+     */
+    public User createUserToInsert(UserDTO userDTO) {
+        //user's password counter is 0 at insertion
         userDTO.setCounter(0);
+
+        //the user is considered active at insertion
         userDTO.setStatus(1);
         User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
+
+        //generate unique username
         String username = generateUsername(user.getFirstName(), user.getLastName());
         user.setUsername(username);
 
+        //generates and hashes password
         String generatedPassword = generatePassword();
         String hashPassword = sha256()
                 .hashString(generatedPassword, StandardCharsets.UTF_8)
@@ -75,21 +96,35 @@ public class UserManager implements UserManagerRemote {
         return user;
     }
 
-    public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS){
-        Set<Role> actualRoles = new HashSet<>();
+
+    /**
+     * Returnes a set containing the corresponding {@link Role} objects from the database
+     *          using de role type
+     * @param roleDTOS is a set of {@link RoleDTO} objects
+     * @return a set of {@link Role} object
+     * @author Mara Corina
+     */
+    public Set<Role> getActualRoleList(Set<RoleDTO> roleDTOS) {
+        Set<RoleType> types = new HashSet<>();
         roleDTOS.forEach(roleDTO -> {
-            try {
-                actualRoles.add(roleDao.findRoleByType(roleDTO.getType()));
-            } catch (BusinessException e) {
-                //logger.error(e);
-                return;
-            }
+            types.add(roleDTO.getType());
         });
+
+        Set<Role> actualRoles = new HashSet<>(roleDao.getRolesByTypes(types));
         return actualRoles;
     }
 
-    public String generateUsername(String firstName, String lastName){
 
+    /**
+     * Generates a unique username for the ready to insert {@link User} object
+     *      using the user firstname and lastname
+     * @param firstName and lastName
+     *
+     * @return {@link String} representing the username
+     */
+    public String generateUsername(String firstName, String lastName) {
+
+        //uses only the first 5 characters from the lastName
         String firstPart;
         if(lastName.length() >= 5){
 
@@ -99,6 +134,8 @@ public class UserManager implements UserManagerRemote {
             firstPart = lastName;
         }
 
+        //adds characters from the firstName to the username until the username is unique
+        //when it reaches the end of the firstName it adds 'x' characters
         int charPosition = 0;
         String username = (firstPart + firstName.charAt(charPosition)).toLowerCase();
 
@@ -113,6 +150,14 @@ public class UserManager implements UserManagerRemote {
         return username;
     }
 
+
+    /**
+     * Generates a password for the ready to insert {@link User} object
+     *      using the user firstname and lastname
+     *
+     * @return {@link String} representing the password
+     * @author Mara Corina
+     */
     public String generatePassword(){
         String password = new Random().ints(10, 33, 122).collect(StringBuilder::new,
                 StringBuilder::appendCodePoint, StringBuilder::append)
@@ -156,10 +201,10 @@ public class UserManager implements UserManagerRemote {
         try {
             User user = userDao.findByUsernameAndPassword(
                     loginReceivedDTO.getUsername(), loginReceivedDTO.getPassword());
-            List<String> permissions = userDao.getPermissionsOfUser(user);
+            List<PermissionType> permissions = userDao.getPermissionsOfUser(user);
 
             Set<String> stringPermissions = new HashSet<>();
-            permissions.forEach(permission -> stringPermissions.add(permission));
+            permissions.forEach(permission -> stringPermissions.add(permission.getActualString()));
 
             UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(user);
             loginResponseUserDTO = new LoginResponseUserDTO(userDTO, stringPermissions);
@@ -174,9 +219,9 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public boolean userHasPermission(Integer userId, String permission){
-        List<String> permissions = userDao.getPermissionsOfUser(userId);
-        Set<String> setPermissions = new HashSet<>();
+    public boolean userHasPermission(Integer userId, String permission) {
+        List<PermissionType> permissions = userDao.getPermissionsOfUser(userId);
+        Set<PermissionType> setPermissions = new HashSet<>();
 
         permissions.forEach(p -> setPermissions.add(p));
         return setPermissions.contains(permission);
@@ -188,6 +233,7 @@ public class UserManager implements UserManagerRemote {
      * @return an {@link UserDTO} object with the persisted informations
      * @throws {@link BusinessException} if the {@link UserDTO} object is
      *                invalid or doesn't have a corresponding object in the database
+     * @author Mara Corina
      */
     @Override
     public UserDTO updateUser(UserDTO userDTO) throws BusinessException {
@@ -234,6 +280,7 @@ public class UserManager implements UserManagerRemote {
      * @param id is an {@link Integer}
      * @return {@link Boolean}
      * @throws {@link BusinessException} if there's no corresponding object in the database
+     * @author Mara Corina
      */
     @Override
     public boolean hasBugsAssigned(Integer id) throws BusinessException {

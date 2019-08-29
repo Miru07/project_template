@@ -1,8 +1,16 @@
 package ro.msg.edu.jbugs.dto;
 
+import ro.msg.edu.jbugs.entity.Notification;
+import ro.msg.edu.jbugs.entity.User;
+
 import java.io.Serializable;
 import java.sql.Date;
 
+/**
+ * The class maps a {@link Notification} object.
+ *
+ * @author Mara Corina
+ */
 public class NotificationDTO implements Serializable {
 
     private Integer ID;

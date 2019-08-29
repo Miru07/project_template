@@ -1,12 +1,13 @@
 package ro.msg.edu.jbugs.dto;
 
+import ro.msg.edu.jbugs.entity.Role;
+
 import java.io.Serializable;
 
 /**
- * Document me.
+ * The class maps a {@link Role} object id and an array of {@link PermissionDTO} objects
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 public class PermissionsInsertDTO implements Serializable {
     private Integer roleId;

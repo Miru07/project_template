@@ -1,21 +1,23 @@
 package ro.msg.edu.jbugs.dto;
 
+import ro.msg.edu.jbugs.entity.Permission;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
+
 import java.io.Serializable;
 
 /**
- * Document me.
+ * The class maps a {@link Permission} object.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 public class PermissionDTO implements Serializable {
     private Integer id;
-    private String type;
+    private PermissionType type;
 
     public PermissionDTO() {
     }
 
-    public PermissionDTO(Integer id, String type) {
+    public PermissionDTO(Integer id, PermissionType type) {
         this.id = id;
         this.type = type;
     }
@@ -28,11 +30,11 @@ public class PermissionDTO implements Serializable {
         this.id = id;
     }
 
-    public String getType() {
+    public PermissionType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(PermissionType type) {
         this.type = type;
     }
 }

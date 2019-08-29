@@ -4,9 +4,12 @@ import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.entity.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
+/**
+ * Entity Mapper class for {@link User} & {@link UserDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
+ */
 public class UserDTOEntityMapper {
 
 
@@ -16,7 +19,7 @@ public class UserDTOEntityMapper {
 
     public static User getUserFromUserDTO(UserDTO userDTO){
         User user = new User();
-        if(userDTO != null){
+        if (userDTO != null) {
             user.setID(userDTO.getId());
             user.setCounter(userDTO.getCounter());
             user.setFirstName(userDTO.getFirstName());
@@ -31,7 +34,7 @@ public class UserDTOEntityMapper {
     }
     public static UserDTO getDTOFromUser(User user){
         UserDTO userDTO = new UserDTO();
-        if(user != null){
+        if (user != null) {
             userDTO.setCounter(user.getCounter());
             userDTO.setFirstName(user.getFirstName());
             userDTO.setLastName(user.getLastName());
@@ -46,9 +49,10 @@ public class UserDTOEntityMapper {
     }
     public static UserDTO getDTOCompleteFromUser(User user) {
         UserDTO userDTO = getDTOFromUser(user);
-        if(user != null){
+        if (user != null) {
             userDTO.setPassword(user.getPassword());
         }
+
         return userDTO;
     }
 
@@ -58,21 +62,11 @@ public class UserDTOEntityMapper {
      * @return UserDTO without password, with array of roles
      */
     public static UserDTO getDTOWithRolesWithoutPasswFromUser(User user){
-        UserDTO userDTO = new UserDTO();
-
-        userDTO.setId(user.getID());
-        userDTO.setFirstName(user.getFirstName());
-        userDTO.setLastName(user.getLastName());
-        userDTO.setUsername(user.getUsername());
-        userDTO.setEmail(user.getEmail());
-        userDTO.setMobileNumber(user.getMobileNumber());
-        userDTO.setStatus(user.getStatus());
-        userDTO.setCounter(user.getCounter());
+        UserDTO userDTO = getDTOFromUser(user);
         userDTO.setPassword("");
-
-        userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
         return userDTO;
     }
+
     /***************************************VIEW_USERS********************************************
      *
      * @param users

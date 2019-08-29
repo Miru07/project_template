@@ -1,7 +1,8 @@
 package ro.msg.edu.jbugs.entity;
 
+import ro.msg.edu.jbugs.entity.types.RoleType;
+
 import javax.persistence.*;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,7 +22,8 @@ public class Role implements Serializable {
     private Integer ID;
 
     @Column(name="type")
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private RoleType type;
 
     @ManyToMany
     @JoinTable(name="users_roles",
@@ -38,7 +40,7 @@ public class Role implements Serializable {
     public Role() {
     }
 
-    public Role(Integer id, String type) {
+    public Role(Integer id, RoleType type) {
         this.ID = id;
         this.type = type;
     }
@@ -51,11 +53,11 @@ public class Role implements Serializable {
         this.ID = ID;
     }
 
-    public String getType() {
+    public RoleType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(RoleType type) {
         this.type = type;
     }
 

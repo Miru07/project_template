@@ -1,7 +1,7 @@
 package rest_app_config.type.util;
 
 import lombok.Getter;
-import ro.msg.edu.jbugs.type.PermissionType;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 
 import java.util.HashMap;
 import java.util.Map;
