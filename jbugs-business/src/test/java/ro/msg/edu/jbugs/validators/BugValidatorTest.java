@@ -54,6 +54,7 @@ public class BugValidatorTest {
         bugToTest.setTitle("Test");
         bugToTest.setDescription("Test");
         bugToTest.setVersion("1.1.1");
+        bugToTest.setFixedVersion("1.1.2");
         bugToTest.setTargetDate(new Date(2019, 1, 1));
         bugToTest.setStatus("NEW");
         bugToTest.setSeverity("LOW");
