@@ -17,6 +17,7 @@ import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.sql.Date;
@@ -255,8 +256,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_requestUserDoesNotHavePermission_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         when(userDao.findUser(any())).thenReturn(testObjectUser());
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
@@ -265,8 +266,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugIDNotInDatabase_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         when(userDao.findUser(any())).thenReturn(testObjectUser());
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
@@ -277,8 +278,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdateCreatedUserNull_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         BugDTO bugDTO = testObjectBugDTO();
         bugDTO.setCREATED_ID(null);
@@ -292,8 +293,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdateAssigndUserNull_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         BugDTO bugDTO = testObjectBugDTO();
         bugDTO.setASSIGNED_ID(null);
@@ -307,8 +308,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdateMappedAssignedUserIDNull_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         BugDTO bugDTO = testObjectBugDTO();
         Bug bug = BugDTOEntityMapper.getBug(bugDTO);
@@ -323,8 +324,8 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdateMappedNotValid_BussinessException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         BugDTO bugDTO = testObjectBugDTO();
         Bug bug = BugDTOEntityMapper.getBug(bugDTO);
@@ -340,8 +341,8 @@ public class BugManagerTest {
 
     @Test
     public void updateBug_bugToUpdateMappedValid_NoException() throws BusinessException {
-        List<String> permission = new LinkedList<>();
-        permission.add("BUG_MANAGEMENT");
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
 
         BugDTO bugDTO = testObjectBugDTO();
         Bug bug = BugDTOEntityMapper.getBugWithUserCreatedAndAssigned(bugDTO);

@@ -5,24 +5,21 @@ import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
-import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.entity.types.StatusType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.helpers.StatusHelper;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import ro.msg.edu.jbugs.type.PermissionType;
 import ro.msg.edu.jbugs.validators.BugValidator;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Manager class for CRUD actions on {@link Bug}, {@link BugDTO} & {@link BugAttachmentWrapperDTO} objects.
@@ -37,13 +34,13 @@ public class BugManager implements BugManagerRemote {
     @EJB
     AttachmentDao attachmentDao;
 
-    @Override
-    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO) {
-        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
-        List<Bug> bugs = bugDao.findBugCreatedBy(user);
-
-        return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO) {
+//        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
+//        List<Bug> bugs = bugDao.findBugCreatedBy(user);
+//
+//        return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
+//    }
 
     /**
      * @return a list of {@link Bug} objects with all the bugs from the database
@@ -150,7 +147,7 @@ public class BugManager implements BugManagerRemote {
             throw new BusinessException("msg-601", "User does not exist");
         }
         boolean hasUpdatePermission = userDao.getPermissionsOfUser(requestUserID).
-                contains(PermissionType.BUG_MANAGEMENT.getActualString());
+                contains(PermissionType.BUG_MANAGEMENT);
         if (!hasUpdatePermission) {
             throw new BusinessException("msg-602", "User does not have permission");
         }
