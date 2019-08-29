@@ -7,10 +7,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Document me.
+ * Entity Mapper class for {@link Permission} & {@link PermissionDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 public class PermissionDTOEntityMapper {
 
@@ -20,7 +20,13 @@ public class PermissionDTOEntityMapper {
 
 
     public static PermissionDTO getDTOFromPermission(Permission permission) {
-        PermissionDTO permissionDTO = new PermissionDTO(permission.getID(), permission.getType());
+        PermissionDTO permissionDTO = new PermissionDTO();
+
+        if (permission != null) {
+            permissionDTO.setId(permission.getID());
+            permissionDTO.setType(permission.getType());
+        }
+
         return permissionDTO;
     }
 

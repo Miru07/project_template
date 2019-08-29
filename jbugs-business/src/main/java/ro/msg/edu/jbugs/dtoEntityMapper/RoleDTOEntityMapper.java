@@ -3,16 +3,14 @@ package ro.msg.edu.jbugs.dtoEntityMapper;
 import ro.msg.edu.jbugs.dto.RoleDTO;
 import ro.msg.edu.jbugs.entity.Role;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
- * Document me.
+ * Entity Mapper class for {@link Role} & {@link RoleDTO} objects.
+ * The class maps an object that has been stated above, to its counterpart.
  *
- * @author msg systems AG; User Name.
- * @since 19.1.2
+ * @author Mara Corina
  */
 public class RoleDTOEntityMapper {
 
@@ -23,8 +21,9 @@ public class RoleDTOEntityMapper {
 
 
     public static RoleDTO getDTOFromRole(Role role){
-
-        RoleDTO roleDTO = new RoleDTO(role.getType());
+        RoleDTO roleDTO = new RoleDTO();
+        if (role != null)
+            roleDTO.setType(role.getType());
         return roleDTO;
     }
 

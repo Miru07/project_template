@@ -1,4 +1,4 @@
-package ro.msg.edu.jbugs.type;
+package ro.msg.edu.jbugs.entity.types;
 
 import java.util.HashMap;
 import java.util.Map;

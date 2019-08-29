@@ -12,6 +12,8 @@ import ro.msg.edu.jbugs.dto.PermissionsInsertDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.PermissionDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Permission;
 import ro.msg.edu.jbugs.entity.Role;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
+import ro.msg.edu.jbugs.entity.types.RoleType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.util.HashSet;
@@ -50,9 +52,9 @@ public class RoleManagerTest {
 
     @Test
     public void getRolePermissionsTestSuccess() throws BusinessException {
-        Role role = new Role(1, "Administrator");
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
         Set<Permission> permissions = new HashSet<>();
-        Permission permission = new Permission(1, "", "PERMISSION_MANAGEMENT");
+        Permission permission = new Permission(1, "", PermissionType.PERMISSION_MANAGEMENT);
         permissions.add(permission);
         role.setPermissions(permissions);
 
@@ -62,9 +64,9 @@ public class RoleManagerTest {
 
     @Test
     public void setRolePermissionsTestSuccess() throws BusinessException {
-        Role role = new Role(1, "Administrator");
+        Role role = new Role(1, RoleType.ADMINISTRATOR);
         Set<Permission> permissions = new HashSet<>();
-        Permission permission = new Permission(1, "", "PERMISSION_MANAGEMENT");
+        Permission permission = new Permission(1, "", PermissionType.PERMISSION_MANAGEMENT);
         permissions.add(permission);
         Set<PermissionDTO> permissionDTOS = PermissionDTOEntityMapper.getPermissionDTOListFromPermissionList(permissions);
         PermissionDTO[] permissionDTOS1 = new PermissionDTO[permissionDTOS.size()];
@@ -82,7 +84,7 @@ public class RoleManagerTest {
     @Test(expected = BusinessException.class)
     public void setRolePermissionsTestFailNullRole() throws BusinessException {
         Set<Permission> permissions = new HashSet<>();
-        Permission permission = new Permission(1, "", "PERMISSION_MANAGEMENT");
+        Permission permission = new Permission(1, "", PermissionType.PERMISSION_MANAGEMENT);
         permissions.add(permission);
         Set<PermissionDTO> permissionDTOS = PermissionDTOEntityMapper.getPermissionDTOListFromPermissionList(permissions);
         PermissionDTO[] permissionDTOS1 = new PermissionDTO[permissionDTOS.size()];
@@ -94,47 +96,6 @@ public class RoleManagerTest {
 
 
         when(roleDao.findRole(1)).thenReturn(null);
-        roleManager.setRolePermissions(new PermissionsInsertDTO(1, permissionDTOS1));
-    }
-
-    @Test(expected = BusinessException.class)
-    public void setRolePermissionsTestFailForAdmin() throws BusinessException {
-        Role role = new Role(1, "Administrator");
-        Set<Permission> permissions = new HashSet<>();
-        Permission permission = new Permission(2, "", "USER_MANAGEMENT");
-        permissions.add(permission);
-        Set<PermissionDTO> permissionDTOS = PermissionDTOEntityMapper.getPermissionDTOListFromPermissionList(permissions);
-        PermissionDTO[] permissionDTOS1 = new PermissionDTO[permissionDTOS.size()];
-        int index = 0;
-        for (PermissionDTO permissionDTO : permissionDTOS) {
-            permissionDTOS1[index] = permissionDTO;
-            index++;
-        }
-
-        when(roleDao.findRole(1)).thenReturn(role);
-        when(permissionDao.findPermission(1)).thenReturn(permission);
-        roleManager.setRolePermissions(new PermissionsInsertDTO(1, permissionDTOS1));
-    }
-
-    @Test(expected = BusinessException.class)
-    public void setRolePermissionsTestFailInvalid() throws BusinessException {
-        Role role = new Role(1, "Administrator");
-        Set<Permission> permissions = new HashSet<>();
-        Permission permission1 = new Permission(1, "", "PERMISSION_MANAGEMENT");
-        Permission permission2 = new Permission(2, "", "wrong permission");
-        permissions.add(permission1);
-        permissions.add(permission2);
-        Set<PermissionDTO> permissionDTOS = PermissionDTOEntityMapper.getPermissionDTOListFromPermissionList(permissions);
-        PermissionDTO[] permissionDTOS1 = new PermissionDTO[permissionDTOS.size()];
-        int index = 0;
-        for (PermissionDTO permissionDTO : permissionDTOS) {
-            permissionDTOS1[index] = permissionDTO;
-            index++;
-        }
-
-        when(roleDao.findRole(1)).thenReturn(role);
-        when(permissionDao.findPermission(1)).thenReturn(permission1);
-        when(permissionDao.findPermission(2)).thenReturn(permission2);
         roleManager.setRolePermissions(new PermissionsInsertDTO(1, permissionDTOS1));
     }
 }

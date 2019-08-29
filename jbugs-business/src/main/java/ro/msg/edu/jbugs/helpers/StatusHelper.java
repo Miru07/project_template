@@ -1,6 +1,6 @@
 package ro.msg.edu.jbugs.helpers;
 
-import ro.msg.edu.jbugs.entity.StatusType;
+import ro.msg.edu.jbugs.entity.types.StatusType;
 
 import java.util.Arrays;
 import java.util.Collections;

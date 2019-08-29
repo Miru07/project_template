@@ -1,11 +1,17 @@
 package ro.msg.edu.jbugs.dto;
 
-import ro.msg.edu.jbugs.entity.Role;
+import ro.msg.edu.jbugs.entity.User;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+
+/**
+ * The class maps a {@link User} object.
+ *
+ * @author Mara Corina
+ */
 public class UserDTO implements Serializable {
 
     private int id;

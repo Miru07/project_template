@@ -7,7 +7,7 @@ import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.BugDTOWrapper;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import utils.TokenService;
+import authorization.util.TokenService;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServlet;
