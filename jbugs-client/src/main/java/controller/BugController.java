@@ -63,21 +63,16 @@ public class BugController extends HttpServlet {
         }
     }
 
-//    @PUT
-//    @Path("/update-bug-status/{id}")
-//    @Produces(MediaType.APPLICATION_JSON)
-//    @Consumes(MediaType.TEXT_PLAIN)
-//    public Response updateBugStatus(@PathParam("id") Integer bugID, String newStatus) {
-//
-//
-//        try {
-//            BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
-//            return Response.status(Response.Status.OK).entity("OK").build();
-//        } catch (BusinessException e) {
-//            return Response.status(500).entity(e).build();
-//        }
-//    }
-
+    /**
+     * The function consumes a JSON to map it to a {@link BugDTOWrapper} object.
+     * The wrapper contains a token, which we map it to an ID. We also extract the bug to be updated.
+     * We pass these objects forth to the manager.
+     *
+     * @param bugID      is an {@link Integer} of the Bug to be updated.
+     * @param wrapperDTO is an {@link BugDTOWrapper} that contains the updated details of the Bug and
+     *                   the token.
+     * @return {@link Response} OK, if no isses were encountered, ERROR else.
+     */
     @PUT
     @Path("/update-bug/{id}")
     @Consumes(MediaType.APPLICATION_JSON)

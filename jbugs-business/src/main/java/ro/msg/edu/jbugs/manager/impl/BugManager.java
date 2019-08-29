@@ -172,15 +172,15 @@ public class BugManager implements BugManagerRemote {
             throw new BusinessException("msg-606", "Updated Bug is not valid!");
         }
 
-        if (updateBugStatus(bugMappedToUpdate.getStatus(), bugInDatabase.getStatus())) {
-            bugInDatabase.setStatus(bugMappedToUpdate.getStatus());
+        if (updateBugStatus(bugMappedToUpdate.getStatus().toUpperCase(), bugInDatabase.getStatus())) {
+            bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
         bugInDatabase.setDescription(bugMappedToUpdate.getDescription());
         bugInDatabase.setVersion(bugMappedToUpdate.getVersion());
         bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
-        bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity());
+        bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
         bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
 
         return BugDTOEntityMapper.getBugDTO(bugInDatabase);
