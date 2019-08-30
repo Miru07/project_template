@@ -18,6 +18,7 @@ public enum RegisteredRequestType {
     GET_USER_ID("GET", "/jbugs/api/users/{id}", PermissionType.USER_MANAGEMENT.getActualString()),
 
     GET_BUGS("GET", "/jbugs/api/bugs", PermissionType.BUG_MANAGEMENT.getActualString()),
+    GET_BUG_ID("GET", "/jbugs/api/bugs/{id}", ""),
     CREATE_BUG("POST", "/jbugs/api/bugs", PermissionType.BUG_MANAGEMENT.getActualString()),
     UPDATE_BUG_ID("PUT", "/jbugs/api/bugs/update-bug-status/{id}", PermissionType.BUG_MANAGEMENT.getActualString()),
     UPDATE_BUG("PUT", "/jbugs/api/bugs/update-bug/{id}", PermissionType.BUG_MANAGEMENT.getActualString()), // Sebi? method in Bug Controller

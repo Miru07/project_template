@@ -5,6 +5,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -81,7 +82,7 @@ public class TokenService {
         // and a value greater than 0 if this Date is after the Date argument.
         return (expirationDateOfToken.compareTo(now) < 0);
     }
-    public static boolean currentUserHasPermission(UserManagerRemote var_userManager, String token, String permission) {
+    public static boolean currentUserHasPermission(UserManagerRemote var_userManager, String token, PermissionType permission) {
         Integer userID = Integer.parseInt(decodeJWT(token).getId());
         return var_userManager.userHasPermission(userID, permission);
     }
