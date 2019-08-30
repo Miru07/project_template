@@ -228,7 +228,7 @@ public class UserManagerTest {
         when(userDao.isUsernameUnique("marac")).thenReturn(true);
 
         NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(LocalDate.now()), "Welcome: " + persistedUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString(), "", UserDTOEntityMapper.getDTOFromUser(persistedUser));
+                NotificationType.WELCOME_NEW_USER, "", UserDTOEntityMapper.getDTOFromUser(persistedUser));
         Notification notification = NotificationDTOEntityMapper.getNotificationFromDTO(notificationDTO);
         when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(notification);
 
@@ -250,14 +250,16 @@ public class UserManagerTest {
         userDTO.setStatus(1);
         userDTO.setPassword("");
 
-        UserDTO updatedUser = userManager.updateUser(userDTO);
+        UserUpdateDTO userUpdateDTO = new UserUpdateDTO(userDTO, "");
+        UserDTO updatedUser = userManager.updateUser(userUpdateDTO);
     }
 
     @Test(expected = BusinessException.class)
     public void updateUserTestFailNull() throws BusinessException {
         UserDTO userDTO = createUserDTO();
         when(userDao.findUser(1)).thenReturn(null);
-        userManager.updateUser(userDTO);
+        UserUpdateDTO userUpdateDTO = new UserUpdateDTO(userDTO, "");
+        userManager.updateUser(userUpdateDTO);
     }
 
     @Test
@@ -309,7 +311,7 @@ public class UserManagerTest {
     public void getUserNotificationsSuccess() throws BusinessException {
         User user = createUser();
         Set<Notification> notifications = new HashSet<>();
-        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER.toString(), "", user);
+        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER, "", user);
         notifications.add(notification);
         user.setNotifications(notifications);
 

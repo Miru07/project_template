@@ -1,6 +1,8 @@
 package ro.msg.edu.jbugs.entity;
 
 
+import ro.msg.edu.jbugs.entity.types.NotificationType;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
@@ -16,15 +18,18 @@ public class Notification implements Serializable {
 
     private Date date;
     private String message;
-    private String type;
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
+
     private String url;
 
     @ManyToOne(cascade = CascadeType.MERGE)
-//    @ManyToOne
     @JoinColumn(name="user_id",referencedColumnName = "ID")
     private User user;
 
-    public Notification(Integer id, Date date, String message, String type, String url, User user) {
+    public Notification(Integer id, Date date, String message, NotificationType type, String url, User user) {
         this.ID = id;
         this.date = date;
         this.message = message;
@@ -33,7 +38,7 @@ public class Notification implements Serializable {
         this.user = user;
     }
 
-    public Notification(Date date, String message, String type, String url, User user) {
+    public Notification(Date date, String message, NotificationType type, String url, User user) {
         this.date = date;
         this.message = message;
         this.type = type;
@@ -68,11 +73,11 @@ public class Notification implements Serializable {
         this.message = message;
     }
 
-    public String getType() {
+    public NotificationType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(NotificationType type) {
         this.type = type;
     }
 

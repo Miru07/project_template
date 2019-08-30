@@ -34,7 +34,6 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             RegisteredRequestType.GET_USERS,
             RegisteredRequestType.CREATE_USER,
             RegisteredRequestType.GET_NOTIFICATIONS,
-            // RegisteredRequestType.GET_NOTIFICATION??? // TODO Corina
             RegisteredRequestType.IS_DEACTIVATABLE_ID,
             RegisteredRequestType.EDIT_USER,
             RegisteredRequestType.GET_USER_ID,
