@@ -4,6 +4,7 @@ import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
 import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
 import ro.msg.edu.jbugs.dto.NotificationDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import javax.ejb.Remote;
@@ -31,5 +32,5 @@ public interface UserManagerRemote {
     boolean hasBugsAssigned(Integer id) throws BusinessException;
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
 
-    boolean userHasPermission(Integer userId, String permission);
+    boolean userHasPermission(Integer userId, PermissionType permission);
 }

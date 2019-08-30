@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
+import ro.msg.edu.jbugs.dto.BugViewDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 import authorization.util.TokenService;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 
 /**
@@ -25,18 +25,23 @@ public class BugController extends HttpServlet {
     @EJB
     private BugManagerRemote bugManagerRemote;
 
+    /**
+     * @return a JSON with all the {@link BugDTO} objects
+     * @throws JsonProcessingException if there was a problem at parsing JSON
+     * @author Miruna Dinu
+     */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public String getBugs() throws JsonProcessingException {
 
-        List<BugDTO> bugDTOList = bugManagerRemote.getAllBugs();
+        BugViewDTO bugViewDTO = bugManagerRemote.getBugViewDTO();
 
         ObjectMapper jsonTransformer = new ObjectMapper();
-        String listOfBugsJSON = jsonTransformer.writeValueAsString(bugDTOList);
-        System.out.println(listOfBugsJSON);
-        return listOfBugsJSON;
-    }
+        String bugViewJSON = jsonTransformer.writeValueAsString(bugViewDTO);
+        System.out.println(bugViewJSON);
 
+        return bugViewJSON;
+    }
     @GET
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -73,6 +78,19 @@ public class BugController extends HttpServlet {
         }
     }
 
+    /**
+     * The controller receives a path parameter {@link Integer} that represents the bugId of the
+     * {@link BugDTO} object whose status is to
+     * be changed. It also consumes a text and maps it to a String.
+     * We pass it to the {@link BugManagerRemote} interface to update the data.
+     *
+     * @param bugID is the id of the {@link BugDTO} object whose status is to be changed
+     * @param newStatus is the new status of the {@link BugDTO} object
+     * @return true if the update is successful
+     * @exception {@link BusinessException} if there was an error in {@link BugManagerRemote}
+     * If it catches the exception, the client will receive an ERROR response.
+     * @author Miruna Dinu
+     */
     @PUT
     @Path("/update-bug-status/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -84,6 +102,29 @@ public class BugController extends HttpServlet {
             BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
             return Response.status(Response.Status.OK).entity("OK").build();
         } catch (BusinessException e) {
+            return Response.status(500).entity(e).build();
+        }
+    }
+
+    /**
+     * The controller receives a path parameter {@link Integer} that represents the bugID of the {@link BugDTO}
+     * object to be closed.
+     *
+     * @param bugID is the id of the {@link BugDTO} object to be closed
+     * @return true if the update is successful
+     * @exception {@link BusinessException} if there was an error in {@link BugManagerRemote}
+     * If it catches the exception, the client will receive an ERROR response.
+     * @author Miruna Dinu
+     */
+    @PUT
+    @Path("/close-bug/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response closeBug(@PathParam("id") Integer bugID){
+
+        try{
+            BugDTO closeBugResult = bugManagerRemote.closeBug(bugID);
+            return Response.status(Response.Status.OK).entity("OK").build();
+        } catch (BusinessException e){
             return Response.status(500).entity(e).build();
         }
     }
