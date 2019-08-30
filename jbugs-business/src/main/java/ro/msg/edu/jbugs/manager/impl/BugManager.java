@@ -79,6 +79,12 @@ public class BugManager implements BugManagerRemote {
         return BugDTOEntityMapper.getBugDTOList(bugList);
     }
 
+    @Override
+    public BugDTO getBugById(Integer id) {
+        Bug bug = bugDao.getBugByID(id);
+        return BugDTOEntityMapper.getBugDTO(bug);
+    }
+
     /**
      * The function breaks and maps the {@link BugAttachmentWrapperDTO} object to an {@link Bug} and an
      * {@link Attachment} object respectively.

@@ -111,6 +111,21 @@ public class BugManagerTest {
         return new Attachment(0, null, testObjectBug());
     }
 
+    @Test
+    public void getBugById() throws BusinessException {
+        Bug bug = testObjectBug();
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        BugDTO bugDTO = bugManager.getBugById(bug.getID());
+        Assert.assertEquals(bugDTO.getID(), bug.getID());
+        Assert.assertEquals(bugDTO.getTitle(), bug.getTitle());
+        Assert.assertEquals(bugDTO.getDescription(), bug.getDescription());
+        Assert.assertEquals(bugDTO.getVersion(), bug.getVersion());
+        Assert.assertEquals(bugDTO.getTargetDate(), bug.getTargetDate());
+        Assert.assertEquals(bugDTO.getStatus(), bug.getStatus());
+        Assert.assertEquals(bugDTO.getFixedVersion(), bug.getFixedVersion());
+        Assert.assertEquals(bugDTO.getSeverity(), bug.getSeverity());
+    }
+
     @Test(expected = BusinessException.class)
     public void insertBugNullBug() throws BusinessException {
         BugAttachmentWrapperDTO wrapperDTO = createTestObject();
