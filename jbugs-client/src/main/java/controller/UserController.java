@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.NotificationDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.UserUpdateDTO;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
@@ -117,7 +118,7 @@ public class UserController extends HttpServlet {
      * The Controller consumes a JSON and maps its content to the {@link UserDTO} Object.
      * We pass it to the {@link UserManagerRemote} interface to persist the data.
      *
-     * @param userDTO is an {@link UserDTO} object that contains the data to be
+     * @param userUpdateDTO is an {@link UserDTO} object that contains the data to be
      *                updated for a {@link User} object.
      * @return a success response containing the {@link UserDTO} object that maps the updated data
      * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
@@ -127,9 +128,9 @@ public class UserController extends HttpServlet {
     @Path("/edit-user")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response updateUser(UserDTO userDTO) {
+    public Response updateUser(UserUpdateDTO userUpdateDTO) {
         try {
-            return Response.status(Response.Status.OK).entity(userManagerRemote.updateUser(userDTO)).build();
+            return Response.status(Response.Status.OK).entity(userManagerRemote.updateUser(userUpdateDTO)).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
         }
@@ -154,6 +155,38 @@ public class UserController extends HttpServlet {
             return Response.status(Response.Status.OK).entity(userDTO).build();
         } catch (BusinessException e) {
             return Response.status(500).entity(e).build();
+        }
+    }
+
+    @GET
+    @Path("/{username}/notifications/day")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getUserTodayNotifications(@PathParam("username") String username) {
+        try {
+            Set<NotificationDTO> listOfNotifications = userManagerRemote.getUserTodayNotifications(username);
+
+            ObjectMapper jsonTransformer = new ObjectMapper();
+            return jsonTransformer.writeValueAsString(listOfNotifications);
+        } catch (BusinessException e) {
+            return e.getMessage();
+        } catch (JsonProcessingException e) {
+            return e.getMessage();
+        }
+    }
+
+    @GET
+    @Path("/{username}/notifications/{idNotification}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getUserNewNotifications(@PathParam("username") String username, @PathParam("idNotification") Integer idNotification) {
+        try {
+            Set<NotificationDTO> listOfNotifications = userManagerRemote.getUserNewNotificationsById(username, idNotification);
+
+            ObjectMapper jsonTransformer = new ObjectMapper();
+            return jsonTransformer.writeValueAsString(listOfNotifications);
+        } catch (BusinessException e) {
+            return e.getMessage();
+        } catch (JsonProcessingException e) {
+            return e.getMessage();
         }
     }
 

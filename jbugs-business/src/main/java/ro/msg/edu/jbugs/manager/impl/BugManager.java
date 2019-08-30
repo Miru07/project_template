@@ -9,6 +9,7 @@ import ro.msg.edu.jbugs.dto.BugViewDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
@@ -17,6 +18,7 @@ import ro.msg.edu.jbugs.entity.types.StatusType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.helpers.StatusHelper;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
+import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import ro.msg.edu.jbugs.validators.BugValidator;
 
@@ -36,6 +38,8 @@ public class BugManager implements BugManagerRemote {
     UserDao userDao;
     @EJB
     AttachmentDao attachmentDao;
+    @EJB
+    private NotificationManagerRemote notificationManager;
     @EJB
     UserManagerRemote userManager;
 
@@ -61,7 +65,11 @@ public class BugManager implements BugManagerRemote {
 
         if(statusToClose.contains(StatusType.valueOf(bug.getStatus()))){
 
-            return BugDTOEntityMapper.getBugDTO(this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID));
+            StatusType oldStatus = StatusType.valueOf(bug.getStatus());
+            Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
+            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(updatedBug), oldStatus);
+            notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
+            return BugDTOEntityMapper.getBugDTO(updatedBug);
         }
         else{
             throw new BusinessException("msg-242", "Cannot close bug");
@@ -183,6 +191,7 @@ public class BugManager implements BugManagerRemote {
         if (!hasUpdatePermission) {
             throw new BusinessException("msg-602", "User does not have permission");
         }
+
         Bug bugInDatabase = bugDao.getBugByID(bugID);
         if (bugInDatabase == null) {
             throw new BusinessException("msg-603", "Bug does not exist");
@@ -201,9 +210,15 @@ public class BugManager implements BugManagerRemote {
             throw new BusinessException("msg-606", "Updated Bug is not valid!");
         }
 
+        StatusType oldStatus = StatusType.valueOf(bugInDatabase.getStatus());
+
         if (updateBugStatus(bugMappedToUpdate.getStatus().toUpperCase(), bugInDatabase.getStatus())) {
             bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
+
+        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
+
+
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
         bugInDatabase.setDescription(bugMappedToUpdate.getDescription());
         bugInDatabase.setVersion(bugMappedToUpdate.getVersion());
@@ -212,7 +227,30 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
         bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
 
+        if (justStatusUpdate)
+            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
+        else
+            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
         return BugDTOEntityMapper.getBugDTO(bugInDatabase);
+    }
+
+    public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {
+        Bug bugInDatabase = bugDao.getBugByID(bugID);
+        if (!bugInDatabase.getStatus().equals(bugToUpdate.getStatus()) &&
+                bugInDatabase.getID().equals(bugToUpdate.getID()) &&
+                bugInDatabase.getTitle().equals(bugToUpdate.getTitle()) &&
+                bugInDatabase.getDescription().equals(bugToUpdate.getDescription()) &&
+                bugInDatabase.getVersion().equals(bugToUpdate.getVersion()) &&
+                bugInDatabase.getTargetDate().equals(bugToUpdate.getTargetDate()) &&
+                bugInDatabase.getStatus().equals(bugToUpdate.getStatus()) &&
+                bugInDatabase.getFixedVersion().equals(bugToUpdate.getFixedVersion()) &&
+                bugInDatabase.getSeverity().equals(bugToUpdate.getSeverity()) &&
+                bugInDatabase.getCREATED_ID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getCREATED_ID())) &&
+                bugInDatabase.getASSIGNED_ID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getASSIGNED_ID()))
+        ) {
+            return true;
+        }
+        return false;
     }
 
 

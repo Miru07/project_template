@@ -8,7 +8,6 @@ import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.Role;
 import ro.msg.edu.jbugs.entity.User;
-import ro.msg.edu.jbugs.entity.types.NotificationType;
 import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.entity.types.RoleType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
@@ -19,7 +18,6 @@ import ro.msg.edu.jbugs.validators.UserValidator;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import java.nio.charset.StandardCharsets;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
@@ -59,10 +57,7 @@ public class UserManager implements UserManagerRemote {
         User persistedUser =  userDao.insertUser(createUserToInsert(userDTO));
         LocalDate date = LocalDate.now();
 
-        NotificationDTO notificationDTO = new NotificationDTO(Date.valueOf(date),  "Welcome: " +  persistedUser.toString(),
-                NotificationType.WELCOME_NEW_USER.toString(), "", UserDTOEntityMapper.getDTOFromUser(persistedUser));
-
-        notificationManager.insertNotification(notificationDTO);
+        notificationManager.insertWelcomeNotification(UserDTOEntityMapper.getDTOFromUser(persistedUser));
     }
 
     /**
@@ -212,10 +207,57 @@ public class UserManager implements UserManagerRemote {
             // but sets MESSAGE on 'SUCCESS'
             return loginResponseUserDTO;
         } catch (BusinessException busy) {
+            if (busy.getErrorCode().equals("LOGIN-003")) {
+                sendDeactivatedUserNotification(loginReceivedDTO.getUsername());
+            }
             loginResponseUserDTO = new LoginResponseUserDTO(); // init to 0 and null fields... token included
             loginResponseUserDTO.setMessageCode(busy.getErrorCode()); // busy.getMessage()
             return loginResponseUserDTO;
         }
+    }
+
+    private void sendDeactivatedUserNotification(String username) {
+        try {
+            UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(userDao.findUserByUsername(username));
+            userDao.findUsersByRoleType(RoleType.ADMINISTRATOR).forEach(admin -> {
+                notificationManager.insertDeactivatedUserNotification(userDTO, UserDTOEntityMapper.getDTOCompleteFromUser(admin));
+            });
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void sendUpdatedOrDeletedUserNotification(UserDTO oldUserDTO, UserDTO newUserDTO, String usernameUpdater) throws BusinessException {
+        boolean rolesAreEqual = true;
+        if (oldUserDTO.getRoles().size() == newUserDTO.getRoles().size())
+            for (RoleDTO roleDTO : oldUserDTO.getRoles()) {
+                boolean existsRole = false;
+                for (RoleDTO roleDTO2 : newUserDTO.getRoles())
+                    if (roleDTO.getType().equals(roleDTO2.getType())) {
+                        existsRole = true;
+                    }
+                if (!existsRole) {
+                    rolesAreEqual = false;
+                    break;
+                }
+            }
+        else
+            rolesAreEqual = false;
+        if (oldUserDTO.getStatus() == 1 && newUserDTO.getStatus() == 0
+                && oldUserDTO.getFirstName().equals(newUserDTO.getFirstName())
+                && oldUserDTO.getLastName().equals(newUserDTO.getLastName())
+                && oldUserDTO.getMobileNumber().equals(newUserDTO.getMobileNumber())
+                && oldUserDTO.getEmail().equals(newUserDTO.getEmail())
+                && rolesAreEqual) {
+            userDao.findUsersByPermissionType(PermissionType.USER_MANAGEMENT).forEach(userManager -> {
+                notificationManager.insertDeletedUserNotification(newUserDTO, UserDTOEntityMapper.getDTOFromUser(userManager));
+            });
+        } else {
+            UserDTO updater = UserDTOEntityMapper.getDTOFromUser(userDao.findUserByUsername(usernameUpdater));
+            notificationManager.insertUserUpdatedNotification(newUserDTO, oldUserDTO, updater);
+        }
+
     }
 
     @Override
@@ -228,7 +270,7 @@ public class UserManager implements UserManagerRemote {
     }
 
     /**
-     * @param userDTO is an {@link UserDTO} object that contains the updated info
+     * @param userUpdateDTO is an {@link UserDTO} object that contains the updated info
      *                of the {@link User} object that will be updated in the database.
      * @return an {@link UserDTO} object with the persisted informations
      * @throws {@link BusinessException} if the {@link UserDTO} object is
@@ -236,9 +278,12 @@ public class UserManager implements UserManagerRemote {
      * @author Mara Corina
      */
     @Override
-    public UserDTO updateUser(UserDTO userDTO) throws BusinessException {
+    public UserDTO updateUser(UserUpdateDTO userUpdateDTO) throws BusinessException {
+        UserDTO userDTO = userUpdateDTO.getUser();
         UserValidator.validateForUpdate(userDTO);
         User persistedUser = userDao.findUser(userDTO.getId());
+        UserDTO oldUserValue = UserDTOEntityMapper.getDTOFromUser(persistedUser);
+
         if (persistedUser == null)
             throw new BusinessException("msg8_10_1101", "No user was found!");
 
@@ -266,13 +311,17 @@ public class UserManager implements UserManagerRemote {
         if (persistedUser.getStatus() == 0 && userDTO.getStatus() == 1)
             persistedUser.setCounter(0);
 
-        //do not allow deactivation is user has assigned bugs
+        //do not allow deactivation if user has assigned bugs
         if (persistedUser.getStatus() == 1 && userDTO.getStatus() == 0 && persistedUser.getAssignedBugs().size() > 0)
             persistedUser.setStatus(1);
         else
             persistedUser.setStatus(userDTO.getStatus());
 
-        return UserDTOEntityMapper.getDTOFromUser(persistedUser);
+        UserDTO newUserValue = UserDTOEntityMapper.getDTOFromUser(persistedUser);
+
+        sendUpdatedOrDeletedUserNotification(oldUserValue, newUserValue, userUpdateDTO.getUsernameUpdater());
+
+        return newUserValue;
     }
 
     /**
@@ -288,5 +337,27 @@ public class UserManager implements UserManagerRemote {
         if (user == null)
             throw new BusinessException("msg8_10_1102", "No user was found!");
         return user.getAssignedBugs().size() > 0;
+    }
+
+    @Override
+    public Set<NotificationDTO> getUserTodayNotifications(String username) throws BusinessException {
+        User user = userDao.findUserByUsername(username);
+        if (user == null) {
+            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
+        }
+        long millis = System.currentTimeMillis();
+        java.sql.Date date = new java.sql.Date(millis);
+        List<Notification> notifications = userDao.getNotificationsByDay(user.getID(), date);
+        return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(new HashSet<>(notifications));
+    }
+
+    @Override
+    public Set<NotificationDTO> getUserNewNotificationsById(String username, Integer idLastNotification) throws BusinessException {
+        User user = userDao.findUserByUsername(username);
+        if (user == null) {
+            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
+        }
+        List<Notification> notifications = userDao.getNewNotificationsById(user.getID(), idLastNotification);
+        return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(new HashSet<>(notifications));
     }
 }

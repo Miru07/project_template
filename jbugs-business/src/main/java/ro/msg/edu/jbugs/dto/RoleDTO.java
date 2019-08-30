@@ -27,4 +27,11 @@ public class RoleDTO implements Serializable {
     public void setType(RoleType type) {
         this.type = type;
     }
+
+    @Override
+    public String toString() {
+        return "RoleDTO{" +
+                "type=" + type +
+                '}';
+    }
 }

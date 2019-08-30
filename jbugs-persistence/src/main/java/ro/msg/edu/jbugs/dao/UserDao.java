@@ -1,7 +1,9 @@
 package ro.msg.edu.jbugs.dao;
 
+import ro.msg.edu.jbugs.entity.Notification;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.entity.types.PermissionType;
+import ro.msg.edu.jbugs.entity.types.RoleType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import javax.ejb.Stateless;
@@ -9,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.nio.charset.StandardCharsets;
+import java.sql.Date;
 import java.util.List;
 
 import static com.google.common.hash.Hashing.sha256;
@@ -130,6 +133,20 @@ public class UserDao {
         }
     }
 
+    public List<User> findUsersByRoleType(RoleType type) throws BusinessException {
+        return entityManager.createNamedQuery(User.QUERY_SELECT_BY_ROLE, User.class)
+                .setParameter("type", type)
+                .getResultList();
+    }
+
+    public List<User> findUsersByPermissionType(PermissionType type) throws BusinessException {
+        return entityManager.createNamedQuery(User.QUERY_SELECT_BY_PERMISSION, User.class)
+                .setParameter("type", type)
+                .getResultList();
+    }
+
+
+
     /**
      * **********************************LOGIN********************not sure if needed just yet
      * @param user
@@ -161,5 +178,21 @@ public class UserDao {
                 .setParameter("user_id", userId)
                 .getResultList();
         return permissions;
+    }
+
+    public List<Notification> getNotificationsByDay(Integer userId, Date date) {
+        List<Notification> notifications = entityManager.createNamedQuery(User.QUERY_GET_USER_DAY_NOTIFICATIONS, Notification.class)
+                .setParameter("id", userId)
+                .setParameter("day", date)
+                .getResultList();
+        return notifications;
+    }
+
+    public List<Notification> getNewNotificationsById(Integer userId, Integer notificationId) {
+        List<Notification> notifications = entityManager.createNamedQuery(User.QUERY_GET_USER_NOTIFICATIONS_AFTER_ID, Notification.class)
+                .setParameter("notificationId", notificationId)
+                .setParameter("userId", userId)
+                .getResultList();
+        return notifications;
     }
 }
