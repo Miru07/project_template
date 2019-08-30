@@ -15,14 +15,18 @@ public class RequestType{
     }
     // to be modified...........................
     public boolean matches(RegisteredRequestType registeredRequestType) {
-        if(RegisteredRequestType.OPTIONS.getMethodPathObject().getMethod()
-                .equals(this.methodPathObject.getMethod())){
-            return true;
+        if(registeredRequestType == RegisteredRequestType.OPTIONS){
+            if(RegisteredRequestType.OPTIONS.getMethodPathObject().getMethod()
+                    .equals(this.methodPathObject.getMethod())){
+                return true;
+            }
         }
-        if(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getMethod()
-                .equals(this.methodPathObject.getMethod())
-        && this.methodPathObject.getPath().endsWith(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getPath())){
-            return true;
+        if(registeredRequestType == RegisteredRequestType.GET_NOTIFICATIONS){
+            if(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getMethod()
+                    .equals(this.methodPathObject.getMethod())
+                    && this.methodPathObject.getPath().endsWith(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getPath())){
+                return true;
+            }
         }
         if(registeredRequestType.getMethodPathObject().getMethod().equals(this.methodPathObject.getMethod())
                 && registeredRequestType.getMethodPathObject().getPath().equals(this.methodPathObject.getPath())){
