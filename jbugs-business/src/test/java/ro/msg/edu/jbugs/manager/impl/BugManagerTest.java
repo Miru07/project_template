@@ -13,12 +13,16 @@ import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
+import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.sql.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
@@ -53,13 +57,13 @@ public class BugManagerTest {
         BugDTO bugDTO = new BugDTO(0, "test", "test", "1.1.1",
                 new Date(2019, 1, 1), "NEW", "", "LOW",
                 userDTO, userDTO);
-
         String string = "test";
         int len = string.length();
-        byte[] attContent = new byte[len/2];
-        for (int i = 0; i<len; i+=2){
+        byte[] attContent = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
             attContent[i / 2] = (byte) ((Character.digit(string.charAt(i), 16) << 4)
-                    + Character.digit(string.charAt(i+1), 16));}
+                    + Character.digit(string.charAt(i + 1), 16));
+        }
         AttachmentDTO attachmentDTO = new AttachmentDTO(0, attContent, bugDTO);
 
         return new BugAttachmentWrapperDTO(bugDTO, attachmentDTO, "token");
@@ -74,10 +78,11 @@ public class BugManagerTest {
 
         String string = "test";
         int len = string.length();
-        byte[] attContent = new byte[len/2];
-        for (int i = 0; i<len; i+=2){
+        byte[] attContent = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
             attContent[i / 2] = (byte) ((Character.digit(string.charAt(i), 16) << 4)
-                    + Character.digit(string.charAt(i+1), 16));}
+                    + Character.digit(string.charAt(i + 1), 16));
+        }
         AttachmentDTO attachmentDTO = new AttachmentDTO(1, attContent, bugDTO);
 
         return new BugAttachmentWrapperDTO(bugDTO, attachmentDTO, "token");
@@ -220,6 +225,161 @@ public class BugManagerTest {
         Assert.assertEquals(wrapperPersisted.getAttachment().getAttContent(), attachment.getAttContent());
         Assert.assertEquals(wrapperPersisted.getAttachment().getBugID().getID(), attachment.getBugID().getID());
     }
+
+    // ============== BUG UPDATE ===============
+
+    public UserDTO testObjectUserDTO() {
+        return new UserDTO(1, "test", "test", "test", "test",
+                0, "test", "077", 1);
+    }
+
+    public BugDTO testObjectBugDTO() {
+        return new BugDTO(1, "test", "test", "1.1", new Date(2018, 1, 1), "OPEN",
+                "1.2", "LOW", testObjectUserDTO(), testObjectUserDTO());
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_requestUserID_BussinessException() throws BusinessException {
+        bugManager.updateBug(null, null, null);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_requestUserIDZero_BussinessException() throws BusinessException {
+        bugManager.updateBug(0, null, null);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugID_BussinessException() throws BusinessException {
+        bugManager.updateBug(1, null, null);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugIDZero_BussinessException() throws BusinessException {
+        bugManager.updateBug(1, 0, null);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugToUpdate_BussinessException() throws BusinessException {
+        bugManager.updateBug(1, 1, null);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_requestUserIDNotInDatabase_BussinessException() throws BusinessException {
+        when(userDao.findUser(any())).thenReturn(null);
+        bugManager.updateBug(1, 1, testObjectBugDTO());
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_requestUserDoesNotHavePermission_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        bugManager.updateBug(1, 1, testObjectBugDTO());
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugIDNotInDatabase_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(null);
+
+        bugManager.updateBug(1, 1, testObjectBugDTO());
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugToUpdateCreatedUserNull_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        BugDTO bugDTO = testObjectBugDTO();
+        bugDTO.setCREATED_ID(null);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(null);
+
+        bugManager.updateBug(1, 1, bugDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugToUpdateAssigndUserNull_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        BugDTO bugDTO = testObjectBugDTO();
+        bugDTO.setASSIGNED_ID(null);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(null);
+
+        bugManager.updateBug(1, 1, bugDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugToUpdateMappedAssignedUserIDNull_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        BugDTO bugDTO = testObjectBugDTO();
+        Bug bug = BugDTOEntityMapper.getBug(bugDTO);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(bug);
+        when(userDao.findUser(any())).thenReturn(null);
+
+        bugManager.updateBug(1, 1, bugDTO);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void updateBug_bugToUpdateMappedNotValid_BussinessException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        BugDTO bugDTO = testObjectBugDTO();
+        Bug bug = BugDTOEntityMapper.getBug(bugDTO);
+        bug.setStatus("");
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(bug);
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+
+        bugManager.updateBug(1, 1, bugDTO);
+    }
+
+    @Test
+    public void updateBug_bugToUpdateMappedValid_NoException() throws BusinessException {
+        List<PermissionType> permission = new LinkedList<>();
+        permission.add(PermissionType.BUG_MANAGEMENT);
+
+        BugDTO bugDTO = testObjectBugDTO();
+        Bug bug = BugDTOEntityMapper.getBugWithUserCreatedAndAssigned(bugDTO);
+
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
+        when(bugDao.getBugByID(any())).thenReturn(bug);
+        when(userDao.findUser(any())).thenReturn(testObjectUser());
+
+        BugDTO updatedBugDTO = bugManager.updateBug(1, 1, bugDTO);
+
+        Assert.assertEquals(updatedBugDTO.getID().intValue(), bugDTO.getID().intValue());
+        Assert.assertEquals(updatedBugDTO.getVersion(), bugDTO.getVersion());
+        Assert.assertEquals(updatedBugDTO.getTitle(), bugDTO.getTitle());
+        Assert.assertEquals(updatedBugDTO.getStatus(), bugDTO.getStatus());
+        Assert.assertEquals(updatedBugDTO.getSeverity(), bugDTO.getSeverity());
+        Assert.assertEquals(updatedBugDTO.getFixedVersion(), bugDTO.getFixedVersion());
+        Assert.assertEquals(updatedBugDTO.getDescription(), bugDTO.getDescription());
+        Assert.assertEquals(updatedBugDTO.getTargetDate(), bugDTO.getTargetDate());
+    }
+
+    //TODO : this
 
 
 }

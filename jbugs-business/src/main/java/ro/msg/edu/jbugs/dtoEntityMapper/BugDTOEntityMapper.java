@@ -5,7 +5,6 @@ import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.entity.Bug;
 
 import javax.ejb.EJB;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,6 +20,37 @@ public class BugDTOEntityMapper {
 
     private BugDTOEntityMapper(){
 
+    }
+
+    public static Bug getBugWithoutUsers(BugDTO bugDTO) {
+        Bug bug = new Bug();
+        bug.setID(bugDTO.getID());
+        bug.setTitle(bugDTO.getTitle());
+        bug.setDescription(bugDTO.getDescription());
+        bug.setTargetDate(bugDTO.getTargetDate());
+        bug.setFixedVersion(bugDTO.getFixedVersion());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
+        bug.setStatus(bugDTO.getStatus());
+        bug.setVersion(bugDTO.getVersion());
+
+        return bug;
+    }
+
+    public static Bug getBugWithUserCreatedAndAssigned(BugDTO bugDTO) {
+        Bug bug = new Bug();
+        bug.setID(bugDTO.getID());
+        bug.setTitle(bugDTO.getTitle());
+        bug.setDescription(bugDTO.getDescription());
+        bug.setTargetDate(bugDTO.getTargetDate());
+        bug.setFixedVersion(bugDTO.getFixedVersion());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
+        bug.setStatus(bugDTO.getStatus());
+        bug.setVersion(bugDTO.getVersion());
+
+        bug.setASSIGNED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID()));
+        bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
+
+        return bug;
     }
 
     public static Bug getBug(BugDTO bugDTO){

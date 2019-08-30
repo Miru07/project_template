@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
+import ro.msg.edu.jbugs.dto.BugDTOWrapper;
 import ro.msg.edu.jbugs.dto.BugViewDTO;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
@@ -79,30 +80,27 @@ public class BugController extends HttpServlet {
     }
 
     /**
-     * The controller receives a path parameter {@link Integer} that represents the bugId of the
-     * {@link BugDTO} object whose status is to
-     * be changed. It also consumes a text and maps it to a String.
-     * We pass it to the {@link BugManagerRemote} interface to update the data.
+     * The function consumes a JSON to map it to a {@link BugDTOWrapper} object.
+     * The wrapper contains a token, which we map it to an ID. We also extract the bug to be updated.
+     * We pass these objects forth to the manager.
      *
-     * @param bugID is the id of the {@link BugDTO} object whose status is to be changed
-     * @param newStatus is the new status of the {@link BugDTO} object
-     * @return true if the update is successful
-     * @exception {@link BusinessException} if there was an error in {@link BugManagerRemote}
-     * If it catches the exception, the client will receive an ERROR response.
-     * @author Miruna Dinu
+     * @param bugID      is an {@link Integer} of the Bug to be updated.
+     * @param wrapperDTO is an {@link BugDTOWrapper} that contains the updated details of the Bug and
+     *                   the token.
+     * @return {@link Response} OK, if no isses were encountered, ERROR else.
      */
     @PUT
-    @Path("/update-bug-status/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.TEXT_PLAIN)
-    public Response updateBugStatus(@PathParam("id") Integer bugID, String newStatus) {
-
-
+    @Path("/update-bug/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updateBug(@PathParam("id") Integer bugID, BugDTOWrapper wrapperDTO) {
         try {
-            BugDTO updateResult = bugManagerRemote.updateBugStatus(newStatus, bugID);
+            Integer requestUserID = TokenService.getCurrentUserID(wrapperDTO.getToken());
+            BugDTO bugToUpdate = wrapperDTO.getBugDTO();
+            bugManagerRemote.updateBug(requestUserID, bugID, bugToUpdate);
             return Response.status(Response.Status.OK).entity("OK").build();
-        } catch (BusinessException e) {
-            return Response.status(500).entity(e).build();
+        } catch (BusinessException ex) {
+            return Response.status(Response.Status.OK).entity("ERROR").build();
         }
     }
 

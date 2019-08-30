@@ -9,7 +9,6 @@ import ro.msg.edu.jbugs.manager.remote.UserManagerRemote;
 import javax.ejb.EJB;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.util.Arrays;
@@ -81,6 +80,32 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
         abortRequestWithMessage(containerRequestContext, ACCESS_DENIED_MESSAGE);
         return;
+//
+//        RequestType requestType = new RequestType(containerRequestContext.getMethod(),
+//                containerRequestContext.getUriInfo().getRequestUri().getPath());
+//
+//        if (requestType.matches(RegisteredRequestType.OPTIONS)) {
+//            return;
+//        }
+//        if (requestType.matches(RegisteredRequestType.LOGIN)) {
+//            return; // no auth needed
+//        }
+//
+//        // get TOKEN from authorization header:
+//        String authorizationHeader = containerRequestContext.getHeaderString(HttpHeaders.AUTHORIZATION);
+//        String token = authorizationHeader.substring("Bearer".length()).trim();
+//
+//        if (TokenService.isTokenExpired(token)) {
+//            abortRequestWithMessage(containerRequestContext, TOKEN_EXPIRED_MESSAGE);
+//            return;
+//        }
+//
+//        if(isRequestPermitted(requestType, token)){
+//            return;
+//        }
+//
+//        abortRequestWithMessage(containerRequestContext, ACCESS_DENIED_MESSAGE);
+//        return;
     }
 
     private boolean isRequestPermitted(RequestType requestType, String token) {
