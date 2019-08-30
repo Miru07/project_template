@@ -2,6 +2,8 @@ package ro.msg.edu.jbugs.validators;
 
 import ro.msg.edu.jbugs.entity.Bug;
 
+import java.time.LocalDate;
+
 /**
  * Validator class for {@link Bug} class.
  *
@@ -26,12 +28,19 @@ public class BugValidator {
             if (bug.getDescription().length() > 250) return false;
         } else return false;
 
+        LocalDate date = bug.getTargetDate().toLocalDate();
+
+        if (date.getYear() == 2000) return false;
         /* The RegEx matches cases such as:
            1.1.1, 1.2.a etc;
          */
         if (bug.getVersion() != null) {
             if (!bug.getVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
         } else return false;
+
+        if (!bug.getFixedVersion().equals("")) {
+            if (!bug.getFixedVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
+        }
 
         if (bug.getSeverity() != null) {
             if (!validateSeverity(bug.getSeverity())) return false;
@@ -40,8 +49,6 @@ public class BugValidator {
         if (bug.getStatus() != null) {
             if (!validateStatus(bug.getStatus())) return false;
         }
-
-        if (bug.getASSIGNED_ID() == null) return false;
 
         return true;
     }
@@ -52,6 +59,6 @@ public class BugValidator {
 
     private static boolean validateStatus(String status) {
         return status.equals("NEW") || status.equals("IN_PROGRESS") || status.equals("FIXED") || status.equals("CLOSED")
-                || status.equals("REJECTED") || status.equals("INFO_NEEDED");
+                || status.equals("REJECTED") || status.equals("INFO_NEEDED") || status.equals("OPEN");
     }
 }

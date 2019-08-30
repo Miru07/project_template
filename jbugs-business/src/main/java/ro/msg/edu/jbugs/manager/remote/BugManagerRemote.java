@@ -17,12 +17,13 @@ import java.util.List;
 @Remote
 public interface BugManagerRemote {
 
-    List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
+    //List<BugDTO> findBugsCreatedBy(UserDTO userDTO);
 
-    BugDTO updateBugStatus(String newStatus, int bugId) throws BusinessException;
     List<BugDTO> getAllBugs();
     BugDTO closeBug(int bugID) throws BusinessException;
     BugViewDTO getBugViewDTO();
 
     BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException;
+
+    BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException;
 }
