@@ -35,11 +35,11 @@ public class BugValidator {
            1.1.1, 1.2.a etc;
          */
         if (bug.getVersion() != null) {
-            if (!bug.getVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
+            if (!bug.getVersion().matches("(^[0-9a-zA-Z]{1,2}[.]{1}[0-9a-zA-Z]{1,2}){1}([.]{1}[0-9a-zA-Z]{0,2}){0,1}")) return false;
         } else return false;
 
         if (!bug.getFixedVersion().equals("")) {
-            if (!bug.getFixedVersion().matches("(([\\w][.]){1,2}[\\w])")) return false;
+            if (!bug.getFixedVersion().matches("(^[0-9a-zA-Z]{1,2}[.]{1}[0-9a-zA-Z]{1,2}){1}([.]{1}[0-9a-zA-Z]{0,2}){0,1}")) return false;
         }
 
         if (bug.getSeverity() != null) {
