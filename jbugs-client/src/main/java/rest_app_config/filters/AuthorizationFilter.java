@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * intercepts all requests from frontend
  */
-@Provider
+//@Provider
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     @EJB
@@ -51,6 +51,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {
+
         RequestType requestType = new RequestType(containerRequestContext.getMethod(),
                 containerRequestContext.getUriInfo().getRequestUri().getPath());
 
