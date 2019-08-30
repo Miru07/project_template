@@ -18,7 +18,7 @@ import java.util.Set;
 /**
  * intercepts all requests from frontend
  */
-@Provider
+//@Provider
 public class AuthorizationFilter implements ContainerRequestFilter {
 
     @EJB
