@@ -43,6 +43,17 @@ public class BugController extends HttpServlet {
 
         return bugViewJSON;
     }
+    @GET
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getBugById(@PathParam("id") Integer id) throws JsonProcessingException {
+        BugDTO bugDTO = bugManagerRemote.getBugById(id);
+        ObjectMapper jsonTransformer = new ObjectMapper();
+        String bugsJSON = jsonTransformer.writeValueAsString(bugDTO);
+        System.out.println(bugsJSON);
+        return bugsJSON;
+    }
+
 
     /**
      * The Controller consumes a JSON and maps its content to the BugAttachmentWrapperDTO Object.
