@@ -11,11 +11,19 @@ import java.util.Set;
         @NamedQuery(name = User.FIND_ALL_USERS, query = "select u from User u"),
         @NamedQuery(name = User.QUERY_CHECK_USERNAME_UNIQUE, query = "select count(u) from User u where u.username = :username"),
         @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME_AND_PASSWORD, query = "select u from User u where u.username = :username and u.password = :password"),
+        @NamedQuery(name = User.QUERY_SELECT_BY_ROLE, query = "select u from User u join u.roles r where r.type = :type"),
+        @NamedQuery(name = User.QUERY_SELECT_BY_PERMISSION, query = "select u from User u inner join u.roles r inner join r.permissions p where p.type = :type"),
         @NamedQuery(name = User.QUERY_SELECT_BY_USERNAME, query = "select u from User u where u.username = :username"),
         @NamedQuery(name = User.QUERY_GET_PERMISSIONS, query = "Select p.type From User u " +
                 "inner join u.roles as r " +
                 "inner join r.permissions as p " +
                 "where u.ID = :user_id "),
+        @NamedQuery(name = User.QUERY_GET_USER_DAY_NOTIFICATIONS, query = "Select n From User u " +
+                "inner join u.notifications as n " +
+                "where n.date = :day and u.ID = :id"),
+        @NamedQuery(name = User.QUERY_GET_USER_NOTIFICATIONS_AFTER_ID, query = "Select n From User u " +
+                "inner join u.notifications as n " +
+                "where n.ID > :notificationId and u.ID = :userId"),
         @NamedQuery(name = User.QUERY_UPDATE_USER_STATUS_AND_COUNTER, query = "UPDATE User " +
                 "SET status = :status, counter = :counter " +
                 "WHERE ID = :id")
@@ -27,10 +35,14 @@ public class User implements Serializable {
 
     public static final String QUERY_UPDATE_USER_STATUS_AND_COUNTER = "User.updateStatusAndCounter";
     public static final String QUERY_GET_PERMISSIONS = "User.getUserPermissions";
+    public static final String QUERY_GET_USER_DAY_NOTIFICATIONS = "User.getUserNotificationsByDay";
+    public static final String QUERY_GET_USER_NOTIFICATIONS_AFTER_ID = "User.getUserNewNotifications";
     public static final String FIND_ALL_USERS = "findAllUsers";
     public static final String QUERY_CHECK_USERNAME_UNIQUE = "User.checkUsernameUnique";
     public static final String QUERY_SELECT_BY_USERNAME_AND_PASSWORD = "User.selectByUsernameAndPassword";
     public static final String QUERY_SELECT_BY_USERNAME = "User.selectByUsername";
+    public static final String QUERY_SELECT_BY_ROLE = "User.selectByRolee";
+    public static final String QUERY_SELECT_BY_PERMISSION = "User.selectByPermission";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

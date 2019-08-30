@@ -24,7 +24,7 @@ public class RequestType{
         if(registeredRequestType == RegisteredRequestType.GET_NOTIFICATIONS){
             if(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getMethod()
                     .equals(this.methodPathObject.getMethod())
-                    && this.methodPathObject.getPath().endsWith(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getPath())){
+                    && this.methodPathObject.getPath().contains(RegisteredRequestType.GET_NOTIFICATIONS.getMethodPathObject().getPath())) {
                 return true;
             }
         }

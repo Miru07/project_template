@@ -1,9 +1,6 @@
 package ro.msg.edu.jbugs.manager.remote;
 
-import ro.msg.edu.jbugs.dto.LoginReceivedDTO;
-import ro.msg.edu.jbugs.dto.LoginResponseUserDTO;
-import ro.msg.edu.jbugs.dto.NotificationDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
@@ -27,10 +24,14 @@ public interface UserManagerRemote {
 
     List<UserDTO> findAllUsers();
 
-    UserDTO updateUser(UserDTO userDTO) throws BusinessException;
+    UserDTO updateUser(UserUpdateDTO userUpdateDTO) throws BusinessException;
 
     boolean hasBugsAssigned(Integer id) throws BusinessException;
     LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
 
     boolean userHasPermission(Integer userId, PermissionType permission);
+
+    Set<NotificationDTO> getUserTodayNotifications(String username) throws BusinessException;
+
+    Set<NotificationDTO> getUserNewNotificationsById(String username, Integer idLastNotification) throws BusinessException;
 }
