@@ -87,17 +87,31 @@ public class BugManager implements BugManagerRemote {
         List<Bug> bugList = bugDao.getAllBugs();
         List<BugDTO> bugDTOList = new ArrayList<>();
 
-        for(Bug b: bugList){
-            if(b.getASSIGNED_ID() == null)
-            {
-                bugDTOList.add(BugDTOEntityMapper.getBugDTOWithoutAssigned(b));
-            }
-            else{
-                bugDTOList.add(BugDTOEntityMapper.getBugDTOForUpdate(b));
-            }
-        }
+//        for(Bug b: bugList){
+//            if(b.getASSIGNED_ID() == null)
+//            {
+//                bugDTOList.add(BugDTOEntityMapper.getBugDTOWithoutAssigned(b));
+//            }
+//            else{
+//                bugDTOList.add(BugDTOEntityMapper.getBugDTOForUpdate(b));
+//            }
+//        }
 
         return BugDTOEntityMapper.getBugDTOList(bugList);
+    }
+
+    /**
+     * @return a DTO that contians two lists, one with all the bugs from the database and one with all the users from
+     *          the database
+     * @author Miruna Dinu
+     */
+    @Override
+    public BugViewDTO getBugViewDTO(){
+
+        List<BugDTO> bugDTOList = this.getAllBugs();
+        List<UserDTO> userDTOList = this.userManager.findAllUsers();
+        //userDTOList.remove(11);
+        return new BugViewDTO(bugDTOList, userDTOList);
     }
 
     @Override
@@ -239,11 +253,11 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
         bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
-
-        if (justStatusUpdate)
-            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
-        else
-            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
+//
+//        if (justStatusUpdate)
+//            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
+//        else
+//            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
         return BugDTOEntityMapper.getBugDTO(bugInDatabase);
     }
 
@@ -267,14 +281,7 @@ public class BugManager implements BugManagerRemote {
     }
 
 
-    @Override
-    public BugViewDTO getBugViewDTO(){
 
-        List<BugDTO> bugDTOList = this.getAllBugs();
-        List<UserDTO> userDTOList = this.userManager.findAllUsers();
-        //userDTOList.remove(11);
-        return new BugViewDTO(bugDTOList, userDTOList);
-    }
 
 
 }

@@ -27,11 +27,6 @@ public class BugDao {
         return entityManager.find(Bug.class, bugID);
     }
 
-//    public List<Bug> findBugCreatedBy(User user) {
-//        Query query = entityManager.createNamedQuery(Bug.FIND_BUGS_CREATED_ID, Bug.class);
-//        return query.setParameter("var_user_id", user.getID()).getResultList();
-//    }
-
     /**
      * @param bug is an {@link Bug} object that contains the data to be
      *            persisted inside the database.

@@ -118,12 +118,14 @@ public class BugController extends HttpServlet {
      */
     @PUT
     @Path("/close-bug/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.TEXT_PLAIN})
     public Response closeBug(@PathParam("id") Integer bugID){
+
+        String message = "OK";
 
         try{
             BugDTO closeBugResult = bugManagerRemote.closeBug(bugID);
-            return Response.status(Response.Status.OK).entity("OK").build();
+            return Response.status(Response.Status.OK).entity(message).build();
         } catch (BusinessException e){
             return Response.status(500).entity(e).build();
         }
