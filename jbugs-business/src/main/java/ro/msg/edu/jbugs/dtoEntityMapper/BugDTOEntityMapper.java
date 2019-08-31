@@ -65,7 +65,7 @@ public class BugDTOEntityMapper {
         bug.setVersion(bugDTO.getVersion());
 
         bug.setASSIGNED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID()));
-        //bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
+        bug.setCREATED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID()));
 
         return bug;
     }
@@ -90,5 +90,36 @@ public class BugDTOEntityMapper {
     public static List<BugDTO> getBugDTOList(List<Bug> bugList){
 
         return bugList.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
+    }
+
+    public static BugDTO getBugDTOWithoutAssigned(Bug bug) {
+        BugDTO bugDTO = new BugDTO();
+        bugDTO.setID(bug.getID());
+        bugDTO.setTitle(bug.getTitle());
+        bugDTO.setDescription(bug.getDescription());
+        bugDTO.setTargetDate(bug.getTargetDate());
+        bugDTO.setFixedVersion(bug.getFixedVersion());
+        bugDTO.setSeverity(bug.getSeverity().toUpperCase());
+        bugDTO.setStatus(bug.getStatus());
+        bugDTO.setVersion(bug.getVersion());
+        bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUser(bug.getCREATED_ID()));
+
+        return bugDTO;
+    }
+
+    public static BugDTO getBugDTOForUpdate(Bug bug){
+        BugDTO bugDTO = new BugDTO();
+        bugDTO.setID(bug.getID());
+        bugDTO.setTitle(bug.getTitle());
+        bugDTO.setDescription(bug.getDescription());
+        bugDTO.setTargetDate(bug.getTargetDate());
+        bugDTO.setFixedVersion(bug.getFixedVersion());
+        bugDTO.setSeverity(bug.getSeverity().toUpperCase());
+        bugDTO.setStatus(bug.getStatus());
+        bugDTO.setVersion(bug.getVersion());
+        bugDTO.setCREATED_ID(UserDTOEntityMapper.getDTOFromUserWithPass(bug.getCREATED_ID()));
+        bugDTO.setASSIGNED_ID((UserDTOEntityMapper.getDTOFromUserWithPass(bug.getASSIGNED_ID())));
+
+        return bugDTO;
     }
 }

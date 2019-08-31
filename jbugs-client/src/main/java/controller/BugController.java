@@ -1,20 +1,19 @@
 package controller;
 
+import authorization.util.TokenService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
-import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.BugDTOWrapper;
-import ro.msg.edu.jbugs.dto.BugViewDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
+import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
-import authorization.util.TokenService;
 
 import javax.ejb.EJB;
 import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 
 /**
@@ -25,6 +24,9 @@ public class BugController extends HttpServlet {
 
     @EJB
     private BugManagerRemote bugManagerRemote;
+
+    @EJB
+    private AttachmentManagerRemote attachmentManagerRemote;
 
     /**
      * @return a JSON with all the {@link BugDTO} objects
@@ -125,5 +127,19 @@ public class BugController extends HttpServlet {
         } catch (BusinessException e){
             return Response.status(500).entity(e).build();
         }
+    }
+
+    @GET
+    @Path("/get-att")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getAtt() throws JsonProcessingException {
+
+        List<AttachmentDTO> attachmentDTOList = attachmentManagerRemote.getAllAtt();
+
+        ObjectMapper jsonTransformer = new ObjectMapper();
+        String attachmentDTOString = jsonTransformer.writeValueAsString(attachmentDTOList);
+        System.out.println(attachmentDTOString);
+
+        return attachmentDTOString;
     }
 }

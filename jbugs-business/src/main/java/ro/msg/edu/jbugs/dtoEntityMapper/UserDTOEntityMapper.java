@@ -45,6 +45,7 @@ public class UserDTOEntityMapper {
             userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
             userDTO.setId(user.getID());
         }
+
         return userDTO;
     }
     public static UserDTO getDTOCompleteFromUser(User user) {
@@ -101,6 +102,23 @@ public class UserDTOEntityMapper {
         }
 
         return userList;
+    }
+
+    public static UserDTO getDTOFromUserWithPass(User user){
+        UserDTO userDTO = new UserDTO();
+        if (user != null) {
+            userDTO.setCounter(user.getCounter());
+            userDTO.setFirstName(user.getFirstName());
+            userDTO.setLastName(user.getLastName());
+            userDTO.setMobileNumber(user.getMobileNumber());
+            userDTO.setEmail(user.getEmail());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setPassword(user.getPassword());
+            userDTO.setStatus(user.getStatus());
+            userDTO.setRoles(RoleDTOEntityMapper.getRoleDTOListFromRoleList(user.getRoles()));
+            userDTO.setId(user.getID());
+        }
+        return userDTO;
     }
 
 }

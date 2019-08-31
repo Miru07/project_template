@@ -1,12 +1,10 @@
 package ro.msg.edu.jbugs.dao;
 
 import ro.msg.edu.jbugs.entity.Bug;
-import ro.msg.edu.jbugs.entity.User;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import java.util.List;
 
 /**
@@ -29,10 +27,10 @@ public class BugDao {
         return entityManager.find(Bug.class, bugID);
     }
 
-    public List<Bug> findBugCreatedBy(User user) {
-        Query query = entityManager.createNamedQuery(Bug.FIND_BUGS_CREATED_ID, Bug.class);
-        return query.setParameter("var_user_id", user.getID()).getResultList();
-    }
+//    public List<Bug> findBugCreatedBy(User user) {
+//        Query query = entityManager.createNamedQuery(Bug.FIND_BUGS_CREATED_ID, Bug.class);
+//        return query.setParameter("var_user_id", user.getID()).getResultList();
+//    }
 
     /**
      * @param bug is an {@link Bug} object that contains the data to be
@@ -58,7 +56,7 @@ public class BugDao {
 
         Bug bug = getBugByID(bugID);
         bug.setStatus(newStatus);
-
+        entityManager.flush();
         return bug;
     }
 
