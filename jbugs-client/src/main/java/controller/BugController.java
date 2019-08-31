@@ -124,12 +124,18 @@ public class BugController extends HttpServlet {
         String message = "OK";
 
         try{
-            BugDTO closeBugResult = bugManagerRemote.closeBug(bugID);
+            bugManagerRemote.closeBug(bugID);
             return Response.status(Response.Status.OK).entity(message).build();
         } catch (BusinessException e){
             return Response.status(500).entity(e).build();
         }
     }
+
+    /**
+     * @return a JSON with all the {@link AttachmentDTO} objects
+     * @throws JsonProcessingException if there was a problem at parsing JSON
+     * @author Miruna Dinu
+     */
 
     @GET
     @Path("/get-att")

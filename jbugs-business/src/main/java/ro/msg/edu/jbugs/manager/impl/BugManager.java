@@ -24,14 +24,12 @@ import ro.msg.edu.jbugs.validators.BugValidator;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Manager class for CRUD actions on {@link Bug}, {@link BugDTO} & {@link BugAttachmentWrapperDTO} objects.
  */
 @Stateless
-//@Interceptors(TimeInterceptors.class)
 public class BugManager implements BugManagerRemote {
     @EJB
     BugDao bugDao;
@@ -61,7 +59,6 @@ public class BugManager implements BugManagerRemote {
             StatusType oldStatus = StatusType.valueOf(bug.getStatus());
             Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
 
-            System.out.println(updatedBug.getASSIGNED_ID());
             if (updatedBug.getASSIGNED_ID() == null) {
 //                notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug), oldStatus);
 //                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug));
@@ -85,18 +82,6 @@ public class BugManager implements BugManagerRemote {
     @Override
     public List<BugDTO> getAllBugs() {
         List<Bug> bugList = bugDao.getAllBugs();
-        List<BugDTO> bugDTOList = new ArrayList<>();
-
-//        for(Bug b: bugList){
-//            if(b.getASSIGNED_ID() == null)
-//            {
-//                bugDTOList.add(BugDTOEntityMapper.getBugDTOWithoutAssigned(b));
-//            }
-//            else{
-//                bugDTOList.add(BugDTOEntityMapper.getBugDTOForUpdate(b));
-//            }
-//        }
-
         return BugDTOEntityMapper.getBugDTOList(bugList);
     }
 
@@ -114,6 +99,12 @@ public class BugManager implements BugManagerRemote {
         return new BugViewDTO(bugDTOList, userDTOList);
     }
 
+
+    /**
+     * @param id is a {@link Integer} that contains a bug id
+     * @return {@link Bug} object with the id bugID
+     * @author Miruna Dinu
+     */
     @Override
     public BugDTO getBugById(Integer id) {
         Bug bug = bugDao.getBugByID(id);

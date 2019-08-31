@@ -10,6 +10,8 @@ import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
+import java.sql.Date;
+
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,7 +29,7 @@ public class CloseBugTest {
         bug.setTitle("bug1");
         bug.setDescription("bug1");
         bug.setVersion("1.1");
-        bug.setTargetDate(null);
+        bug.setTargetDate(new Date(2019, 1, 1));
         bug.setStatus(status);
         bug.setFixedVersion("1.2");
         bug.setSeverity("low");
@@ -94,5 +96,60 @@ public class CloseBugTest {
         when(bugDao.getBugByID(1)).thenReturn(this.createBug("CLOSED"));
         bugManager.closeBug(1);
     }
+
+    @Test
+    public void closeBugWithoutAssignedSuccess1() throws BusinessException {
+        Bug bug = this.createBug("FIXED");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
+    @Test
+    public void closeBugWithoutAssignedSuccess2() throws BusinessException {
+        Bug bug = this.createBug("REJECTED");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void closeBugWithoutAssignedOpen() throws BusinessException {
+        Bug bug = this.createBug("OPEN");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void closeBugWithoutAssignedClosed() throws BusinessException {
+        Bug bug = this.createBug("CLOSED");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void closeBugWithoutAssignedInProgress() throws BusinessException {
+        Bug bug = this.createBug("IN_PROGRESS");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void closeBugWithoutAssignedInfoNeeded() throws BusinessException {
+        Bug bug = this.createBug("INFO_NEEDED");
+        bug.setASSIGNED_ID(null);
+        when(bugDao.getBugByID(1)).thenReturn(bug);
+        when(bugDao.updateBugStatus("CLOSED", 1)).thenReturn(bug);
+        bugManager.closeBug(1);
+    }
+
 
 }
