@@ -128,4 +128,21 @@ public class BugDTOEntityMapper {
 
         return bugDTO;
     }
+
+    public static Bug getBugWithoutUserCreated(BugDTO bugDTO) {
+        Bug bug = new Bug();
+        bug.setID(bugDTO.getID());
+        bug.setTitle(bugDTO.getTitle());
+        bug.setDescription(bugDTO.getDescription());
+        bug.setTargetDate(bugDTO.getTargetDate());
+        bug.setFixedVersion(bugDTO.getFixedVersion());
+        bug.setSeverity(bugDTO.getSeverity().toUpperCase());
+        bug.setStatus(bugDTO.getStatus());
+        bug.setVersion(bugDTO.getVersion());
+
+        bug.setASSIGNED_ID(UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID()));
+        bug.setCREATED_ID(null);
+
+        return bug;
+    }
 }

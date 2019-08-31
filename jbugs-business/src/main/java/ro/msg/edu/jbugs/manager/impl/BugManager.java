@@ -115,7 +115,7 @@ public class BugManager implements BugManagerRemote {
         if (wrapperDTO.getBug().getASSIGNED_ID() == null) {
             bugToPersist = BugDTOEntityMapper.getBugWithoutUsers(wrapperDTO.getBug());
         } else {
-            bugToPersist = BugDTOEntityMapper.getBugWithoutUserAssigned(wrapperDTO.getBug());
+            bugToPersist = BugDTOEntityMapper.getBugWithoutUserCreated(wrapperDTO.getBug());
         }
 
         if (!BugValidator.validate(bugToPersist)) {
