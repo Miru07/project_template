@@ -23,6 +23,7 @@ public enum RegisteredRequestType {
     CREATE_BUG("POST", "/jbugs/api/bugs", PermissionType.BUG_MANAGEMENT.getActualString()),
     UPDATE_BUG("PUT", "/jbugs/api/bugs/update-bug/{id}", PermissionType.BUG_MANAGEMENT.getActualString()),
     CLOSE_BUG("PUT", "/jbugs/api/bugs/close-bug/{id}", PermissionType.BUG_CLOSE.getActualString()),
+    GET_ATT("GET", "/jbugs/api/bugs/get-att", PermissionType.BUG_MANAGEMENT.getActualString()),
 
     GET_PERMISSIONS("GET", "/jbugs/api/roles/get-permissions/{id}", PermissionType.PERMISSION_MANAGEMENT.getActualString()),
     SET_PERMISSIONS("PUT", "/jbugs/api/roles/set-permissions", PermissionType.PERMISSION_MANAGEMENT.getActualString());

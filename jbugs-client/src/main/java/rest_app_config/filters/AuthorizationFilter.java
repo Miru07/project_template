@@ -44,6 +44,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
             RegisteredRequestType.CREATE_BUG,
             RegisteredRequestType.UPDATE_BUG,
             RegisteredRequestType.CLOSE_BUG,
+            RegisteredRequestType.GET_ATT,
 
             RegisteredRequestType.SET_PERMISSIONS,
             RegisteredRequestType.GET_PERMISSIONS

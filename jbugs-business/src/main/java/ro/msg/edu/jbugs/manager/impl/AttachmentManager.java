@@ -9,6 +9,8 @@ import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manager class for CRUD actions on {@link Attachment} & {@link AttachmentDTO} objects.
@@ -32,5 +34,19 @@ public class AttachmentManager implements AttachmentManagerRemote {
         Attachment attachmentWithFlushedID = attachmentDao.insert(attachmentToAdd);
 
         return AttachmentDTOEntityMapper.getAttachmentDTO(attachmentWithFlushedID);
+    }
+
+    @Override
+    public List<AttachmentDTO> getAllAtt() {
+
+        List<AttachmentDTO> attachmentDTOList = new ArrayList<>();
+        List<Attachment> attachmentList = attachmentDao.getAllAtt();
+
+        for(Attachment a: attachmentList){
+            attachmentDTOList.add(AttachmentDTOEntityMapper.getAttachmentDTO(a));
+        }
+
+        return attachmentDTOList;
+
     }
 }

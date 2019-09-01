@@ -9,11 +9,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.AttachmentDao;
 import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.AttachmentDTO;
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
-import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
+import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
 import ro.msg.edu.jbugs.entity.Bug;
 import ro.msg.edu.jbugs.entity.User;
@@ -21,6 +19,7 @@ import ro.msg.edu.jbugs.entity.types.PermissionType;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -37,6 +36,9 @@ public class BugManagerTest {
 
     @InjectMocks
     BugManager bugManager;
+
+    @Mock
+    UserManager userManager;
 
     @Mock
     BugDao bugDao;
@@ -382,4 +384,82 @@ public class BugManagerTest {
     //TODO : this
 
 
+    private Bug createBug(String status){
+        Bug bug = new Bug();
+        bug.setID(1);
+        bug.setTitle("bug1");
+        bug.setDescription("bug1");
+        bug.setVersion("1.1");
+        bug.setTargetDate(new Date(2019, 1, 1));
+        bug.setStatus(status);
+        bug.setFixedVersion("1.2");
+        bug.setSeverity("low");
+        bug.setASSIGNED_ID(createUser());
+        bug.setCREATED_ID(createUser());
+
+        return bug;
+    }
+
+    private User createUser(){
+
+        User user = new User();
+        user.setID(1);
+        user.setFirstName("test5");
+        user.setLastName("test5");
+        user.setEmail("test5");
+        user.setCounter(1);
+        user.setMobileNumber("123456");
+        user.setUsername("dinum");
+        user.setPassword("a140c0c1eda2def2b830363ba362aa4d7d255c262960544821f556e16661b6ff");
+        user.setStatus(1);
+
+        return user;
+    }
+    @Test
+    public void getBugViewDTO(){
+
+        User user = createUser();
+        List<User> users = new ArrayList<>();
+        users.add(user);
+        when(userDao.findAllUsers()).thenReturn(users);
+        when(userManager.findAllUsers()).thenReturn(UserDTOEntityMapper.getUserDTOListFromUserList(users));
+
+        Bug bug = createBug("OPEN");
+        Bug bug2 = createBug("CLOSED");
+        List<Bug> bugs = new ArrayList<>();
+        bugs.add(bug);
+        bugs.add(bug2);
+        when(bugDao.getAllBugs()).thenReturn(bugs);
+
+        BugViewDTO bugViewDTO = new BugViewDTO(BugDTOEntityMapper.getBugDTOList(bugs), UserDTOEntityMapper.getUserDTOListFromUserList(users));
+
+        Assert.assertEquals(bugManager.getBugViewDTO().getBugDTOList().size(), 2);
+        Assert.assertEquals(bugManager.getBugViewDTO().getUserDTOList().size(), 1);
+
+        Bug bug3 = createBug("REJECTED");
+        User user2 = createUser();
+
+        bugs.add(bug3);
+        users.add(user2);
+
+        bugViewDTO.setBugDTOList(BugDTOEntityMapper.getBugDTOList(bugs));
+        bugViewDTO.setUserDTOList(UserDTOEntityMapper.getUserDTOListFromUserList(users));
+        when(userManager.findAllUsers()).thenReturn(UserDTOEntityMapper.getUserDTOListFromUserList(users));
+        Assert.assertEquals(bugManager.getBugViewDTO().getBugDTOList().size(), 3);
+        Assert.assertEquals(bugManager.getBugViewDTO().getUserDTOList().size(), 2);
+    }
+
+    @Test
+    public void getAllBugs(){
+
+        Bug bug = createBug("OPEN");
+        Bug bug2 = createBug("CLOSED");
+        bug2.setASSIGNED_ID(null);
+        List<Bug> bugs = new ArrayList<>();
+        bugs.add(bug);
+        bugs.add(bug2);
+        when(bugDao.getAllBugs()).thenReturn(bugs);
+
+        Assert.assertEquals(bugManager.getAllBugs().size(), 2);
+    }
 }

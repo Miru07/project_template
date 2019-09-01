@@ -6,8 +6,13 @@ import java.util.Arrays;
 
 @Entity
 @Table(name="attachments")
+@NamedQueries({
+        @NamedQuery(name = Attachment.FIND_ALL_ATT, query = "SELECT a FROM Attachment a")
+
+})
 public class Attachment implements Serializable {
 
+    public static final String FIND_ALL_ATT = "findAllAttachments";
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="ID")
