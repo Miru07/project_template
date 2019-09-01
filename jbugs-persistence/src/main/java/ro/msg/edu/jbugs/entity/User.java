@@ -24,6 +24,9 @@ import java.util.Set;
         @NamedQuery(name = User.QUERY_GET_USER_NOTIFICATIONS_AFTER_ID, query = "Select n From User u " +
                 "inner join u.notifications as n " +
                 "where n.ID > :notificationId and u.ID = :userId"),
+        @NamedQuery(name = User.QUERY_GET_USER_NOTIFICATIONS_BY_USERNAME, query = "Select n From User u " +
+                "inner join u.notifications as n " +
+                "where u.username = :username"),
         @NamedQuery(name = User.QUERY_UPDATE_USER_STATUS_AND_COUNTER, query = "UPDATE User " +
                 "SET status = :status, counter = :counter " +
                 "WHERE ID = :id")
@@ -43,6 +46,7 @@ public class User implements Serializable {
     public static final String QUERY_SELECT_BY_USERNAME = "User.selectByUsername";
     public static final String QUERY_SELECT_BY_ROLE = "User.selectByRolee";
     public static final String QUERY_SELECT_BY_PERMISSION = "User.selectByPermission";
+    public static final String QUERY_GET_USER_NOTIFICATIONS_BY_USERNAME = "User.getNotificationsByUsername";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
