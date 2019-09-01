@@ -3,10 +3,7 @@ package ro.msg.edu.jbugs.manager.impl;
 import ro.msg.edu.jbugs.dao.AttachmentDao;
 import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
-import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.BugViewDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
@@ -59,11 +56,10 @@ public class BugManager implements BugManagerRemote {
             StatusType oldStatus = StatusType.valueOf(bug.getStatus());
             Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
 
-            notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
-
             if (updatedBug.getASSIGNED_ID() == null) {
                 return BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug);
             } else {
+                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
                 return BugDTOEntityMapper.getBugDTO(updatedBug);
             }
         }
@@ -168,7 +164,10 @@ public class BugManager implements BugManagerRemote {
             if (persistedAttachmentWithID.getID().equals(0) || persistedAttachmentWithID.getID() == null) {
                 throw new BusinessException("msg-505", "Attachment could not be added");
             } else {
-                notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
+                //throws exception otherwise
+                if(assignedUserToSet != null){
+                    notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
+                }
                 return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
                         AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
             }
@@ -208,7 +207,8 @@ public class BugManager implements BugManagerRemote {
      * @author Miruna Dinu & Sebastian Maier
      */
     @Override
-    public BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException {
+    public BugAttachmentWrapperDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate,
+                                             AttachmentDTO attachmentDTO, String token) throws BusinessException {
         if (requestUserID == null || requestUserID == 0 || bugID == null || bugID == 0 || bugToUpdate == null) {
             throw new BusinessException("msg-600", "Contents are empty");
         }
@@ -252,6 +252,7 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
+
         if (bugMappedToUpdate.getASSIGNED_ID() != null) {
             bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
         }
@@ -261,9 +262,33 @@ public class BugManager implements BugManagerRemote {
         else
             notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
 
+        if (!(attachmentDTO.getAttContent() == null || attachmentDTO.getAttContent().length == 0)) {
+            Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(attachmentDTO);
+            attachmentToPersist.setBugID(bugMappedToUpdate);
+
+            Attachment attachmentToPersistWithID = attachmentDao.insert(attachmentToPersist);
+            if(attachmentToPersistWithID.getID().equals(0) || attachmentToPersistWithID.getID() == null) {
+                throw new BusinessException("msg-505", "Attachment could not be added");
+            }
+
+            //No assigned_id, but attachment
+            if (bugInDatabase.getASSIGNED_ID() == null) {
+                return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase),
+                        AttachmentDTOEntityMapper.getAttachmentDTO(attachmentToPersistWithID), token);
+            }
+            else
+                return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(bugInDatabase),
+                        AttachmentDTOEntityMapper.getAttachmentDTO(attachmentToPersistWithID), token);
+        }
+
+        //No attachment inserted in database
         if (bugInDatabase.getASSIGNED_ID() == null) {
-            return BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase);
-        } else return BugDTOEntityMapper.getBugDTO(bugInDatabase);
+            return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase),
+                    attachmentDTO, token);
+        }
+        else
+            return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(bugInDatabase),
+                    attachmentDTO, token);
     }
 
     public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {

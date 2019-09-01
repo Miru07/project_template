@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.exceptions.BusinessException;
-import ro.msg.edu.jbugs.manager.remote.AttachmentManagerRemote;
 import ro.msg.edu.jbugs.manager.remote.BugManagerRemote;
 
 import javax.ejb.EJB;
@@ -13,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 
 /**
@@ -24,9 +22,6 @@ public class BugController extends HttpServlet {
 
     @EJB
     private BugManagerRemote bugManagerRemote;
-
-    @EJB
-    private AttachmentManagerRemote attachmentManagerRemote;
 
     /**
      * @return a JSON with all the {@link BugDTO} objects
@@ -95,11 +90,13 @@ public class BugController extends HttpServlet {
     @Path("/update-bug/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
-    public Response updateBug(@PathParam("id") Integer bugID, BugDTOWrapper wrapperDTO) {
+    public Response updateBug(@PathParam("id") Integer bugID, BugAttachmentWrapperDTO wrapperDTO) {
         try {
             Integer requestUserID = TokenService.getCurrentUserID(wrapperDTO.getToken());
-            BugDTO bugToUpdate = wrapperDTO.getBugDTO();
-            bugManagerRemote.updateBug(requestUserID, bugID, bugToUpdate);
+            BugDTO bugToUpdate = wrapperDTO.getBug();
+            AttachmentDTO attachmentDTO = wrapperDTO.getAttachment();
+            String token = wrapperDTO.getToken();
+            bugManagerRemote.updateBug(requestUserID, bugID, bugToUpdate, attachmentDTO, token);
             return Response.status(Response.Status.OK).entity("OK").build();
         } catch (BusinessException ex) {
             return Response.status(Response.Status.OK).entity("ERROR").build();
@@ -118,36 +115,16 @@ public class BugController extends HttpServlet {
      */
     @PUT
     @Path("/close-bug/{id}")
-    @Produces({MediaType.TEXT_PLAIN})
+    @Produces(MediaType.TEXT_PLAIN)
     public Response closeBug(@PathParam("id") Integer bugID){
 
         String message = "OK";
 
         try{
             bugManagerRemote.closeBug(bugID);
-            return Response.status(Response.Status.OK).entity(message).build();
+            return Response.status(Response.Status.OK).build();
         } catch (BusinessException e){
             return Response.status(500).entity(e).build();
         }
-    }
-
-    /**
-     * @return a JSON with all the {@link AttachmentDTO} objects
-     * @throws JsonProcessingException if there was a problem at parsing JSON
-     * @author Miruna Dinu
-     */
-
-    @GET
-    @Path("/get-att")
-    @Produces(MediaType.APPLICATION_JSON)
-    public String getAtt() throws JsonProcessingException {
-
-        List<AttachmentDTO> attachmentDTOList = attachmentManagerRemote.getAllAtt();
-
-        ObjectMapper jsonTransformer = new ObjectMapper();
-        String attachmentDTOString = jsonTransformer.writeValueAsString(attachmentDTOList);
-        System.out.println(attachmentDTOString);
-
-        return attachmentDTOString;
     }
 }

@@ -16,4 +16,5 @@ public interface AttachmentManagerRemote {
 
     AttachmentDTO insertAttachment(@NotNull AttachmentDTO attachmentDTO);
     List<AttachmentDTO> getAllAtt();
+    AttachmentDTO deleteAttachment(int attachmentID);
 }

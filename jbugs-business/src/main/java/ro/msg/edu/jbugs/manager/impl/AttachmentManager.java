@@ -36,6 +36,9 @@ public class AttachmentManager implements AttachmentManagerRemote {
         return AttachmentDTOEntityMapper.getAttachmentDTO(attachmentWithFlushedID);
     }
 
+    /**
+     * @return a list of {@link AttachmentDTO} from the database
+     */
     @Override
     public List<AttachmentDTO> getAllAtt() {
 
@@ -47,6 +50,16 @@ public class AttachmentManager implements AttachmentManagerRemote {
         }
 
         return attachmentDTOList;
-
     }
+
+    /**
+     * @param attachmentID the id of the {@link Attachment} that must be removed from the database
+     * @return the attachment that was removed
+     */
+    @Override
+    public AttachmentDTO deleteAttachment(int attachmentID) {
+        return AttachmentDTOEntityMapper.getAttachmentDTO(this.attachmentDao.delete(attachmentID));
+    }
+
+
 }
