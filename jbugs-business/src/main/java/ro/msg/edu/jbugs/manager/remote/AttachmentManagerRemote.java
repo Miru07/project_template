@@ -4,6 +4,7 @@ import ro.msg.edu.jbugs.dto.AttachmentDTO;
 
 import javax.ejb.Remote;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Interface for Remote usage
@@ -14,4 +15,5 @@ import javax.validation.constraints.NotNull;
 public interface AttachmentManagerRemote {
 
     AttachmentDTO insertAttachment(@NotNull AttachmentDTO attachmentDTO);
+    List<AttachmentDTO> getAllAtt();
 }
