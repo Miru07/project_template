@@ -1,13 +1,12 @@
 package ro.msg.edu.jbugs.dto;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BugViewDTO implements Serializable {
 
-    List<BugDTO> bugDTOList = new ArrayList<>();
-    List<UserDTO> userDTOList = new ArrayList<>();
+    List<BugDTO> bugDTOList;
+    List<UserDTO> userDTOList;
 
     public BugViewDTO(List<BugDTO> bugDTOList, List<UserDTO> userDTOList) {
         this.bugDTOList = bugDTOList;

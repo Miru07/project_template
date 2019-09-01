@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Data Access Object class for {@link Attachment} objects.
@@ -30,5 +31,10 @@ public class AttachmentDao {
         entityManager.flush();
 
         return attachment;
+    }
+
+    public List<Attachment> getAllAtt(){
+
+        return entityManager.createNamedQuery(Attachment.FIND_ALL_ATT, Attachment.class).getResultList();
     }
 }

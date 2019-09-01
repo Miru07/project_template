@@ -30,7 +30,6 @@ import java.util.List;
  * Manager class for CRUD actions on {@link Bug}, {@link BugDTO} & {@link BugAttachmentWrapperDTO} objects.
  */
 @Stateless
-//@Interceptors(TimeInterceptors.class)
 public class BugManager implements BugManagerRemote {
     @EJB
     BugDao bugDao;
@@ -43,14 +42,6 @@ public class BugManager implements BugManagerRemote {
     @EJB
     UserManagerRemote userManager;
 
-//    @Override
-//    public List<BugDTO> findBugsCreatedBy(UserDTO userDTO) {
-//        User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
-//        List<Bug> bugs = bugDao.findBugCreatedBy(user);
-//
-//        return bugs.stream().map(BugDTOEntityMapper::getBugDTO).collect(Collectors.toList());
-//    }
-
     /**
      * @param bugID is the id of the {@link Bug} to be closed
      * @return a {@link BugDTO} object with the status changed to "CLOSED"
@@ -58,19 +49,27 @@ public class BugManager implements BugManagerRemote {
      * @author Miruna Dinu
      */
     @Override
-    public BugDTO closeBug(int bugID) throws BusinessException{
+    public BugDTO closeBug(int bugID) throws BusinessException {
 
         Bug bug = bugDao.getBugByID(bugID);
         List<StatusType> statusToClose = StatusHelper.getStatusesToClose();
 
-        if(statusToClose.contains(StatusType.valueOf(bug.getStatus()))){
+        if (statusToClose.contains(StatusType.valueOf(bug.getStatus()))) {
 
             StatusType oldStatus = StatusType.valueOf(bug.getStatus());
             Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
-            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(updatedBug), oldStatus);
-            notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
-            return BugDTOEntityMapper.getBugDTO(updatedBug);
-        }
+
+            if (updatedBug.getASSIGNED_ID() == null) {
+//                notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug), oldStatus);
+//                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug));
+                return BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug);
+            }
+
+        else {
+//                notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(updatedBug), oldStatus);
+//                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
+                return BugDTOEntityMapper.getBugDTO(updatedBug);
+        }}
         else{
             throw new BusinessException("msg-242", "Cannot close bug");
         }
@@ -83,10 +82,29 @@ public class BugManager implements BugManagerRemote {
     @Override
     public List<BugDTO> getAllBugs() {
         List<Bug> bugList = bugDao.getAllBugs();
-
         return BugDTOEntityMapper.getBugDTOList(bugList);
     }
 
+    /**
+     * @return a DTO that contians two lists, one with all the bugs from the database and one with all the users from
+     *          the database
+     * @author Miruna Dinu
+     */
+    @Override
+    public BugViewDTO getBugViewDTO(){
+
+        List<BugDTO> bugDTOList = this.getAllBugs();
+        List<UserDTO> userDTOList = this.userManager.findAllUsers();
+        //userDTOList.remove(11);
+        return new BugViewDTO(bugDTOList, userDTOList);
+    }
+
+
+    /**
+     * @param id is a {@link Integer} that contains a bug id
+     * @return {@link Bug} object with the id bugID
+     * @author Miruna Dinu
+     */
     @Override
     public BugDTO getBugById(Integer id) {
         Bug bug = bugDao.getBugByID(id);
@@ -271,11 +289,7 @@ public class BugManager implements BugManagerRemote {
     }
 
 
-    @Override
-    public BugViewDTO getBugViewDTO(){
 
-        List<BugDTO> bugDTOList = this.getAllBugs();
-        List<UserDTO> userDTOList = this.userManager.findAllUsers();
-        return new BugViewDTO(bugDTOList, userDTOList);
-    }
+
+
 }
