@@ -61,7 +61,11 @@ public class BugManager implements BugManagerRemote {
 
             notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
 
-            return BugDTOEntityMapper.getBugDTO(updatedBug);
+            if (updatedBug.getASSIGNED_ID() == null) {
+                return BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug);
+            } else {
+                return BugDTOEntityMapper.getBugDTO(updatedBug);
+            }
         }
         else{
             throw new BusinessException("msg-242", "Cannot close bug");
