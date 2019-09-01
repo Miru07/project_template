@@ -56,11 +56,10 @@ public class BugManager implements BugManagerRemote {
             StatusType oldStatus = StatusType.valueOf(bug.getStatus());
             Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
 
-            notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
-
             if (updatedBug.getASSIGNED_ID() == null) {
                 return BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug);
             } else {
+                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
                 return BugDTOEntityMapper.getBugDTO(updatedBug);
             }
         }
@@ -165,7 +164,10 @@ public class BugManager implements BugManagerRemote {
             if (persistedAttachmentWithID.getID().equals(0) || persistedAttachmentWithID.getID() == null) {
                 throw new BusinessException("msg-505", "Attachment could not be added");
             } else {
-                notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
+                //throws exception otherwise
+                if(assignedUserToSet != null){
+                    notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
+                }
                 return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
                         AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
             }
@@ -259,6 +261,7 @@ public class BugManager implements BugManagerRemote {
             notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
         else
             notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
+
         if (!(attachmentDTO.getAttContent() == null || attachmentDTO.getAttContent().length == 0)) {
             Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(attachmentDTO);
             attachmentToPersist.setBugID(bugMappedToUpdate);
@@ -286,12 +289,6 @@ public class BugManager implements BugManagerRemote {
         else
             return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(bugInDatabase),
                     attachmentDTO, token);
-//        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
-//        if (justStatusUpdate)
-//            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
-//        else
-//            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
-
     }
 
     public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {
