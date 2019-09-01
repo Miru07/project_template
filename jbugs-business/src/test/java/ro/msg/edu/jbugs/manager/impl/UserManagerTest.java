@@ -279,13 +279,13 @@ public class UserManagerTest {
     }
 
     @Test(expected = BusinessException.class)
-    public void hasBugsAssignedFailNull() throws BusinessException {
+    public void hasBugsAssignedFailTestNull() throws BusinessException {
         when(userDao.findUser(1)).thenReturn(null);
         userManager.hasBugsAssigned(1);
     }
 
     @Test
-    public void findUserSuccess() throws BusinessException {
+    public void findUserTestSuccess() throws BusinessException {
         User user = createUser();
         when(userDao.findUser(1)).thenReturn(user);
         UserDTO userDTO = userManager.findUser(1);
@@ -293,13 +293,13 @@ public class UserManagerTest {
     }
 
     @Test(expected = BusinessException.class)
-    public void findUserFailNull() throws BusinessException {
+    public void findUserFailTestNull() throws BusinessException {
         when(userDao.findUser(1)).thenReturn(null);
         userManager.findUser(1);
     }
 
     @Test
-    public void findAllUsers() {
+    public void findAllUsersTest() {
         User user = createUser();
         List<User> users = new ArrayList<>();
         users.add(user);
@@ -308,7 +308,19 @@ public class UserManagerTest {
     }
 
     @Test
-    public void getUserNotificationsSuccess() throws BusinessException {
+    public void getUserNotificationsTestSuccess() {
+        User user = createUser();
+        Set<Notification> notifications = new HashSet<>();
+        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER, "", user);
+        notifications.add(notification);
+        user.setNotifications(notifications);
+
+        when(userDao.getNotificationsByUsername("marac")).thenReturn(new ArrayList<>(notifications));
+        assertEquals(userManager.getUserNotifications("marac").size(), 1);
+    }
+
+    @Test
+    public void getUserTodayNotificationsTestSuccess() throws BusinessException {
         User user = createUser();
         Set<Notification> notifications = new HashSet<>();
         Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER, "", user);
@@ -316,12 +328,39 @@ public class UserManagerTest {
         user.setNotifications(notifications);
 
         when(userDao.findUserByUsername("marac")).thenReturn(user);
-        assertEquals(userManager.getUserNotifications("marac").size(), 1);
+
+        when(userDao.getNotificationsByDay(Matchers.anyInt(), Matchers.any(Date.class))).thenReturn(new ArrayList<>(notifications));
+        assertEquals(userManager.getUserTodayNotifications("marac").size(), 1);
     }
 
     @Test(expected = BusinessException.class)
-    public void getUserNotificationsNull() throws BusinessException {
+    public void getUserTodayNotificationsTestNull() throws BusinessException {
         when(userDao.findUserByUsername("marac")).thenReturn(null);
-        userManager.getUserNotifications("marac");
+        userManager.getUserTodayNotifications("marac");
     }
+
+    @Test
+    public void getUserNewNotificationsByIdTestSuccess() throws BusinessException {
+        User user = createUser();
+        Set<Notification> notifications = new HashSet<>();
+        Notification notification = new Notification(1, new java.sql.Date(Calendar.getInstance().getTime().getTime()), "Welcome:", NotificationType.WELCOME_NEW_USER, "", user);
+        notifications.add(notification);
+        user.setNotifications(notifications);
+
+        when(userDao.findUserByUsername("marac")).thenReturn(user);
+
+        when(userDao.getNewNotificationsById(1, 0)).thenReturn(new ArrayList<>(notifications));
+        assertEquals(userManager.getUserNewNotificationsById("marac", 0).size(), 1);
+    }
+
+    @Test(expected = BusinessException.class)
+    public void getUserNewNotificationsByIdTestNull() throws BusinessException {
+        when(userDao.findUserByUsername("marac")).thenReturn(null);
+        userManager.getUserNewNotificationsById("marac", 0);
+    }
+
+//    @Test
+//    public void sendUpdatedOrDeletedUserNotificationTest(){
+//        userManager
+//    }
 }

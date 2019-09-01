@@ -23,6 +23,9 @@ public class CloseBugTest {
     @Mock
     private BugDao bugDao;
 
+    @Mock
+    private NotificationManager notificationManager;
+
     private Bug createBug(String status){
         Bug bug = new Bug();
         bug.setID(1);

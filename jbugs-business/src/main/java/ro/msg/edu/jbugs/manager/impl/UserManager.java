@@ -173,15 +173,12 @@ public class UserManager implements UserManagerRemote {
      * Returns a set of {@link NotificationDTO} objects that wrap the {@link Notification} objects
      * corresponding to the user with the username given as parameter from the database
      *
+     * @param username {@link String}
      * @throws {@link BusinessException} if there is no user with the given username in the database
      */
     @Override
-    public Set<NotificationDTO> getUserNotifications(String username) throws BusinessException {
-        User user = userDao.findUserByUsername(username);
-        if (user == null) {
-            throw new BusinessException("msg8_10_1101", "No user with this id was found!");
-        }
-        return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(user.getNotifications());
+    public Set<NotificationDTO> getUserNotifications(String username) {
+        return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(new HashSet<>(userDao.getNotificationsByUsername(username)));
     }
 
     @Override
@@ -191,7 +188,7 @@ public class UserManager implements UserManagerRemote {
     }
 
     @Override
-    public LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO) {
+    public LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO) throws BusinessException {
         LoginResponseUserDTO loginResponseUserDTO;
         try {
             User user = userDao.findByUsernameAndPassword(
@@ -216,14 +213,15 @@ public class UserManager implements UserManagerRemote {
         }
     }
 
-    private void sendDeactivatedUserNotification(String username) {
+
+    private void sendDeactivatedUserNotification(String username) throws BusinessException {
         try {
             UserDTO userDTO = UserDTOEntityMapper.getDTOFromUser(userDao.findUserByUsername(username));
             userDao.findUsersByRoleType(RoleType.ADMINISTRATOR).forEach(admin -> {
                 notificationManager.insertDeactivatedUserNotification(userDTO, UserDTOEntityMapper.getDTOCompleteFromUser(admin));
             });
         } catch (BusinessException e) {
-            e.printStackTrace();
+            throw new BusinessException(e.getErrorCode(), e.getMessage());
         }
 
     }
@@ -270,8 +268,11 @@ public class UserManager implements UserManagerRemote {
     }
 
     /**
-     * @param userUpdateDTO is an {@link UserDTO} object that contains the updated info
-     *                of the {@link User} object that will be updated in the database.
+     * @param userUpdateDTO is an {@link UserUpdateDTO} object that wraps a
+     *                {@link UserDTO} object that contains the updated info
+     *                     of the {@link User} object that will be updated in the database and a
+     *                {@link String} object corresponding to the user that realized the update,
+     *
      * @return an {@link UserDTO} object with the persisted informations
      * @throws {@link BusinessException} if the {@link UserDTO} object is
      *                invalid or doesn't have a corresponding object in the database
@@ -319,6 +320,7 @@ public class UserManager implements UserManagerRemote {
 
         UserDTO newUserValue = UserDTOEntityMapper.getDTOFromUser(persistedUser);
 
+        //send the specific notifications
         sendUpdatedOrDeletedUserNotification(oldUserValue, newUserValue, userUpdateDTO.getUsernameUpdater());
 
         return newUserValue;
@@ -339,6 +341,14 @@ public class UserManager implements UserManagerRemote {
         return user.getAssignedBugs().size() > 0;
     }
 
+    /**
+     * Returns a set of {@link NotificationDTO} objects that wrap the {@link Notification} objects
+     * corresponding to the user with the username given as parameter from the database,
+     * inserted today in the database
+     *
+     * @param username {@link String}
+     * @throws {@link BusinessException} if there is no user with the given username in the database
+     */
     @Override
     public Set<NotificationDTO> getUserTodayNotifications(String username) throws BusinessException {
         User user = userDao.findUserByUsername(username);
@@ -351,6 +361,15 @@ public class UserManager implements UserManagerRemote {
         return NotificationDTOEntityMapper.getNotificationDTOListFromNotificationList(new HashSet<>(notifications));
     }
 
+    /**
+     * Returns a set of {@link NotificationDTO} objects that wrap the {@link Notification} objects
+     * corresponding to the user with the username given as parameter from the database,
+     * having the id bigger than the one given as parameter
+     *
+     * @param username           {@link String}
+     * @param idLastNotification {@link Integer}
+     * @throws {@link BusinessException} if there is no user with the given username in the database
+     */
     @Override
     public Set<NotificationDTO> getUserNewNotificationsById(String username, Integer idLastNotification) throws BusinessException {
         User user = userDao.findUserByUsername(username);

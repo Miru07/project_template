@@ -28,6 +28,7 @@ public class NotificationDao {
      */
     public Notification insertNotification(Notification notification){
         entityManager.persist(notification);
+        entityManager.flush();
         return notification;
     }
 

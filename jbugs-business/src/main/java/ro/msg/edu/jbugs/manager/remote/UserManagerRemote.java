@@ -27,7 +27,8 @@ public interface UserManagerRemote {
     UserDTO updateUser(UserUpdateDTO userUpdateDTO) throws BusinessException;
 
     boolean hasBugsAssigned(Integer id) throws BusinessException;
-    LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO);
+
+    LoginResponseUserDTO login(LoginReceivedDTO loginReceivedDTO) throws BusinessException;
 
     boolean userHasPermission(Integer userId, PermissionType permission);
 

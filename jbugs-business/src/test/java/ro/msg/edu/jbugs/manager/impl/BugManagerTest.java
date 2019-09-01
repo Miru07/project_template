@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import ro.msg.edu.jbugs.dao.AttachmentDao;
 import ro.msg.edu.jbugs.dao.BugDao;
+import ro.msg.edu.jbugs.dao.NotificationDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
@@ -48,6 +49,12 @@ public class BugManagerTest {
 
     @Mock
     AttachmentDao attachmentDao;
+
+    @Mock
+    NotificationDao notificationDao;
+
+    @Mock
+    private NotificationManager notificationManager;
 
     public BugManagerTest() {
         bugManager = new BugManager();
