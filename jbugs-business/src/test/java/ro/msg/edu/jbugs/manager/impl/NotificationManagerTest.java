@@ -101,11 +101,29 @@ public class NotificationManagerTest {
     }
 
     @Test
+    public void insertBugStatusUpdatedNotificationTest2() {
+        BugDTO bugDTO = createBugDTO();
+        bugDTO.setASSIGNED_ID(null);
+        when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
+        notificationManager.insertBugStatusUpdatedNotification(bugDTO, StatusType.FIXED);
+        Mockito.verify(notificationDao, Mockito.times(1)).insertNotification(Matchers.any(Notification.class));
+    }
+
+    @Test
     public void insertBugUpdatedNotificationTest() {
         BugDTO bugDTO = createBugDTO();
         when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
         notificationManager.insertBugUpdatedNotification(bugDTO);
         Mockito.verify(notificationDao, Mockito.times(2)).insertNotification(Matchers.any(Notification.class));
+    }
+
+    @Test
+    public void insertBugUpdatedNotificationTest2() {
+        BugDTO bugDTO = createBugDTO();
+        bugDTO.setASSIGNED_ID(null);
+        when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
+        notificationManager.insertBugUpdatedNotification(bugDTO);
+        Mockito.verify(notificationDao, Mockito.times(1)).insertNotification(Matchers.any(Notification.class));
     }
 
     @Test
@@ -118,11 +136,31 @@ public class NotificationManagerTest {
     }
 
     @Test
+    public void insertNewBugNotificationTest2() {
+        BugDTO bugDTO = createBugDTO();
+        bugDTO.setASSIGNED_ID(null);
+        when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
+        notificationManager.insertNewBugNotification(bugDTO);
+        Mockito.verify(notificationDao, Mockito.times(1)).insertNotification(Matchers.any(Notification.class));
+
+    }
+
+    @Test
     public void insertClosedBugNotificationTest() {
         BugDTO bugDTO = createBugDTO();
         when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
         notificationManager.insertClosedBugNotification(bugDTO);
         Mockito.verify(notificationDao, Mockito.times(2)).insertNotification(Matchers.any(Notification.class));
+
+    }
+
+    @Test
+    public void insertClosedBugNotificationTest2() {
+        BugDTO bugDTO = createBugDTO();
+        bugDTO.setASSIGNED_ID(null);
+        when(notificationDao.insertNotification(Matchers.any(Notification.class))).thenReturn(new Notification());
+        notificationManager.insertClosedBugNotification(bugDTO);
+        Mockito.verify(notificationDao, Mockito.times(1)).insertNotification(Matchers.any(Notification.class));
 
     }
 
