@@ -3,10 +3,7 @@ package ro.msg.edu.jbugs.manager.impl;
 import ro.msg.edu.jbugs.dao.AttachmentDao;
 import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
-import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
-import ro.msg.edu.jbugs.dto.BugDTO;
-import ro.msg.edu.jbugs.dto.BugViewDTO;
-import ro.msg.edu.jbugs.dto.UserDTO;
+import ro.msg.edu.jbugs.dto.*;
 import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
@@ -206,7 +203,8 @@ public class BugManager implements BugManagerRemote {
      * @author Miruna Dinu & Sebastian Maier
      */
     @Override
-    public BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException {
+    public BugAttachmentWrapperDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate,
+                                             AttachmentDTO attachmentDTO, String token) throws BusinessException {
         if (requestUserID == null || requestUserID == 0 || bugID == null || bugID == 0 || bugToUpdate == null) {
             throw new BusinessException("msg-600", "Contents are empty");
         }
@@ -246,27 +244,50 @@ public class BugManager implements BugManagerRemote {
             bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
 
-//        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
-
-
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
         bugInDatabase.setDescription(bugMappedToUpdate.getDescription());
         bugInDatabase.setVersion(bugMappedToUpdate.getVersion());
         bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
+
         if (bugMappedToUpdate.getASSIGNED_ID() != null) {
             bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
         }
 
+        if (!(attachmentDTO.getAttContent() == null || attachmentDTO.getAttContent().length == 0)) {
+            Attachment attachmentToPersist = AttachmentDTOEntityMapper.getAttachment(attachmentDTO);
+            attachmentToPersist.setBugID(bugMappedToUpdate);
+
+            Attachment attachmentToPersistWithID = attachmentDao.insert(attachmentToPersist);
+            if(attachmentToPersistWithID.getID().equals(0) || attachmentToPersistWithID.getID() == null) {
+                throw new BusinessException("msg-505", "Attachment could not be added");
+            }
+
+            //No assigned_id, but attachment
+            if (bugInDatabase.getASSIGNED_ID() == null) {
+                return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase),
+                        AttachmentDTOEntityMapper.getAttachmentDTO(attachmentToPersistWithID), token);
+            }
+            else
+                return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(bugInDatabase),
+                        AttachmentDTOEntityMapper.getAttachmentDTO(attachmentToPersistWithID), token);
+        }
+
+        //No attachment inserted in database
+        if (bugInDatabase.getASSIGNED_ID() == null) {
+            return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase),
+                    attachmentDTO, token);
+        }
+        else
+            return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(bugInDatabase),
+                    attachmentDTO, token);
+//        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
 //        if (justStatusUpdate)
 //            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
 //        else
 //            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
 
-        if (bugInDatabase.getASSIGNED_ID() == null) {
-            return BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase);
-        } else return BugDTOEntityMapper.getBugDTO(bugInDatabase);
     }
 
     public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {

@@ -37,4 +37,12 @@ public class AttachmentDao {
 
         return entityManager.createNamedQuery(Attachment.FIND_ALL_ATT, Attachment.class).getResultList();
     }
+
+    public Attachment delete(int attachmentID){
+        Attachment attachment = entityManager.find(Attachment.class, attachmentID);
+
+        entityManager.remove(attachment);
+
+        return attachment;
+    }
 }

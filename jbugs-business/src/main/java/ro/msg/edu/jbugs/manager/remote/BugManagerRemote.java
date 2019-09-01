@@ -1,5 +1,6 @@
 package ro.msg.edu.jbugs.manager.remote;
 
+import ro.msg.edu.jbugs.dto.AttachmentDTO;
 import ro.msg.edu.jbugs.dto.BugAttachmentWrapperDTO;
 import ro.msg.edu.jbugs.dto.BugDTO;
 import ro.msg.edu.jbugs.dto.BugViewDTO;
@@ -28,5 +29,6 @@ public interface BugManagerRemote {
 
     BugAttachmentWrapperDTO insertBug(BugAttachmentWrapperDTO wrapperDTO, Integer createdID) throws BusinessException;
 
-    BugDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate) throws BusinessException;
+    BugAttachmentWrapperDTO updateBug(Integer requestUserID, Integer bugID, BugDTO bugToUpdate,
+                                      AttachmentDTO attachmentDTO, String token) throws BusinessException;
 }

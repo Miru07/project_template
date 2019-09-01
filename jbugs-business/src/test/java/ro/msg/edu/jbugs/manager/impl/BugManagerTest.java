@@ -10,6 +10,7 @@ import ro.msg.edu.jbugs.dao.AttachmentDao;
 import ro.msg.edu.jbugs.dao.BugDao;
 import ro.msg.edu.jbugs.dao.UserDao;
 import ro.msg.edu.jbugs.dto.*;
+import ro.msg.edu.jbugs.dtoEntityMapper.AttachmentDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.BugDTOEntityMapper;
 import ro.msg.edu.jbugs.dtoEntityMapper.UserDTOEntityMapper;
 import ro.msg.edu.jbugs.entity.Attachment;
@@ -242,33 +243,33 @@ public class BugManagerTest {
 
     @Test(expected = BusinessException.class)
     public void updateBug_requestUserID_BussinessException() throws BusinessException {
-        bugManager.updateBug(null, null, null);
+        bugManager.updateBug(null, null, null, null, null);
     }
 
     @Test(expected = BusinessException.class)
     public void updateBug_requestUserIDZero_BussinessException() throws BusinessException {
-        bugManager.updateBug(0, null, null);
+        bugManager.updateBug(0, null, null, null, null);
     }
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugID_BussinessException() throws BusinessException {
-        bugManager.updateBug(1, null, null);
+        bugManager.updateBug(1, null, null, null, null);
     }
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugIDZero_BussinessException() throws BusinessException {
-        bugManager.updateBug(1, 0, null);
+        bugManager.updateBug(1, 0, null, null, null);
     }
 
     @Test(expected = BusinessException.class)
     public void updateBug_bugToUpdate_BussinessException() throws BusinessException {
-        bugManager.updateBug(1, 1, null);
+        bugManager.updateBug(1, 1, null, null, null);
     }
 
     @Test(expected = BusinessException.class)
     public void updateBug_requestUserIDNotInDatabase_BussinessException() throws BusinessException {
         when(userDao.findUser(any())).thenReturn(null);
-        bugManager.updateBug(1, 1, testObjectBugDTO());
+        bugManager.updateBug(1, 1, testObjectBugDTO(), createTestObject().getAttachment(), null);
     }
 
     @Test(expected = BusinessException.class)
@@ -278,7 +279,7 @@ public class BugManagerTest {
 
         when(userDao.findUser(any())).thenReturn(testObjectUser());
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
-        bugManager.updateBug(1, 1, testObjectBugDTO());
+        bugManager.updateBug(1, 1, testObjectBugDTO(), createTestObject().getAttachment(), "token");
     }
 
     @Test(expected = BusinessException.class)
@@ -290,7 +291,7 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(null);
 
-        bugManager.updateBug(1, 1, testObjectBugDTO());
+        bugManager.updateBug(1, 1, testObjectBugDTO(), createTestObject().getAttachment(), "token");
     }
 
     @Test(expected = BusinessException.class)
@@ -305,7 +306,7 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(null);
 
-        bugManager.updateBug(1, 1, bugDTO);
+        bugManager.updateBug(1, 1, bugDTO, createTestObject().getAttachment(), "token");
     }
 
     @Test(expected = BusinessException.class)
@@ -320,7 +321,7 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(null);
 
-        bugManager.updateBug(1, 1, bugDTO);
+        bugManager.updateBug(1, 1, bugDTO, createTestObject().getAttachment(), "token");
     }
 
     @Test(expected = BusinessException.class)
@@ -336,7 +337,7 @@ public class BugManagerTest {
         when(bugDao.getBugByID(any())).thenReturn(bug);
         when(userDao.findUser(any())).thenReturn(null);
 
-        bugManager.updateBug(1, 1, bugDTO);
+        bugManager.updateBug(1, 1, bugDTO, createTestObject().getAttachment(), "token");
     }
 
     @Test(expected = BusinessException.class)
@@ -353,7 +354,7 @@ public class BugManagerTest {
         when(bugDao.getBugByID(any())).thenReturn(bug);
         when(userDao.findUser(any())).thenReturn(testObjectUser());
 
-        bugManager.updateBug(1, 1, bugDTO);
+        bugManager.updateBug(1, 1, bugDTO, createTestObject().getAttachment(), "token");
     }
 
     @Test
@@ -368,17 +369,17 @@ public class BugManagerTest {
         when(userDao.getPermissionsOfUser(1)).thenReturn(permission);
         when(bugDao.getBugByID(any())).thenReturn(bug);
         when(userDao.findUser(any())).thenReturn(testObjectUser());
+        when(attachmentDao.insert(any())).thenReturn(AttachmentDTOEntityMapper.getAttachment(testObjectPersisted().getAttachment()));
+        BugAttachmentWrapperDTO updatedBugDTO = bugManager.updateBug(1, 1, bugDTO, testObjectPersisted().getAttachment(), "token");
 
-        BugDTO updatedBugDTO = bugManager.updateBug(1, 1, bugDTO);
-
-        Assert.assertEquals(updatedBugDTO.getID().intValue(), bugDTO.getID().intValue());
-        Assert.assertEquals(updatedBugDTO.getVersion(), bugDTO.getVersion());
-        Assert.assertEquals(updatedBugDTO.getTitle(), bugDTO.getTitle());
-        Assert.assertEquals(updatedBugDTO.getStatus(), bugDTO.getStatus());
-        Assert.assertEquals(updatedBugDTO.getSeverity(), bugDTO.getSeverity());
-        Assert.assertEquals(updatedBugDTO.getFixedVersion(), bugDTO.getFixedVersion());
-        Assert.assertEquals(updatedBugDTO.getDescription(), bugDTO.getDescription());
-        Assert.assertEquals(updatedBugDTO.getTargetDate(), bugDTO.getTargetDate());
+        Assert.assertEquals(updatedBugDTO.getBug().getID().intValue(), bugDTO.getID().intValue());
+        Assert.assertEquals(updatedBugDTO.getBug().getVersion(), bugDTO.getVersion());
+        Assert.assertEquals(updatedBugDTO.getBug().getTitle(), bugDTO.getTitle());
+        Assert.assertEquals(updatedBugDTO.getBug().getStatus(), bugDTO.getStatus());
+        Assert.assertEquals(updatedBugDTO.getBug().getSeverity(), bugDTO.getSeverity());
+        Assert.assertEquals(updatedBugDTO.getBug().getFixedVersion(), bugDTO.getFixedVersion());
+        Assert.assertEquals(updatedBugDTO.getBug().getDescription(), bugDTO.getDescription());
+        Assert.assertEquals(updatedBugDTO.getBug().getTargetDate(), bugDTO.getTargetDate());
     }
 
     //TODO : this
