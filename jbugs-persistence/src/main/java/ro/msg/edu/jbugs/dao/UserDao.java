@@ -133,12 +133,24 @@ public class UserDao {
         }
     }
 
+    /**
+     * Returns the list of users with a specific role type
+     *
+     * @param type is a {@link RoleType} object
+     * @return a list of {@link User} objects
+     */
     public List<User> findUsersByRoleType(RoleType type) throws BusinessException {
         return entityManager.createNamedQuery(User.QUERY_SELECT_BY_ROLE, User.class)
                 .setParameter("type", type)
                 .getResultList();
     }
 
+    /**
+     * Returns the list of users with a specific role type
+     *
+     * @param type is a {@link RoleType} object
+     * @return a list of {@link User} objects
+     */
     public List<User> findUsersByPermissionType(PermissionType type) throws BusinessException {
         return entityManager.createNamedQuery(User.QUERY_SELECT_BY_PERMISSION, User.class)
                 .setParameter("type", type)
@@ -180,6 +192,11 @@ public class UserDao {
         return permissions;
     }
 
+    /**
+     * @param userId is a {@link Integer} object representing the id of the user in the database
+     * @param date   is a {@link Date} object
+     * @return a list of {@link Notification} objects for a user sent in a specific day
+     */
     public List<Notification> getNotificationsByDay(Integer userId, Date date) {
         List<Notification> notifications = entityManager.createNamedQuery(User.QUERY_GET_USER_DAY_NOTIFICATIONS, Notification.class)
                 .setParameter("id", userId)
@@ -188,6 +205,27 @@ public class UserDao {
         return notifications;
     }
 
+    /**
+     * Returns the list of notifications assigned to the user with the given username
+     *
+     * @param username is a {@link String} object
+     * @return a list of {@link Notification} objects
+     */
+    public List<Notification> getNotificationsByUsername(String username) {
+        List<Notification> notifications = entityManager.createNamedQuery(User.QUERY_GET_USER_NOTIFICATIONS_BY_USERNAME, Notification.class)
+                .setParameter("username", username)
+                .getResultList();
+        return notifications;
+    }
+
+    /**
+     * Returns the list of notifications assigned to the user with the given id
+     * sent after the notification with the id given as parameter
+     * @param userId is a {@link Integer} object
+     * @param notificationId is a {@link Integer} object
+     *
+     * @return a list of {@link Notification} objects
+     */
     public List<Notification> getNewNotificationsById(Integer userId, Integer notificationId) {
         List<Notification> notifications = entityManager.createNamedQuery(User.QUERY_GET_USER_NOTIFICATIONS_AFTER_ID, Notification.class)
                 .setParameter("notificationId", notificationId)

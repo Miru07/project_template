@@ -115,11 +115,13 @@ public class UserController extends HttpServlet {
     }
 
     /**
-     * The Controller consumes a JSON and maps its content to the {@link UserDTO} Object.
+     * The Controller consumes a JSON and maps its content to the {@link UserUpdateDTO} Object.
      * We pass it to the {@link UserManagerRemote} interface to persist the data.
      *
-     * @param userUpdateDTO is an {@link UserDTO} object that contains the data to be
-     *                updated for a {@link User} object.
+     * @param userUpdateDTO is an {@link UserDTO} object that wraps a
+     *      *                {@link UserDTO} object that contains the updated info
+     *      *                     of the {@link User} object that will be updated in the database and a
+     *      *                {@link String} object corresponding to the user that realized the update.
      * @return a success response containing the {@link UserDTO} object that maps the updated data
      * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
      *                and we return an ERROR response to the client containing the thrown exception
@@ -158,6 +160,17 @@ public class UserController extends HttpServlet {
         }
     }
 
+    /**
+     * The Controller consumes a username and returns a list of {@link NotificationDTO} objects
+     * sent today
+     * corresponding to the user with the given username from the database
+     *
+     * @param username is a {@link String}
+     * @return a success response containing a {@link NotificationDTO} object array
+     * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
+     *                and we return an ERROR response to the client containing the thrown exception
+     * @author Mara Corina
+     */
     @GET
     @Path("/{username}/notifications/day")
     @Produces(MediaType.APPLICATION_JSON)
@@ -174,6 +187,18 @@ public class UserController extends HttpServlet {
         }
     }
 
+    /**
+     * The Controller consumes a username and an id and returns a list of {@link NotificationDTO}
+     * objects sent after the notification with the id given
+     * corresponding to the user with the given username from the database
+     *
+     * @param username       is a {@link String}
+     * @param idNotification is a {@link Integer}
+     * @return a success response containing a {@link NotificationDTO} object array
+     * @throws {@link BusinessException} bubbles up to here from {@link UserManagerRemote}
+     *                and we return an ERROR response to the client containing the thrown exception
+     * @author Mara Corina
+     */
     @GET
     @Path("/{username}/notifications/{idNotification}")
     @Produces(MediaType.APPLICATION_JSON)
