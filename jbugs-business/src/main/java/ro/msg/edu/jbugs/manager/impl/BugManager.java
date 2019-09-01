@@ -246,7 +246,7 @@ public class BugManager implements BugManagerRemote {
             bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
 
-        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
+//        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
 
 
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
@@ -255,16 +255,16 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
-        if (bugMappedToUpdate.getASSIGNED_ID().getID() != 0) {
+        if (bugMappedToUpdate.getASSIGNED_ID() != null) {
             bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
         }
 
-        if (justStatusUpdate)
-            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
-        else
-            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
+//        if (justStatusUpdate)
+//            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
+//        else
+//            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
 
-        if (bugInDatabase.getASSIGNED_ID().getID() == 0) {
+        if (bugInDatabase.getASSIGNED_ID() == null) {
             return BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase);
         } else return BugDTOEntityMapper.getBugDTO(bugInDatabase);
     }
