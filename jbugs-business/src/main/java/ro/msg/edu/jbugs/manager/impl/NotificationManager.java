@@ -157,16 +157,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
                 "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
                 '}';
-        User creatorUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification1 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
-
-        User assignationUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification2 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
-        notificationDao.insertNotification(notification2);
+//        User creatorUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification1 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+//
+//        User assignationUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification2 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+//        notificationDao.insertNotification(notification2);
     }
 
     @Override
@@ -182,16 +182,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
                 "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
                 '}';
-        User creatorUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
-
-        User assignationUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
-        notificationDao.insertNotification(notification2);
+//        User creatorUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+//
+//        User assignationUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+//        notificationDao.insertNotification(notification2);
     }
 
     @Override
@@ -207,16 +207,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
                 "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
                 '}';
-        User creatorUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
-
-        User assignationUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
-        notificationDao.insertNotification(notification2);
+//        User creatorUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+//
+//        User assignationUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+//        notificationDao.insertNotification(notification2);
     }
 
     @Override
@@ -232,16 +232,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
                 "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
                 '}';
-        User creatorUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
-
-        User assignationUser = new User();
-        creatorUser.setID(bugDTO.getID());
-        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
-        notificationDao.insertNotification(notification2);
+//        User creatorUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+//
+//        User assignationUser = new User();
+//        creatorUser.setID(bugDTO.getID());
+//        Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
+//                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+//        notificationDao.insertNotification(notification2);
     }
 
     @Override

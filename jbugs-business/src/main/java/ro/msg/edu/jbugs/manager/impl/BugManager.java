@@ -128,23 +128,33 @@ public class BugManager implements BugManagerRemote {
         if (wrapperDTO.getBug() == null || wrapperDTO.getAttachment() == null || wrapperDTO.getToken() == null) {
             throw new BusinessException("msg-500", "An Entity is empty.");
         }
+
+        Bug bugToPersist;
         if (wrapperDTO.getBug().getASSIGNED_ID() == null) {
-            throw new BusinessException("msg-501", "Needs to be Assigned");
+            bugToPersist = BugDTOEntityMapper.getBugWithoutUsers(wrapperDTO.getBug());
+        } else {
+            bugToPersist = BugDTOEntityMapper.getBugWithoutUserCreated(wrapperDTO.getBug());
         }
 
-        Bug bugToPersist = BugDTOEntityMapper.getBug(wrapperDTO.getBug());
-
         if (!BugValidator.validate(bugToPersist)) {
-            throw new BusinessException("msg-502", "Entity is not valid.");
+            throw new BusinessException("msg-502", "The Bug contains invalid data.");
         }
 
         User createdUserToSet = userDao.findUser(createdID);
-        User assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
-        if (createdUserToSet == null || assignedUserToSet == null) {
+        User assignedUserToSet = null;
+        if (bugToPersist.getASSIGNED_ID() != null) {
+            assignedUserToSet = userDao.findUser(bugToPersist.getASSIGNED_ID().getID());
+        }
+
+        if (createdUserToSet == null) {
             throw new BusinessException("msg-503", "User does not exist");
         }
-        bugToPersist.setCREATED_ID(createdUserToSet);
-        bugToPersist.setASSIGNED_ID(assignedUserToSet);
+        if (assignedUserToSet == null) {
+            bugToPersist.setCREATED_ID(createdUserToSet);
+        } else {
+            bugToPersist.setCREATED_ID(createdUserToSet);
+            bugToPersist.setASSIGNED_ID(assignedUserToSet);
+        }
         // We change the Status from NEW to OPEN.
         bugToPersist.setStatus("OPEN");
 
@@ -214,16 +224,18 @@ public class BugManager implements BugManagerRemote {
         if (bugInDatabase == null) {
             throw new BusinessException("msg-603", "Bug does not exist");
         }
-        if (bugToUpdate.getASSIGNED_ID() == null) {
-            throw new BusinessException("msg-604", "Bug has assigned Users that are empty.");
+        Bug bugMappedToUpdate = null;
+        if (bugToUpdate.getASSIGNED_ID().getId() == 0) {
+            bugMappedToUpdate = BugDTOEntityMapper.getBugWithoutUserAssigned(bugToUpdate);
+        } else {
+            bugMappedToUpdate = BugDTOEntityMapper.getBugWithUserCreatedAndAssigned(bugToUpdate);
         }
-        Bug bugMappedToUpdate = BugDTOEntityMapper.getBugWithUserCreatedAndAssigned(bugToUpdate);
+//        User assignedUserFromBugToUpdate = userDao.findUser(bugMappedToUpdate.getASSIGNED_ID().getID());
+//
+//        if (assignedUserFromBugToUpdate == null) {
+//            throw new BusinessException("msg-605", "User from updated Bug does not exist in database.");
+//        }
 
-        User assignedUserFromBugToUpdate = userDao.findUser(bugMappedToUpdate.getASSIGNED_ID().getID());
-
-        if (assignedUserFromBugToUpdate == null) {
-            throw new BusinessException("msg-605", "User from updated Bug does not exist in database.");
-        }
         if (!BugValidator.validate(bugInDatabase)) {
             throw new BusinessException("msg-606", "Updated Bug is not valid!");
         }
@@ -234,7 +246,7 @@ public class BugManager implements BugManagerRemote {
             bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
 
-        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
+//        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
 
 
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
@@ -243,13 +255,18 @@ public class BugManager implements BugManagerRemote {
         bugInDatabase.setTargetDate(bugMappedToUpdate.getTargetDate());
         bugInDatabase.setFixedVersion(bugMappedToUpdate.getFixedVersion());
         bugInDatabase.setSeverity(bugMappedToUpdate.getSeverity().toUpperCase());
-        bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
-//
+        if (bugMappedToUpdate.getASSIGNED_ID() != null) {
+            bugInDatabase.setASSIGNED_ID(bugMappedToUpdate.getASSIGNED_ID());
+        }
+
 //        if (justStatusUpdate)
 //            notificationManager.insertBugStatusUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase), oldStatus);
 //        else
 //            notificationManager.insertBugUpdatedNotification(BugDTOEntityMapper.getBugDTO(bugInDatabase));
-        return BugDTOEntityMapper.getBugDTO(bugInDatabase);
+
+        if (bugInDatabase.getASSIGNED_ID() == null) {
+            return BugDTOEntityMapper.getBugDTOWithoutUserAssigned(bugInDatabase);
+        } else return BugDTOEntityMapper.getBugDTO(bugInDatabase);
     }
 
     public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {

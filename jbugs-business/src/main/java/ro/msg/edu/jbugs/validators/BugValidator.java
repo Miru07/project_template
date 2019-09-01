@@ -2,6 +2,7 @@ package ro.msg.edu.jbugs.validators;
 
 import ro.msg.edu.jbugs.entity.Bug;
 
+import java.sql.Date;
 import java.time.LocalDate;
 
 /**
@@ -28,9 +29,16 @@ public class BugValidator {
             if (bug.getDescription().length() > 250) return false;
         } else return false;
 
-        LocalDate date = bug.getTargetDate().toLocalDate();
+        // We're checking this only for new bugs being added to the database
+        if (bug.getID() == null || bug.getID() == 0) {
+            Date sqlDateToday = new Date(new java.util.Date().getTime());
+            LocalDate bugDate = bug.getTargetDate().toLocalDate();
+            LocalDate todayDate = sqlDateToday.toLocalDate();
+            if (todayDate.getYear() > bugDate.getYear()) return false;
+            if (todayDate.getMonth().getValue() > bugDate.getMonth().getValue()) return false;
+            if (todayDate.getDayOfYear() > bugDate.getDayOfYear()) return false;
+        }
 
-        if (date.getYear() == 2000) return false;
         /* The RegEx matches cases such as:
            1.1.1, 1.2.a etc;
          */
