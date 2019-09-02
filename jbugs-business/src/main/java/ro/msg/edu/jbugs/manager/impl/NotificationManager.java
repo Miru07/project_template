@@ -45,14 +45,13 @@ public class NotificationManager implements NotificationManagerRemote {
         }
         ;
         String message = "Welcome, " + userDTO.getFirstName() + " " + userDTO.getLastName() + "!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Email : " + userDTO.getEmail() + '\n' +
                 "First Name : " + userDTO.getFirstName() + '\n' +
                 "Last Name : " + userDTO.getLastName() + '\n' +
                 "Mobile Number : " + userDTO.getMobileNumber() + '\n' +
                 "Roles : " + rolesToString + '\n' +
-                "Username : " + userDTO.getUsername() + '\n' +
-                '}';
+                "Username : " + userDTO.getUsername() + '\n';
         User user = UserDTOEntityMapper.getUserFromUserDTO(userDTO);
         Notification notification = createNewNotification(NotificationType.WELCOME_NEW_USER, message, "", user);
 
@@ -67,14 +66,13 @@ public class NotificationManager implements NotificationManagerRemote {
         }
         ;
         String message = "User " + userDTO.getUsername() + " was deleted!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Email : " + userDTO.getEmail() + '\n' +
                 "First Name : " + userDTO.getFirstName() + '\n' +
                 "Last Name : " + userDTO.getLastName() + '\n' +
                 "Mobile Number : " + userDTO.getMobileNumber() + '\n' +
                 "Roles : " + rolesToString + '\n' +
-                "Username : " + userDTO.getUsername() + '\n' +
-                '}';
+                "Username : " + userDTO.getUsername() + '\n';
         User receiver = UserDTOEntityMapper.getUserFromUserDTO(receiverDTO);
         Notification notification = createNewNotification(NotificationType.USER_DELETED, message, "", receiver);
 
@@ -89,14 +87,13 @@ public class NotificationManager implements NotificationManagerRemote {
         }
 
         String message = "User " + userDTO.getUsername() + " was deactivated!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Email : " + userDTO.getEmail() + '\n' +
                 "First Name : " + userDTO.getFirstName() + '\n' +
                 "Last Name : " + userDTO.getLastName() + '\n' +
                 "Mobile Number : " + userDTO.getMobileNumber() + '\n' +
                 "Roles : " + rolesToString + '\n' +
-                "Username : " + userDTO.getUsername() + '\n' +
-                '}';
+                "Username : " + userDTO.getUsername() + '\n';
         User receiver = UserDTOEntityMapper.getUserFromUserDTO(admin);
         Notification notification = createNewNotification(NotificationType.USER_DEACTIVATED, message, "", receiver);
 
@@ -116,22 +113,21 @@ public class NotificationManager implements NotificationManagerRemote {
         }
         ;
         String message = "User account updated!" + '\n' +
-                "NEW INFO {" + '\n' +
-                "Email : " + newUserDTO.getEmail() + '\n' +
-                "First Name : " + newUserDTO.getFirstName() + '\n' +
-                "Last Name : " + newUserDTO.getLastName() + '\n' +
-                "Mobile Number : " + newUserDTO.getMobileNumber() + '\n' +
-                "Roles : " + newRolesToString + '\n' +
-                "Username : " + newUserDTO.getUsername() + '\n' +
-                '}' + '\n' +
-                "OLD INFO {" + '\n' +
-                "Email : " + oldUserDTO.getEmail() + '\n' +
-                "First Name : " + oldUserDTO.getFirstName() + '\n' +
-                "Last Name : " + oldUserDTO.getLastName() + '\n' +
-                "Mobile Number : " + oldUserDTO.getMobileNumber() + '\n' +
-                "Roles : " + oldRolesToString + '\n' +
-                "Username : " + oldUserDTO.getUsername() + '\n' +
-                '}';
+                "NEW INFO " + '\n' +
+                "\tEmail : " + newUserDTO.getEmail() + '\n' +
+                "\tFirst Name : " + newUserDTO.getFirstName() + '\n' +
+                "\tLast Name : " + newUserDTO.getLastName() + '\n' +
+                "\tMobile Number : " + newUserDTO.getMobileNumber() + '\n' +
+                "\tRoles : " + newRolesToString + '\n' +
+                "\tUsername : " + newUserDTO.getUsername() + '\n' +
+                '\n' +
+                "OLD INFO " + '\n' +
+                "\tEmail : " + oldUserDTO.getEmail() + '\n' +
+                "\tFirst Name : " + oldUserDTO.getFirstName() + '\n' +
+                "\tLast Name : " + oldUserDTO.getLastName() + '\n' +
+                "\tMobile Number : " + oldUserDTO.getMobileNumber() + '\n' +
+                "\tRoles : " + oldRolesToString + '\n' +
+                "\tUsername : " + oldUserDTO.getUsername() + '\n';
 
         User user = UserDTOEntityMapper.getUserFromUserDTO(newUserDTO);
         Notification notificationUser = createNewNotification(NotificationType.USER_UPDATED, message, "", user);
@@ -146,7 +142,7 @@ public class NotificationManager implements NotificationManagerRemote {
     @Override
     public void insertBugStatusUpdatedNotification(BugDTO bugDTO, StatusType oldStatus) {
         String message = "Bug " + bugDTO.getID() + " updated status!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "New status : " + bugDTO.getStatus() + '\n' +
                 "Old Status : " + oldStatus + '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
@@ -155,17 +151,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Target Date : " + bugDTO.getTargetDate() + '\n' +
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
-                '}';
+                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+                "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
         notificationDao.insertNotification(notification1);
 
         if (bugDTO.getASSIGNED_ID() != null) {
             User assignationUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID());
             Notification notification2 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
-                    "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+                    "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), assignationUser);
             notificationDao.insertNotification(notification2);
         }
     }
@@ -173,7 +168,7 @@ public class NotificationManager implements NotificationManagerRemote {
     @Override
     public void insertBugUpdatedNotification(BugDTO bugDTO) {
         String message = "Bug " + bugDTO.getID() + " was updated!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
                 "Description : " + bugDTO.getDescription() + '\n' +
@@ -181,17 +176,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Target Date : " + bugDTO.getTargetDate() + '\n' +
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
-                '}';
+                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+                "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
         notificationDao.insertNotification(notification1);
 
         if (bugDTO.getASSIGNED_ID() != null) {
             User assignationUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID());
             Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                    "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+                    "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), assignationUser);
             notificationDao.insertNotification(notification2);
         }
     }
@@ -199,7 +193,7 @@ public class NotificationManager implements NotificationManagerRemote {
     @Override
     public void insertNewBugNotification(BugDTO bugDTO) {
         String message = "Bug " + bugDTO.getID() + " is new!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
                 "Description : " + bugDTO.getDescription() + '\n' +
                 "Version : " + bugDTO.getVersion() + '\n' +
@@ -207,17 +201,16 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
-                '}';
+                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+                "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
         notificationDao.insertNotification(notification1);
 
         if (bugDTO.getASSIGNED_ID() != null) {
             User assignationUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID());
             Notification notification2 = createNewNotification(NotificationType.BUG_UPDATED, message,
-                    "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+                    "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), assignationUser);
             notificationDao.insertNotification(notification2);
         }
     }
@@ -225,7 +218,7 @@ public class NotificationManager implements NotificationManagerRemote {
     @Override
     public void insertClosedBugNotification(BugDTO bugDTO) {
         String message = "Bug " + bugDTO.getID() + " is closed!" + '\n' +
-                "INFO {" + '\n' +
+                '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
                 "Description : " + bugDTO.getDescription() + '\n' +
                 "Version : " + bugDTO.getVersion() + '\n' +
@@ -233,8 +226,7 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n' +
-                '}';
+                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_CLOSED, message,
                 "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);

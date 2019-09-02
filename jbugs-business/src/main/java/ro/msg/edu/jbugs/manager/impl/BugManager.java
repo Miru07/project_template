@@ -243,7 +243,7 @@ public class BugManager implements BugManagerRemote {
             bugInDatabase.setStatus(bugMappedToUpdate.getStatus().toUpperCase());
         }
 
-        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate);
+        boolean justStatusUpdate = justStatusUpdated(bugID, bugToUpdate, oldStatus);
 
 
         bugInDatabase.setTitle(bugMappedToUpdate.getTitle());
@@ -291,9 +291,9 @@ public class BugManager implements BugManagerRemote {
                     attachmentDTO, token);
     }
 
-    public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate) {
+    public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate, StatusType oldStatus) {
         Bug bugInDatabase = bugDao.getBugByID(bugID);
-        if (!bugInDatabase.getStatus().equals(bugToUpdate.getStatus()) &&
+        if (!StatusType.valueOf(bugInDatabase.getStatus()).equals(oldStatus) &&
                 bugInDatabase.getID().equals(bugToUpdate.getID()) &&
                 bugInDatabase.getTitle().equals(bugToUpdate.getTitle()) &&
                 bugInDatabase.getDescription().equals(bugToUpdate.getDescription()) &&
@@ -302,8 +302,8 @@ public class BugManager implements BugManagerRemote {
                 bugInDatabase.getStatus().equals(bugToUpdate.getStatus()) &&
                 bugInDatabase.getFixedVersion().equals(bugToUpdate.getFixedVersion()) &&
                 bugInDatabase.getSeverity().equals(bugToUpdate.getSeverity()) &&
-                bugInDatabase.getCREATED_ID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getCREATED_ID())) &&
-                bugInDatabase.getASSIGNED_ID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getASSIGNED_ID()))
+                bugInDatabase.getCREATED_ID().getID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getCREATED_ID()).getID()) &&
+                bugInDatabase.getASSIGNED_ID().getID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getASSIGNED_ID()).getID())
         ) {
             return true;
         }
