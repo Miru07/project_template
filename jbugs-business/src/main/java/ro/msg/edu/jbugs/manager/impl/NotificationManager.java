@@ -242,13 +242,13 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Assigned to : " + assignedUsername + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_CLOSED, message,
-                "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
+                "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
         notificationDao.insertNotification(notification1);
 
         if (bugDTO.getASSIGNED_ID().getId() != 0) {
             User assignationUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getASSIGNED_ID());
             Notification notification2 = createNewNotification(NotificationType.BUG_CLOSED, message,
-                    "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), assignationUser);
+                    "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), assignationUser);
             notificationDao.insertNotification(notification2);
         }
     }
