@@ -9,7 +9,10 @@ import java.sql.Date;
 
 @Entity
 @Table(name="notifications")
+@NamedQuery(name = Notification.NOTIFICATION_DELETE_OLDER_THAN_ONE_MONTH, query = "DELETE FROM Notification n WHERE n.date < :date")
 public class Notification implements Serializable {
+
+    public static final String NOTIFICATION_DELETE_OLDER_THAN_ONE_MONTH = "Notification.deleteNotificationsOlderThanOneMonth";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
