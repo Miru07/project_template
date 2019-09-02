@@ -292,6 +292,13 @@ public class BugManager implements BugManagerRemote {
 
     public boolean justStatusUpdated(Integer bugID, BugDTO bugToUpdate, StatusType oldStatus) {
         Bug bugInDatabase = bugDao.getBugByID(bugID);
+        boolean equals = false;
+        if (bugInDatabase.getASSIGNED_ID() == null && bugToUpdate.getASSIGNED_ID().getId() == 0) {
+            equals = true;
+        } else if (bugInDatabase.getASSIGNED_ID() != null && bugToUpdate.getASSIGNED_ID().getId() != 0 &&
+                bugInDatabase.getASSIGNED_ID().getID().equals(bugToUpdate.getASSIGNED_ID().getId())) {
+            equals = true;
+        }
         if (!StatusType.valueOf(bugInDatabase.getStatus()).equals(oldStatus) &&
                 bugInDatabase.getID().equals(bugToUpdate.getID()) &&
                 bugInDatabase.getTitle().equals(bugToUpdate.getTitle()) &&
@@ -302,8 +309,7 @@ public class BugManager implements BugManagerRemote {
                 bugInDatabase.getFixedVersion().equals(bugToUpdate.getFixedVersion()) &&
                 bugInDatabase.getSeverity().equals(bugToUpdate.getSeverity()) &&
                 bugInDatabase.getCREATED_ID().getID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getCREATED_ID()).getID()) &&
-                bugInDatabase.getASSIGNED_ID().getID().equals(UserDTOEntityMapper.getUserFromUserDTO(bugToUpdate.getASSIGNED_ID()).getID())
-        ) {
+                equals) {
             return true;
         }
         return false;
