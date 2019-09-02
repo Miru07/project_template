@@ -6,6 +6,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.Calendar;
 
 
 /**
@@ -39,6 +40,19 @@ public class NotificationDao {
 
         Integer deleteResult = query.executeUpdate();
         return deleteResult;
+    }
+
+    public int deleteOlderThanOneMonth() {
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -30);
+
+        java.sql.Date targetDate = new java.sql.Date(cal.getTimeInMillis());
+
+        int numberOfRowsAffected = entityManager.createNamedQuery(Notification.NOTIFICATION_DELETE_OLDER_THAN_ONE_MONTH, Notification.class)
+                .setParameter("date", targetDate)
+                .executeUpdate();
+
+        return numberOfRowsAffected;
     }
 
 }

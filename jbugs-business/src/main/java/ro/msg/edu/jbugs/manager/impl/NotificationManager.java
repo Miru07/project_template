@@ -15,6 +15,7 @@ import ro.msg.edu.jbugs.entity.types.StatusType;
 import ro.msg.edu.jbugs.manager.remote.NotificationManagerRemote;
 
 import javax.ejb.EJB;
+import javax.ejb.Schedule;
 import javax.ejb.Stateless;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -141,6 +142,9 @@ public class NotificationManager implements NotificationManagerRemote {
 
     @Override
     public void insertBugStatusUpdatedNotification(BugDTO bugDTO, StatusType oldStatus) {
+        String assignedUsername = "";
+        if (bugDTO.getASSIGNED_ID() != null)
+            assignedUsername = bugDTO.getASSIGNED_ID().getUsername();
         String message = "Bug " + bugDTO.getID() + " updated status!" + '\n' +
                 '\n' +
                 "New status : " + bugDTO.getStatus() + '\n' +
@@ -151,7 +155,7 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Target Date : " + bugDTO.getTargetDate() + '\n' +
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
+                "Assigned to : " + assignedUsername + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_STATUS_UPDATED, message,
                 "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
@@ -167,6 +171,9 @@ public class NotificationManager implements NotificationManagerRemote {
 
     @Override
     public void insertBugUpdatedNotification(BugDTO bugDTO) {
+        String assignedUsername = "";
+        if (bugDTO.getASSIGNED_ID() != null)
+            assignedUsername = bugDTO.getASSIGNED_ID().getUsername();
         String message = "Bug " + bugDTO.getID() + " was updated!" + '\n' +
                 '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
@@ -176,7 +183,7 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Target Date : " + bugDTO.getTargetDate() + '\n' +
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
+                "Assigned to : " + assignedUsername + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
                 "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
@@ -192,6 +199,9 @@ public class NotificationManager implements NotificationManagerRemote {
 
     @Override
     public void insertNewBugNotification(BugDTO bugDTO) {
+        String assignedUsername = "";
+        if (bugDTO.getASSIGNED_ID() != null)
+            assignedUsername = bugDTO.getASSIGNED_ID().getUsername();
         String message = "Bug " + bugDTO.getID() + " is new!" + '\n' +
                 '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
@@ -201,7 +211,7 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
+                "Assigned to : " + assignedUsername + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_UPDATED, message,
                 "http://localhost:4200/dashboard/notifications/bugs/view/" + bugDTO.getID(), creatorUser);
@@ -217,6 +227,9 @@ public class NotificationManager implements NotificationManagerRemote {
 
     @Override
     public void insertClosedBugNotification(BugDTO bugDTO) {
+        String assignedUsername = "";
+        if (bugDTO.getASSIGNED_ID() != null)
+            assignedUsername = bugDTO.getASSIGNED_ID().getUsername();
         String message = "Bug " + bugDTO.getID() + " is closed!" + '\n' +
                 '\n' +
                 "Title : " + bugDTO.getTitle() + '\n' +
@@ -226,7 +239,7 @@ public class NotificationManager implements NotificationManagerRemote {
                 "Severity : " + bugDTO.getSeverity() + '\n' +
                 "Status : " + bugDTO.getStatus() + '\n' +
                 "Created by : " + bugDTO.getCREATED_ID().getUsername() + '\n' +
-                "Assigned to : " + bugDTO.getASSIGNED_ID().getUsername() + '\n';
+                "Assigned to : " + assignedUsername + '\n';
         User creatorUser = UserDTOEntityMapper.getUserFromUserDTO(bugDTO.getCREATED_ID());
         Notification notification1 = createNewNotification(NotificationType.BUG_CLOSED, message,
                 "http://localhost:4200/dashboard/bugs/view/" + bugDTO.getID(), creatorUser);
@@ -241,9 +254,9 @@ public class NotificationManager implements NotificationManagerRemote {
     }
 
     @Override
-    public Integer deleteNotification(Integer userID) {
-
-        return notificationDao.deleteNotification(userID);
+    @Schedule(hour = "*", minute = "*/1", second = "*", info = "Every hour notifications cleaner")
+    public void clean() {
+        notificationDao.deleteOlderThanOneMonth();
     }
 }
 

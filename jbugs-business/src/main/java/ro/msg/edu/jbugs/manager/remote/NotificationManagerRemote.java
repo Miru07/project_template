@@ -28,5 +28,5 @@ public interface NotificationManagerRemote {
 
     void insertClosedBugNotification(BugDTO bugDTO);
 
-    Integer deleteNotification(Integer userID);
+    void clean();
 }

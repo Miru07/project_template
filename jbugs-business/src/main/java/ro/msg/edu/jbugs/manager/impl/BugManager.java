@@ -56,10 +56,11 @@ public class BugManager implements BugManagerRemote {
             StatusType oldStatus = StatusType.valueOf(bug.getStatus());
             Bug updatedBug = this.bugDao.updateBugStatus(StatusType.CLOSED.name(), bugID);
 
+            notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
+
             if (updatedBug.getASSIGNED_ID() == null) {
                 return BugDTOEntityMapper.getBugDTOWithoutAssigned(updatedBug);
             } else {
-                notificationManager.insertClosedBugNotification(BugDTOEntityMapper.getBugDTO(updatedBug));
                 return BugDTOEntityMapper.getBugDTO(updatedBug);
             }
         }
@@ -164,10 +165,8 @@ public class BugManager implements BugManagerRemote {
             if (persistedAttachmentWithID.getID().equals(0) || persistedAttachmentWithID.getID() == null) {
                 throw new BusinessException("msg-505", "Attachment could not be added");
             } else {
-                //throws exception otherwise
-                if(assignedUserToSet != null){
-                    notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
-                }
+                notificationManager.insertNewBugNotification(BugDTOEntityMapper.getBugDTO(persistedBugWithID));
+
                 return new BugAttachmentWrapperDTO(BugDTOEntityMapper.getBugDTO(persistedBugWithID),
                         AttachmentDTOEntityMapper.getAttachmentDTO(persistedAttachmentWithID), wrapperDTO.getToken());
             }
